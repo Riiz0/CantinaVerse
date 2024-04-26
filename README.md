@@ -9,9 +9,7 @@ This project aims to create a decentralized NFT marketplace on the Ethereum bloc
 ### Smart Contracts
 
 - **NFT Contract (ERC-721)**: Implements the ERC-721 standard for NFTs, handling creation, ownership, and transfer.
-- **Marketplace Contract**: Manages the listing, buying, and selling of NFTs on the marketplace.
-- **Royalty Contract**: Tracks and distributes royalties to NFT creators whenever their NFTs are sold.
-- **Auction Contract (Optional)**: Manages auctions for NFTs.
+- **Marketplace Contract (Includes Auction)**: Manages the listing, buying, and selling of NFTs on the marketplace.
 - **Access Control Contract (Optional)**: Manages permissions and roles within the marketplace.
 
 ### Development Tools
@@ -34,7 +32,7 @@ A user-friendly interface will be developed to allow users to list their NFTs fo
 ## Getting Started
 
 1. **Set Up Development Environment**: Install Foundry, Ganache, and MetaMask.
-2. **Develop Smart Contracts**: Start by implementing the NFT, Marketplace, and Royalty contracts. Optionally, implement the Auction and Access Control contracts.
+2. **Develop Smart Contracts**: Start by implementing the NFT, Marketplace (Auction). Optionally, implement  Access Control contracts.
 3. **Develop User Interface**: Create a user-friendly interface for listing, buying, and managing NFTs.
 4. **Testing**: Write and run tests for your smart contracts to ensure they work as expected.
 5. **Deployment**: Deploy your smart contracts to the Ethereum blockchain and connect your UI to interact with them.
