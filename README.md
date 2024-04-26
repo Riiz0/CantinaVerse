@@ -1,3 +1,52 @@
+# NFT Marketplace
+
+## About
+
+This project aims to create a decentralized NFT marketplace on the Ethereum blockchain. The marketplace will allow users to create, buy, sell, and trade NFTs using smart contracts.
+
+## Components
+
+### Smart Contracts
+
+- **NFT Contract (ERC-721)**: Implements the ERC-721 standard for NFTs, handling creation, ownership, and transfer.
+- **Marketplace Contract**: Manages the listing, buying, and selling of NFTs on the marketplace.
+- **Royalty Contract**: Tracks and distributes royalties to NFT creators whenever their NFTs are sold.
+- **Auction Contract (Optional)**: Manages auctions for NFTs.
+- **Access Control Contract (Optional)**: Manages permissions and roles within the marketplace.
+
+### Development Tools
+
+- **Foundry**: For compiling, deploying, and testing smart contracts.
+- **Ganache**: For local blockchain development and testing.
+- **MetaMask**: For interacting with the Ethereum blockchain.
+
+### User Interface
+
+A user-friendly interface will be developed to allow users to list their NFTs for sale, browse available NFTs, and interact with the marketplace through transactions.
+
+### Features
+
+- **Fee Management**: Implemented within smart contracts to handle marketplace fees on transactions.
+- **Search/Filter Functionality**: Off-chain mechanisms for efficient search and filter functionalities.
+- **Security and Testing**: Rigorous testing and security audits to ensure the marketplace operates reliably and securely.
+- **Royalty System**: A contract that tracks and distributes royalties to NFT creators on secondary sales.
+
+## Getting Started
+
+1. **Set Up Development Environment**: Install Foundry, Ganache, and MetaMask.
+2. **Develop Smart Contracts**: Start by implementing the NFT, Marketplace, and Royalty contracts. Optionally, implement the Auction and Access Control contracts.
+3. **Develop User Interface**: Create a user-friendly interface for listing, buying, and managing NFTs.
+4. **Testing**: Write and run tests for your smart contracts to ensure they work as expected.
+5. **Deployment**: Deploy your smart contracts to the Ethereum blockchain and connect your UI to interact with them.
+
+## Contributing
+
+Contributions are welcome! Please read the contribution guidelines before submitting pull requests.
+
+## License
+
+This project is licensed under the MIT License.
+
 ## Foundry
 
 **Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
