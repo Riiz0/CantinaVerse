@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.8.20;
+pragma solidity 0.8.24;
 
 /**
  * @title NFTContract
@@ -9,10 +9,10 @@ pragma solidity 0.8.20;
  * It will implement the ERC-721 standard, which is the core standard for NFTs on Ethereum or any EVM Compatible Chain.
  * This contract will handle the minting of new NFTs, the transfer of ownership, and the approval of NFTs for trading.
  */
-import {ERC721} from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
-import {ERC721Enumerable} from "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
-import {ERC721URIStorage} from "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
-import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
+import { ERC721 } from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import { ERC721Enumerable } from "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
+import { ERC721URIStorage } from "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 
 contract NFTContract is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
     //////////////////
@@ -31,7 +31,7 @@ contract NFTContract is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
     //////////////////
     // Functions    //
     //////////////////
-    constructor(address initialOwner) ERC721("NFTContract", "NFTC") Ownable(initialOwner) {}
+    constructor(address initialOwner) ERC721("NFTContract", "NFTC") Ownable(initialOwner) { }
 
     /////////////////////////////////
     // External/Public Functions   //
@@ -43,7 +43,11 @@ contract NFTContract is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
     }
 
     // The following functions are overrides required by Solidity.
-    function _update(address to, uint256 tokenId, address auth)
+    function _update(
+        address to,
+        uint256 tokenId,
+        address auth
+    )
         internal
         override(ERC721, ERC721Enumerable)
         returns (address)

@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.8.20;
+pragma solidity 0.8.24;
 
 /**
  * @title MarketPlace
@@ -9,120 +9,133 @@ pragma solidity 0.8.20;
  * It will interact with the NFT contract to transfer ownership of NFTs when a sale is made.
  * This contract will also handle the listing of NFTs for sale, the bidding process, and the settlement of sales.
  */
-import {NFTContract} from "./NFTContract.sol";
-import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
-import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
+import { IERC721 } from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
+import { ReentrancyGuard } from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
-contract MarkePlace is Ownable, ReentrancyGuard {
+contract MarketPlace is Ownable, ReentrancyGuard {
     //////////////////
     // Errors       //
     //////////////////
+    error MarketPlace__ListNFTNotTheOwner();
+    error MarketPlace__AlreadyListed();
+    error MarketPlace__AlreadySold();
+    error MarketPlace__InsufficientFundsOrExcessFundsToPurchase();
+    error MarketPlace__NotSeller();
+    error MarketPlace__CannotUpdateSoldListing();
 
     //////////////////////
     // State Variables  //
     //////////////////////
-    NFTContract private nftContract;
 
     struct Listing {
+        uint256 listingId;
+        address nftCollection;
         uint256 tokenId;
-        address seller;
+        address payable seller;
         uint256 price;
         bool isSold;
-    }
-
-    struct Auction {
-        uint256 tokenId;
-        address highestBidder;
-        uint256 highestBid;
-        uint256 endTime;
-        bool isActive;
+        bool exists;
     }
 
     mapping(uint256 => Listing) private s_listings;
-    mapping(uint256 => Auction) private s_auctions;
-    uint256 private s_totalListings;
-    uint256 private s_totalAuctions;
+    uint256 private s_lastListingId;
 
     //////////////
     // Events   //
     //////////////
+    event ListingCreated(
+        uint256 indexed listingId, address indexed nftCollection, uint256 indexed tokenId, address seller, uint256 price
+    );
+
+    event NFTPurchased(uint256 indexed listingId, address indexed buyer, uint256 indexed price);
 
     //////////////////
     // Functions    //
     //////////////////
-    constructor(address initialOwner) Ownable(initialOwner) {}
+
+    ///////////////////////////
+    // Internal Functions    //
+    ///////////////////////////
+    function generateUniqueListingId() internal returns (uint256) {
+        s_lastListingId += 1; // Increment the last used listing ID
+        return s_lastListingId;
+    }
+
+    constructor(address initialOwner) Ownable(initialOwner) { }
 
     /////////////////////////////////
     // External/Public Functions   //
     /////////////////////////////////
-    function listNFT(uint256 tokenId, uint256 price) public {
-        require(nftContract.ownerOf(tokenId) == msg.sender, "Not the owner");
-        require(!s_listings[tokenId].isSold, "Already listed");
+    function listNFT(uint256 tokenId, address nftCollection, uint256 price) public {
+        IERC721 INFTStandard = IERC721(nftCollection);
+        address currentOwner = INFTStandard.ownerOf(tokenId);
 
-        s_listings[tokenId] = Listing(tokenId, msg.sender, price, false);
-        s_totalListings++;
+        if (msg.sender != currentOwner) {
+            revert MarketPlace__ListNFTNotTheOwner();
+        }
+        Listing storage existingListing = s_listings[tokenId];
+        if (existingListing.exists) {
+            revert MarketPlace__AlreadyListed();
+        }
+
+        // Generate a unique listingId
+        uint256 listingId = generateUniqueListingId(); // Implement this function based on your requirements
+
+        // List the NFT on the platform
+        Listing memory newListing = Listing({
+            listingId: listingId,
+            nftCollection: nftCollection,
+            tokenId: tokenId,
+            seller: payable(msg.sender),
+            price: price,
+            isSold: false,
+            exists: true
+        });
+        s_listings[listingId] = newListing;
+
+        // Emit the ListingCreated event
+        emit ListingCreated(
+            newListing.listingId, newListing.nftCollection, newListing.tokenId, newListing.seller, newListing.price
+        );
+    }
+
+    function updatePrice(uint256 tokenId, uint256 newPrice) public {
+        Listing storage listing = s_listings[tokenId];
+        if (msg.sender != listing.seller) {
+            revert MarketPlace__NotSeller();
+        }
+
+        if (listing.isSold) {
+            revert MarketPlace__CannotUpdateSoldListing();
+        }
+        listing.price = newPrice;
     }
 
     function buyNFT(uint256 tokenId) public payable nonReentrant {
         Listing storage listing = s_listings[tokenId];
-        require(!listing.isSold, "Already sold");
-        require(msg.value >= listing.price, "Not enough Ether");
-
-        listing.isSold = true;
-        nftContract.transferFrom(listing.seller, msg.sender, tokenId);
-        payable(listing.seller).transfer(msg.value);
-        s_totalListings--;
-    }
-
-    function startAuction(uint256 tokenId, uint256 endTime) public {
-        require(nftContract.ownerOf(tokenId) == msg.sender, "Not the owner");
-        require(!s_auctions[tokenId].isActive, "Auction already active");
-
-        s_auctions[tokenId] = Auction(tokenId, address(0), 0, endTime, true);
-        s_totalAuctions++;
-    }
-
-    function bid(uint256 tokenId) public payable nonReentrant {
-        Auction storage auction = s_auctions[tokenId];
-        require(auction.isActive, "Auction not active");
-        require(block.timestamp < auction.endTime, "Auction ended");
-        require(msg.value > auction.highestBid, "Bid too low");
-
-        if (auction.highestBid > 0) {
-            payable(auction.highestBidder).transfer(auction.highestBid);
+        if (listing.isSold) {
+            revert MarketPlace__AlreadySold();
         }
 
-        auction.highestBidder = msg.sender;
-        auction.highestBid = msg.value;
-    }
+        if (msg.value != listing.price) {
+            revert MarketPlace__InsufficientFundsOrExcessFundsToPurchase();
+        }
 
-    function endAuction(uint256 tokenId) public {
-        Auction storage auction = s_auctions[tokenId];
-        require(auction.isActive, "Auction not active");
-        require(block.timestamp >= auction.endTime, "Auction not ended");
+        IERC721 INFTStandard = IERC721(listing.nftCollection);
+        INFTStandard.safeTransferFrom(listing.seller, msg.sender, listing.tokenId);
 
-        auction.isActive = false;
-        nftContract.transferFrom(nftContract.ownerOf(tokenId), auction.highestBidder, tokenId);
-        payable(nftContract.ownerOf(tokenId)).transfer(auction.highestBid);
-        s_totalAuctions--;
+        listing.isSold = true;
+        listing.seller.transfer(listing.price);
+
+        emit NFTPurchased(listing.listingId, msg.sender, listing.price);
     }
 
     //////////////////////////////////////
     // Public/External View Functions   //
     //////////////////////////////////////
-    function getTotalListings() public view returns (uint256) {
-        return s_totalListings;
-    }
 
-    function getTotals_auctions() public view returns (uint256) {
-        return s_totalAuctions;
-    }
-
-    function getListing(uint256 tokenId) public view returns (Listing memory) {
-        return s_listings[tokenId];
-    }
-
-    function getAuction(uint256 tokenId) public view returns (Auction memory) {
-        return s_auctions[tokenId];
+    function getListingDetails(uint256 listingId) public view returns (Listing memory) {
+        return s_listings[listingId];
     }
 }
