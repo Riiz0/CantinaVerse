@@ -2,7 +2,7 @@
 
 pragma solidity 0.8.24;
 
-import { Test, console2 } from "forge-std/Test.sol";
+import { Test, console2, Vm } from "forge-std/Test.sol";
 import { MarketPlace } from "../../src/MarketPlace.sol";
 import { DeployerMarketPlace } from "../../scripts/DeployMarketPlace.s.sol";
 import { HelperConfig } from "../../scripts/HelperConfig.s.sol";
@@ -15,11 +15,19 @@ contract MarketPlaceTest is Test {
     MockERC721 contractCollection1;
     MockERC721 contractCollection2;
     MockERC721 contractCollection3;
+    MockERC721 contractCollection4;
 
     address SELLER = makeAddr("seller");
     address BUYER = makeAddr("buy");
     uint256 constant STARTING_BALANCE = 100 ether;
     uint256 price = 1 ether;
+
+    event NFTListed(address indexed seller, address indexed nftContract, uint256 indexed tokenId, uint256 price);
+    event NFTDelisted(address indexed seller, address indexed nftContract, uint256 indexed tokenId);
+    event NFTSold(address indexed buyer, address indexed nftContract, uint256 indexed tokenId, uint256 price);
+    event NewNFTListingPrice(
+        address indexed seller, address indexed nftContract, uint256 indexed tokenId, uint256 newPrice
+    );
 
     function setUp() public {
         config = new HelperConfig();
@@ -27,13 +35,15 @@ contract MarketPlaceTest is Test {
         contractCollection1 = new MockERC721("Collection 1", "COL1");
         contractCollection2 = new MockERC721("Collection 2", "COL2");
         contractCollection3 = new MockERC721("Collection 3", "COL3");
+        contractCollection4 = new MockERC721("Collection 4", "COL4");
         marketPlace = deployer.run();
         vm.deal(BUYER, STARTING_BALANCE);
         vm.deal(SELLER, STARTING_BALANCE);
     }
 
-    modifier contractCollection1Mints() {
+    modifier contractCollection1SellerMints() {
         vm.prank(SELLER);
+        contractCollection1.mint(SELLER, 0);
         contractCollection1.mint(SELLER, 1);
         contractCollection1.mint(SELLER, 2);
         contractCollection1.mint(SELLER, 3);
@@ -43,8 +53,9 @@ contract MarketPlaceTest is Test {
         _;
     }
 
-    modifier contractCollection2Mints() {
+    modifier contractCollection2SellerMintsMore() {
         vm.prank(SELLER);
+        contractCollection2.mint(SELLER, 0);
         contractCollection2.mint(SELLER, 1);
         contractCollection2.mint(SELLER, 2);
         contractCollection2.mint(SELLER, 3);
@@ -59,8 +70,9 @@ contract MarketPlaceTest is Test {
         _;
     }
 
-    modifier contractCollection3Mints() {
+    modifier contractCollection3SellerAndBuyerMints() {
         vm.prank(SELLER);
+        contractCollection3.mint(SELLER, 0);
         contractCollection3.mint(SELLER, 1);
         contractCollection3.mint(SELLER, 2);
         contractCollection3.mint(SELLER, 3);
@@ -78,39 +90,204 @@ contract MarketPlaceTest is Test {
         _;
     }
 
-    function testMintAndSupply() public contractCollection1Mints contractCollection2Mints contractCollection3Mints {
-        assertEq(contractCollection1.balanceOf(SELLER), 6);
-        assertEq(contractCollection1.totalSupply(), 6);
+    function testMintAndSupply()
+        public
+        contractCollection1SellerMints
+        contractCollection2SellerMintsMore
+        contractCollection3SellerAndBuyerMints
+    {
+        assertEq(contractCollection1.balanceOf(SELLER), 7);
+        assertEq(contractCollection1.totalSupply(), 7);
 
-        assertEq(contractCollection2.balanceOf(SELLER), 11);
-        assertEq(contractCollection2.totalSupply(), 11);
+        assertEq(contractCollection2.balanceOf(SELLER), 12);
+        assertEq(contractCollection2.totalSupply(), 12);
 
-        assertEq(contractCollection3.balanceOf(SELLER), 5);
+        assertEq(contractCollection3.balanceOf(SELLER), 6);
         assertEq(contractCollection3.balanceOf(BUYER), 8);
-        assertEq(contractCollection3.totalSupply(), 13);
+        assertEq(contractCollection3.totalSupply(), 14);
     }
 
-    function testMarketPlaceListNFTIsTheOwner() public contractCollection3Mints {
+    function testOwnerIsTheSellerListingNFT() public contractCollection3SellerAndBuyerMints {
         vm.prank(SELLER);
-        marketPlace.listNFT(1, address(contractCollection3), price);
+        marketPlace.listNFT(address(contractCollection3), 1, price);
+        address owner = contractCollection3.ownerOf(1);
+        assertEq(owner, address(SELLER));
     }
 
-    function testRevertMarketPlace__ListNFTNotTheOwner() public contractCollection1Mints {
-        vm.prank(BUYER);
-        marketPlace.listNFT(1, address(contractCollection1), price);
+    function testSellerIsNotTheOwnerListingNFT() public contractCollection1SellerMints {
+        vm.startPrank(BUYER);
+
         vm.expectRevert(MarketPlace.MarketPlace__ListNFTNotTheOwner.selector);
+        marketPlace.listNFT(address(contractCollection1), 1, price);
+        vm.stopPrank();
     }
 
-    function testMarketPlaceIsntListed() public contractCollection3Mints {
-        vm.prank(SELLER);
-        //marketPlace.existingListing = s_listings[2];
-        marketPlace.listNFT(2, address(contractCollection3), price);
-    }
-
-    function testRevertMarketPlace__AlreadyListed() public contractCollection3Mints {
-        vm.prank(SELLER);
-        marketPlace.listNFT(3, address(contractCollection3), price);
+    function testMarketPlace__AlreadyListed() public contractCollection3SellerAndBuyerMints {
+        vm.startPrank(SELLER);
+        marketPlace.listNFT(address(contractCollection3), 3, price);
         vm.expectRevert(MarketPlace.MarketPlace__AlreadyListed.selector);
+
+        marketPlace.listNFT(address(contractCollection3), 3, price); // Second listing should revert    }
+        vm.stopPrank();
+    }
+
+    function testOwnerIsListingNFTSuccessfully()
+        public
+        contractCollection1SellerMints
+        contractCollection2SellerMintsMore
+        contractCollection3SellerAndBuyerMints
+    {
+        vm.startPrank(SELLER);
+        marketPlace.listNFT(address(contractCollection3), 0, price);
+        marketPlace.listNFT(address(contractCollection2), 0, price);
+        marketPlace.listNFT(address(contractCollection1), 0, price);
+        vm.stopPrank();
+
+        // Assert that the listings exist with the correct price and seller address
+        MarketPlace.Listing memory listing1 = marketPlace.getListing(address(contractCollection3), 0);
+        assertEq(listing1.price, price);
+        assertEq(listing1.seller, SELLER);
+
+        MarketPlace.Listing memory listing2 = marketPlace.getListing(address(contractCollection2), 0);
+        assertEq(listing2.price, price);
+        assertEq(listing2.seller, SELLER);
+
+        MarketPlace.Listing memory listing3 = marketPlace.getListing(address(contractCollection1), 0);
+        assertEq(listing3.price, price);
+        assertEq(listing3.seller, SELLER);
+    }
+
+    function testIfPriceOfListedNFTIsZero() public contractCollection3SellerAndBuyerMints {
+        uint256 zeroPrice = 0 ether;
+        vm.startPrank(SELLER);
+        vm.expectRevert(MarketPlace.MarketPlace__PriceCannotBeZero.selector);
+        marketPlace.listNFT(address(contractCollection3), 3, zeroPrice);
+        vm.stopPrank();
+    }
+
+    function test_ExpectEmit_EventNFTListed() public contractCollection3SellerAndBuyerMints {
+        vm.prank(SELLER);
+        vm.expectEmit(true, true, true, false);
+        emit NFTListed(address(SELLER), address(contractCollection3), 3, price);
+        marketPlace.listNFT(address(contractCollection3), 3, price);
+    }
+
+    function testCallerIsTheSellerForDelistingNFT() public contractCollection3SellerAndBuyerMints {
+        vm.startPrank(SELLER);
+        marketPlace.listNFT(address(contractCollection3), 2, price);
+        marketPlace.listNFT(address(contractCollection3), 3, price);
+
+        marketPlace.delistNFT(address(contractCollection3), 2);
+
+        // Fetch the listing for the delisted NFT
+        MarketPlace.Listing memory listing = marketPlace.getListing(address(contractCollection3), 2);
+
+        // Assert that the listing's seller is the zero address, indicating it has been removed
+        assertEq(listing.seller, address(0));
+        vm.stopPrank();
+    }
+
+    function testIfCallerIsNotTheSellerForDelistingNFT() public contractCollection3SellerAndBuyerMints {
+        vm.startPrank(SELLER);
+        marketPlace.listNFT(address(contractCollection3), 2, price);
+        vm.stopPrank();
+
+        vm.startPrank(BUYER);
+        vm.expectRevert(
+            abi.encodeWithSelector(MarketPlace.MarketPlace__NotTheSeller.selector, address(contractCollection3), 2)
+        );
+        marketPlace.delistNFT(address(contractCollection3), 2);
+        vm.stopPrank();
+    }
+
+    function testSellerCanDelistAndRelistNFT() public contractCollection3SellerAndBuyerMints {
+        vm.startPrank(SELLER);
+        marketPlace.listNFT(address(contractCollection3), 2, price);
+        marketPlace.delistNFT(address(contractCollection3), 2);
+
+        MarketPlace.Listing memory listing = marketPlace.getListing(address(contractCollection3), 2);
+        assertEq(listing.seller, address(0));
+
+        marketPlace.listNFT(address(contractCollection3), 2, price);
+
+        MarketPlace.Listing memory listing1 = marketPlace.getListing(address(contractCollection3), 2);
+
+        assertEq(listing1.seller, address(SELLER));
+        vm.stopPrank();
+    }
+
+    function test_ExpectEmit_EventNFTDelisted() public contractCollection3SellerAndBuyerMints {
+        vm.startPrank(SELLER);
+        marketPlace.listNFT(address(contractCollection3), 2, price);
+
+        vm.expectEmit(true, true, true, false);
+        emit NFTDelisted(address(SELLER), address(contractCollection3), 2);
+
+        marketPlace.delistNFT(address(contractCollection3), 2);
+        vm.stopPrank();
+    }
+
+    function testIfBuyerValueEqualsAmount() public contractCollection3SellerAndBuyerMints {
+        vm.startPrank(SELLER);
+        contractCollection3.approve(address(marketPlace), 2);
+        marketPlace.listNFT(address(contractCollection3), 2, price);
+        vm.stopPrank();
+
+        vm.prank(BUYER);
+        marketPlace.buyNFT{ value: price }(address(contractCollection3), 2);
+
+        assertEq(contractCollection3.ownerOf(2), BUYER);
+    }
+
+    function testIfBuyerValueIsNotEqualToAmount() public contractCollection3SellerAndBuyerMints {
+        uint256 amount = 2 ether;
+        vm.startPrank(SELLER);
+        marketPlace.listNFT(address(contractCollection3), 2, price);
+        vm.stopPrank();
+
+        vm.startPrank(BUYER);
+        vm.expectRevert(
+            abi.encodeWithSelector(
+                MarketPlace.MarketPlace__InsufficientFundsOrExcessFundsToPurchase.selector,
+                address(contractCollection3),
+                2,
+                price
+            )
+        );
+        marketPlace.buyNFT{ value: amount }(address(contractCollection3), 2);
+        vm.stopPrank();
+    }
+
+    function testViewProceedsOfSuccessfulListingAndBuyingOfNFT() public contractCollection3SellerAndBuyerMints {
+        vm.startPrank(SELLER);
+        contractCollection3.approve(address(marketPlace), 2);
+        marketPlace.listNFT(address(contractCollection3), 2, price);
+        vm.stopPrank();
+
+        vm.startPrank(BUYER);
+        marketPlace.buyNFT{ value: price }(address(contractCollection3), 2);
+        vm.stopPrank();
+
+        assertEq(contractCollection3.ownerOf(2), BUYER);
+
+        vm.startPrank(SELLER);
+        marketPlace.getSellerProceeds(SELLER);
+        vm.stopPrank();
+
+        assertEq(marketPlace.getSellerProceeds(SELLER), price);
+    }
+
+    function test_ExpectEmit_EventNFTSold() public contractCollection3SellerAndBuyerMints {
+        vm.startPrank(SELLER);
+        contractCollection3.approve(address(marketPlace), 2);
+        marketPlace.listNFT(address(contractCollection3), 2, price);
+        vm.stopPrank();
+
+        vm.startPrank(BUYER);
+        vm.expectEmit(true, true, true, false);
+        emit NFTSold(BUYER, address(contractCollection3), 2, price);
+        marketPlace.buyNFT{ value: price }(address(contractCollection3), 2);
+        vm.stopPrank();
     }
 
     function testMarketPlaceInsufficientFundsToPurchaseError() public { }
@@ -122,4 +299,20 @@ contract MarketPlaceTest is Test {
     function testMarketPlaceNotSellerError() public { }
 
     function MarketPlaceCannotUpdateSoldListingError() public { }
+
+    function testFuzz_ListNFT(uint256 tokenId, uint96 amount) public {
+        if (amount == 0) return;
+
+        vm.startPrank(SELLER);
+        contractCollection4.mint(SELLER, tokenId);
+
+        marketPlace.listNFT(address(contractCollection4), tokenId, amount);
+
+        // Assertions: Verify the NFT is listed correctly.
+        MarketPlace.Listing memory listing = marketPlace.getListing(address(contractCollection4), tokenId);
+        assertEq(listing.price, amount);
+        assertEq(listing.seller, SELLER);
+
+        vm.stopPrank();
+    }
 }

@@ -5,8 +5,8 @@ pragma solidity 0.8.24;
 /**
  * @title MarketPlace
  * @author Shawn Rizo
- * @notice This contract will manage the listing, buying, and selling of NFTs on your marketplace.
- * It will interact with the NFT contract to transfer ownership of NFTs when a sale is made.
+ * @notice This contract will manage the listing, buying, and selling of NFTs on the marketplace.
+ * It will interact with NFT contracts to transfer ownership of NFTs when a sale is made.
  * This contract will also handle the listing of NFTs for sale, the bidding process, and the settlement of sales.
  */
 import { IERC721 } from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
@@ -18,124 +18,159 @@ contract MarketPlace is Ownable, ReentrancyGuard {
     // Errors       //
     //////////////////
     error MarketPlace__ListNFTNotTheOwner();
+    error MarketPlace__PriceCannotBeZero();
     error MarketPlace__AlreadyListed();
-    error MarketPlace__AlreadySold();
-    error MarketPlace__InsufficientFundsOrExcessFundsToPurchase();
-    error MarketPlace__NotSeller();
-    error MarketPlace__CannotUpdateSoldListing();
+    error MarketPlace__NotListed();
+    error MarketPlace__InsufficientFundsOrExcessFundsToPurchase(address nftContract, uint256 tokenId, uint256 price);
+    error MarketPlace__ListNFTNotListed();
+    error MarketPlace__NoProceeds();
+    error MarketPlace__TransferFailed();
+    error MarketPlace__NotTheSeller(address nftContract, uint256 tokenId);
 
     //////////////////////
     // State Variables  //
     //////////////////////
-
     struct Listing {
-        uint256 listingId;
-        address nftCollection;
-        uint256 tokenId;
-        address payable seller;
         uint256 price;
-        bool isSold;
-        bool exists;
+        address seller;
     }
 
-    mapping(uint256 => Listing) private s_listings;
-    uint256 private s_lastListingId;
+    // Mapping from NFT contract address and token ID to Listing for quick lookup
+    mapping(address => mapping(uint256 => Listing)) private s_listings;
+
+    // Mapping to track seller proceeds from sales
+    mapping(address => uint256) private proceeds;
 
     //////////////
     // Events   //
     //////////////
-    event ListingCreated(
-        uint256 indexed listingId, address indexed nftCollection, uint256 indexed tokenId, address seller, uint256 price
+    event NFTListed(address indexed seller, address indexed nftContract, uint256 indexed tokenId, uint256 price);
+    event NFTDelisted(address indexed seller, address indexed nftContract, uint256 indexed tokenId);
+    event NFTSold(address indexed buyer, address indexed nftContract, uint256 indexed tokenId, uint256 price);
+    event NewNFTListingPrice(
+        address indexed seller, address indexed nftContract, uint256 indexed tokenId, uint256 newPrice
     );
-
-    event NFTPurchased(uint256 indexed listingId, address indexed buyer, uint256 indexed price);
 
     //////////////////
     // Functions    //
     //////////////////
-
-    ///////////////////////////
-    // Internal Functions    //
-    ///////////////////////////
-    function generateUniqueListingId() internal returns (uint256) {
-        s_lastListingId += 1; // Increment the last used listing ID
-        return s_lastListingId;
-    }
-
     constructor(address initialOwner) Ownable(initialOwner) { }
 
     /////////////////////////////////
     // External/Public Functions   //
     /////////////////////////////////
-    function listNFT(uint256 tokenId, address nftCollection, uint256 price) public {
-        IERC721 INFTStandard = IERC721(nftCollection);
-        address currentOwner = INFTStandard.ownerOf(tokenId);
 
-        if (msg.sender != currentOwner) {
+    /**
+     *
+     * @param nftContract is the address of the NFT
+     * @param tokenId is the unique identifier of the NFT
+     * @param price is the price at which the NFT is listed
+     * @notice This function is used to list an NFT for sale. The owner of the NFT must be the msg.sender.
+     */
+    function listNFT(address nftContract, uint256 tokenId, uint256 price) external {
+        IERC721 nft = IERC721(nftContract);
+        if (price == 0) {
+            revert MarketPlace__PriceCannotBeZero();
+        }
+        if (nft.ownerOf(tokenId) != msg.sender) {
             revert MarketPlace__ListNFTNotTheOwner();
         }
-        Listing storage existingListing = s_listings[tokenId];
-        if (existingListing.exists) {
+        if (s_listings[nftContract][tokenId].price > 0) {
             revert MarketPlace__AlreadyListed();
         }
 
-        // Generate a unique listingId
-        uint256 listingId = generateUniqueListingId(); // Implement this function based on your requirements
+        // Update the listing mapping with the new listing
+        s_listings[nftContract][tokenId] = Listing(price, msg.sender);
 
-        // List the NFT on the platform
-        Listing memory newListing = Listing({
-            listingId: listingId,
-            nftCollection: nftCollection,
-            tokenId: tokenId,
-            seller: payable(msg.sender),
-            price: price,
-            isSold: false,
-            exists: true
-        });
-        s_listings[listingId] = newListing;
-
-        // Emit the ListingCreated event
-        emit ListingCreated(
-            newListing.listingId, newListing.nftCollection, newListing.tokenId, newListing.seller, newListing.price
-        );
+        emit NFTListed(msg.sender, nftContract, tokenId, price);
     }
 
-    function updatePrice(uint256 tokenId, uint256 newPrice) public {
-        Listing storage listing = s_listings[tokenId];
-        if (msg.sender != listing.seller) {
-            revert MarketPlace__NotSeller();
+    /**
+     *
+     * @param nftContract is the address of the NFT
+     * @param tokenId is the unique identifier of the NFT
+     * @notice This function is used to delist an NFT for sale. The owner of the NFT must be the msg.sender.
+     */
+    function delistNFT(address nftContract, uint256 tokenId) external {
+        Listing memory listing = s_listings[nftContract][tokenId];
+
+        // Ensure that the caller is the seller of the NFT
+        if (listing.seller != msg.sender) {
+            revert MarketPlace__NotTheSeller(nftContract, tokenId);
         }
 
-        if (listing.isSold) {
-            revert MarketPlace__CannotUpdateSoldListing();
-        }
-        listing.price = newPrice;
+        // Remove the listing to prevent it from being bought
+        delete s_listings[nftContract][tokenId];
+
+        // Emit an event for the delisting
+        emit NFTDelisted(msg.sender, nftContract, tokenId);
     }
 
-    function buyNFT(uint256 tokenId) public payable nonReentrant {
-        Listing storage listing = s_listings[tokenId];
-        if (listing.isSold) {
-            revert MarketPlace__AlreadySold();
+    /**
+     *
+     * @param tokenId is the unique identifier of the NFT
+     * @notice This function is used to buy an NFT that is listed on the marketplace. The buyer has to send the exact
+     * amount the seller listed the nft for. The NFT must not have been sold already, then it would revert. If the
+     * msg.value != to the listing price then the buyer cant buy the NFT.
+     * If the buyer sends the exact amount, then the NFT is transferred to the buyer and the seller receives the funds.
+     */
+    function buyNFT(address nftContract, uint256 tokenId) external payable nonReentrant {
+        Listing storage listing = s_listings[nftContract][tokenId];
+
+        uint256 amount = listing.price;
+
+        if (msg.value != amount) {
+            revert MarketPlace__InsufficientFundsOrExcessFundsToPurchase(nftContract, tokenId, amount);
         }
 
-        if (msg.value != listing.price) {
-            revert MarketPlace__InsufficientFundsOrExcessFundsToPurchase();
-        }
+        // Store seller's address in a temporary variable before deleting the listing
+        address seller = listing.seller;
 
-        IERC721 INFTStandard = IERC721(listing.nftCollection);
-        INFTStandard.safeTransferFrom(listing.seller, msg.sender, listing.tokenId);
+        // Remove the listing before transferring to prevent reentrancy
+        delete s_listings[nftContract][tokenId];
 
-        listing.isSold = true;
-        listing.seller.transfer(listing.price);
+        // Add the sale proceeds to the seller's balance
+        proceeds[seller] += msg.value;
 
-        emit NFTPurchased(listing.listingId, msg.sender, listing.price);
+        // Transfer the NFT to the buyer
+        IERC721(nftContract).safeTransferFrom(seller, msg.sender, tokenId);
+
+        // Emit an event for the sale
+        emit NFTSold(msg.sender, nftContract, tokenId, listing.price);
+    }
+
+    // Function for sellers to withdraw their proceeds
+    function withdrawProceeds() external nonReentrant {
+        uint256 amount = proceeds[msg.sender];
+        if (amount <= 0) revert MarketPlace__NoProceeds();
+
+        // Reset the proceeds before transferring to prevent reentrancy
+        proceeds[msg.sender] = 0;
+
+        // Transfer the proceeds to the seller
+        (bool success,) = payable(msg.sender).call{ value: amount }("");
+        if (!success) revert MarketPlace__TransferFailed();
     }
 
     //////////////////////////////////////
     // Public/External View Functions   //
     //////////////////////////////////////
+    /**
+     *
+     * @param nftContract is the address of the NFT
+     * @param tokenId is the unique identifier of the NFT
+     * @notice This function is used to get the listing of an NFT
+     */
+    function getListing(address nftContract, uint256 tokenId) public view returns (Listing memory) {
+        return s_listings[nftContract][tokenId];
+    }
 
-    function getListingDetails(uint256 listingId) public view returns (Listing memory) {
-        return s_listings[listingId];
+    /**
+     *
+     * @param seller is the address of the seller
+     * @notice This function is used to get the seller's proceeds
+     */
+    function getSellerProceeds(address seller) public view returns (uint256) {
+        return proceeds[seller];
     }
 }

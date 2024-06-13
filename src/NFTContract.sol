@@ -15,10 +15,6 @@ import { ERC721URIStorage } from "@openzeppelin/contracts/token/ERC721/extension
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 
 contract NFTContract is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
-    //////////////////
-    // Errors       //
-    //////////////////
-
     //////////////////////
     // State Variables  //
     //////////////////////
@@ -27,6 +23,7 @@ contract NFTContract is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
     //////////////
     // Events   //
     //////////////
+    event NewTokenMinted(address indexed to, uint256 indexed tokenId, string uri);
 
     //////////////////
     // Functions    //
@@ -36,10 +33,19 @@ contract NFTContract is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
     /////////////////////////////////
     // External/Public Functions   //
     /////////////////////////////////
+
+    /**
+     *
+     * @param to is the address of the account that will receive the NFT.
+     * @param uri is the URI of the NFT.
+     * @notice This function will mint a new NFT and assign it to the address provided.
+     */
     function safeMint(address to, string memory uri) public onlyOwner {
         uint256 tokenId = _nextTokenId++;
         _safeMint(to, tokenId);
         _setTokenURI(tokenId, uri);
+
+        emit NewTokenMinted(to, tokenId, uri);
     }
 
     // The following functions are overrides required by Solidity.
