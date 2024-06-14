@@ -18,7 +18,9 @@ contract NFTContract is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
     //////////////////////
     // State Variables  //
     //////////////////////
-    uint256 private _nextTokenId;
+    uint256 private s_nextTokenId;
+    string private s_baseURI;
+    uint256 public s_maxSupply;
 
     //////////////
     // Events   //
@@ -28,7 +30,19 @@ contract NFTContract is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
     //////////////////
     // Functions    //
     //////////////////
-    constructor(address initialOwner) ERC721("NFTContract", "NFTC") Ownable(initialOwner) { }
+    constructor(
+        string memory name,
+        string memory symbol,
+        string memory baseURI,
+        uint256 _maxSupply,
+        address initialOwner
+    )
+        ERC721(name, symbol)
+        Ownable(initialOwner)
+    {
+        s_baseURI = baseURI;
+        s_maxSupply = _maxSupply;
+    }
 
     /////////////////////////////////
     // External/Public Functions   //
@@ -40,8 +54,8 @@ contract NFTContract is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
      * @param uri is the URI of the NFT.
      * @notice This function will mint a new NFT and assign it to the address provided.
      */
-    function safeMint(address to, string memory uri) public onlyOwner {
-        uint256 tokenId = _nextTokenId++;
+    function safeMint(address to, string memory uri) public {
+        uint256 tokenId = s_nextTokenId++;
         _safeMint(to, tokenId);
         _setTokenURI(tokenId, uri);
 
@@ -49,6 +63,14 @@ contract NFTContract is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
     }
 
     // The following functions are overrides required by Solidity.
+    function _baseURI() internal view override returns (string memory) {
+        return s_baseURI;
+    }
+
+    function setBaseURI(string memory baseURI) public onlyOwner {
+        s_baseURI = baseURI;
+    }
+
     function _update(
         address to,
         uint256 tokenId,
