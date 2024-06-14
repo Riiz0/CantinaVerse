@@ -4,8 +4,8 @@ pragma solidity 0.8.24;
 
 import { Test, console2, Vm } from "forge-std/Test.sol";
 import { MarketPlace } from "../../src/MarketPlace.sol";
-import { DeployerMarketPlace } from "../../scripts/DeployMarketPlace.s.sol";
-import { HelperConfig } from "../../scripts/HelperConfig.s.sol";
+import { DeployerMarketPlace } from "../../script/DeployMarketPlace.s.sol";
+import { HelperConfig } from "../../script/HelperConfig.s.sol";
 import { MockERC721 } from "../mocks/MockERC721.sol";
 
 contract MarketPlaceTest is Test {
@@ -16,6 +16,7 @@ contract MarketPlaceTest is Test {
     MockERC721 contractCollection2;
     MockERC721 contractCollection3;
     MockERC721 contractCollection4;
+    MockERC721 contractCollection5;
 
     address SELLER = makeAddr("seller");
     address BUYER = makeAddr("buy");
@@ -28,6 +29,7 @@ contract MarketPlaceTest is Test {
     event NewNFTListingPrice(
         address indexed seller, address indexed nftContract, uint256 indexed tokenId, uint256 newPrice
     );
+    event ProceedsWithdrawn(address indexed seller, uint256 indexed amount);
 
     function setUp() public {
         config = new HelperConfig();
@@ -36,6 +38,7 @@ contract MarketPlaceTest is Test {
         contractCollection2 = new MockERC721("Collection 2", "COL2");
         contractCollection3 = new MockERC721("Collection 3", "COL3");
         contractCollection4 = new MockERC721("Collection 4", "COL4");
+        contractCollection5 = new MockERC721("Collection 5", "COL5");
         marketPlace = deployer.run();
         vm.deal(BUYER, STARTING_BALANCE);
         vm.deal(SELLER, STARTING_BALANCE);
@@ -290,16 +293,117 @@ contract MarketPlaceTest is Test {
         vm.stopPrank();
     }
 
-    function testMarketPlaceInsufficientFundsToPurchaseError() public { }
+    function testSuccessfulWithdrawProceeds() public contractCollection3SellerAndBuyerMints {
+        vm.startPrank(SELLER);
+        contractCollection3.approve(address(marketPlace), 2);
+        marketPlace.listNFT(address(contractCollection3), 2, price);
+        vm.stopPrank();
 
-    function testMarketPlaceExcessFundsToPurchaseError() public { }
+        assertEq(marketPlace.getSellerProceeds(SELLER), 0);
+        uint256 beforeBalanceOfSeller = address(SELLER).balance;
 
-    function testMarketPlaceAlreadyListedError() public { }
+        vm.startPrank(BUYER);
+        marketPlace.buyNFT{ value: price }(address(contractCollection3), 2);
+        vm.stopPrank();
 
-    function testMarketPlaceNotSellerError() public { }
+        vm.startPrank(SELLER);
+        uint256 payment = marketPlace.getSellerProceeds(SELLER);
+        assertEq(marketPlace.getSellerProceeds(SELLER), payment);
+        marketPlace.withdrawProceeds();
+        assertEq(marketPlace.getSellerProceeds(SELLER), 0);
+        assertEq(address(SELLER).balance, payment + beforeBalanceOfSeller);
+        vm.stopPrank();
+    }
 
-    function MarketPlaceCannotUpdateSoldListingError() public { }
+    function testIfAmountIsLessThanOrEqualToProceeds() public contractCollection3SellerAndBuyerMints {
+        vm.startPrank(SELLER);
+        contractCollection3.approve(address(marketPlace), 2);
+        marketPlace.listNFT(address(contractCollection3), 2, price);
 
+        assertEq(marketPlace.getSellerProceeds(SELLER), 0);
+
+        vm.expectRevert(MarketPlace.MarketPlace__NoProceeds.selector);
+        marketPlace.withdrawProceeds();
+        vm.stopPrank();
+    }
+
+    function testIfBoolCallFails() public {
+        // Deploy the RejectingReceiver contract
+        RejectingReceiver rejectingReceiver = new RejectingReceiver();
+        address rejectAddress = address(rejectingReceiver);
+
+        // Setup the market with the rejecting contract as the seller
+        vm.startPrank(rejectAddress);
+        contractCollection5.mint(rejectAddress, 0);
+        contractCollection5.mint(rejectAddress, 1);
+        vm.stopPrank();
+
+        vm.startPrank(rejectAddress);
+        contractCollection5.approve(address(marketPlace), 1);
+        marketPlace.listNFT(address(contractCollection5), 1, price);
+        vm.stopPrank();
+
+        // Buy the NFT as a different user to ensure there are proceeds to withdraw
+        vm.startPrank(BUYER);
+        marketPlace.buyNFT{ value: price }(address(contractCollection5), 1);
+        vm.stopPrank();
+
+        // Attempt to withdraw proceeds as the rejecting contract and expect failure
+        vm.startPrank(rejectAddress);
+        vm.expectRevert(MarketPlace.MarketPlace__TransferFailed.selector);
+        marketPlace.withdrawProceeds();
+        vm.stopPrank();
+    }
+
+    function test_ExpectEmit_EventProceedsWithdrawn() public contractCollection3SellerAndBuyerMints {
+        vm.startPrank(SELLER);
+        contractCollection3.approve(address(marketPlace), 2);
+        marketPlace.listNFT(address(contractCollection3), 2, price);
+        vm.stopPrank();
+
+        vm.startPrank(BUYER);
+        marketPlace.buyNFT{ value: price }(address(contractCollection3), 2);
+        vm.stopPrank();
+
+        vm.startPrank(SELLER);
+        vm.expectEmit(true, true, false, false);
+        emit ProceedsWithdrawn(SELLER, price);
+        marketPlace.withdrawProceeds();
+        vm.stopPrank();
+    }
+
+    function testGetListing() public contractCollection3SellerAndBuyerMints {
+        vm.startPrank(SELLER);
+        contractCollection3.approve(address(marketPlace), 3);
+        marketPlace.listNFT(address(contractCollection3), 3, price);
+        marketPlace.getListing(address(contractCollection3), 3);
+        vm.stopPrank();
+
+        assertEq(marketPlace.getListing(address(contractCollection3), 3).seller, SELLER);
+    }
+
+    function testGetSellerProceeds() public contractCollection3SellerAndBuyerMints {
+        vm.startPrank(SELLER);
+        contractCollection3.approve(address(marketPlace), 2);
+        marketPlace.listNFT(address(contractCollection3), 2, price);
+        marketPlace.getSellerProceeds(SELLER);
+        assertEq(marketPlace.getSellerProceeds(BUYER), 0);
+
+        vm.startPrank(BUYER);
+        marketPlace.buyNFT{ value: price }(address(contractCollection3), 2);
+        vm.stopPrank();
+
+        vm.startPrank(SELLER);
+        marketPlace.getSellerProceeds(BUYER);
+        vm.stopPrank();
+
+        assertEq(marketPlace.getSellerProceeds(SELLER), 1 ether);
+        assertEq(marketPlace.getSellerProceeds(BUYER), 0);
+    }
+
+    ////////////////////
+    // Fuzz Testing  //
+    ///////////////////
     function testFuzz_ListNFT(uint256 tokenId, uint96 amount) public {
         if (amount == 0) return;
 
@@ -314,5 +418,12 @@ contract MarketPlaceTest is Test {
         assertEq(listing.seller, SELLER);
 
         vm.stopPrank();
+    }
+}
+
+// Contract that rejects receiving Ether for testIfBoolSuccessFails()
+contract RejectingReceiver {
+    receive() external payable {
+        revert("RejectingReceiver: reject Ether");
     }
 }

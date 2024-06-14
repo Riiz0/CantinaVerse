@@ -50,6 +50,7 @@ contract MarketPlace is Ownable, ReentrancyGuard {
     event NewNFTListingPrice(
         address indexed seller, address indexed nftContract, uint256 indexed tokenId, uint256 newPrice
     );
+    event ProceedsWithdrawn(address indexed seller, uint256 indexed amount);
 
     //////////////////
     // Functions    //
@@ -139,17 +140,21 @@ contract MarketPlace is Ownable, ReentrancyGuard {
         emit NFTSold(msg.sender, nftContract, tokenId, listing.price);
     }
 
-    // Function for sellers to withdraw their proceeds
+    /**
+     *
+     * @notice This function is used to withdraw proceeds from the marketplace
+     */
     function withdrawProceeds() external nonReentrant {
         uint256 amount = proceeds[msg.sender];
         if (amount <= 0) revert MarketPlace__NoProceeds();
 
-        // Reset the proceeds before transferring to prevent reentrancy
-        proceeds[msg.sender] = 0;
-
         // Transfer the proceeds to the seller
         (bool success,) = payable(msg.sender).call{ value: amount }("");
         if (!success) revert MarketPlace__TransferFailed();
+
+        proceeds[msg.sender] = 0;
+
+        emit ProceedsWithdrawn(msg.sender, amount);
     }
 
     //////////////////////////////////////
