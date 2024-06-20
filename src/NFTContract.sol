@@ -10,22 +10,28 @@ pragma solidity 0.8.24;
  * This contract will handle the minting of new NFTs, the transfer of ownership, and the approval of NFTs for trading.
  */
 import { ERC721 } from "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import { ERC2981 } from "@openzeppelin/contracts/token/common/ERC2981.sol";
 import { ERC721Enumerable } from "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import { ERC721URIStorage } from "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 
-contract NFTContract is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
+contract NFTContract is ERC721, ERC2981, ERC721Enumerable, ERC721URIStorage, Ownable {
+    error NFTContract__MaxSupplyReached();
+    error NFTContract__MaxRoyaltyPercentageReached();
+
     //////////////////////
     // State Variables  //
     //////////////////////
     uint256 private s_nextTokenId;
     string private s_baseURI;
     uint256 public s_maxSupply;
+    uint96 private constant MAX_ROYALTY_PERCENTAGE = 30_000; // 30% as maximum royalty fee
 
     //////////////
     // Events   //
     //////////////
     event NewTokenMinted(address indexed to, uint256 indexed tokenId, string uri);
+    event RoyaltyInfoUpdated(address recipient, uint96 feeNumerator);
 
     //////////////////
     // Functions    //
@@ -35,13 +41,18 @@ contract NFTContract is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
         string memory symbol,
         string memory baseURI,
         uint256 _maxSupply,
-        address initialOwner
+        address initialOwner,
+        uint256 royaltyPercentage
     )
         ERC721(name, symbol)
         Ownable(initialOwner)
     {
+        if (royaltyPercentage > MAX_ROYALTY_PERCENTAGE) {
+            revert NFTContract__MaxRoyaltyPercentageReached();
+        }
         s_baseURI = baseURI;
         s_maxSupply = _maxSupply;
+        _setDefaultRoyalty(initialOwner, uint96(royaltyPercentage));
     }
 
     /////////////////////////////////
@@ -54,7 +65,10 @@ contract NFTContract is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
      * @param uri is the URI of the NFT.
      * @notice This function will mint a new NFT and assign it to the address provided.
      */
-    function safeMint(address to, string memory uri) public {
+    function safeMint(address to, string memory uri) external {
+        if (s_nextTokenId > s_maxSupply) {
+            revert NFTContract__MaxSupplyReached();
+        }
         uint256 tokenId = s_nextTokenId++;
         _safeMint(to, tokenId);
         _setTokenURI(tokenId, uri);
@@ -67,8 +81,17 @@ contract NFTContract is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
         return s_baseURI;
     }
 
-    function setBaseURI(string memory baseURI) public onlyOwner {
+    function setBaseURI(string memory baseURI) external onlyOwner {
         s_baseURI = baseURI;
+    }
+
+    function updateRoyaltyInfo(address owner, uint96 newRoyaltyPercentage) external onlyOwner {
+        if (newRoyaltyPercentage > MAX_ROYALTY_PERCENTAGE) {
+            revert NFTContract__MaxRoyaltyPercentageReached();
+        }
+        _setDefaultRoyalty(owner, newRoyaltyPercentage);
+
+        emit RoyaltyInfoUpdated(owner, newRoyaltyPercentage);
     }
 
     function _update(
@@ -94,7 +117,7 @@ contract NFTContract is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable {
     function supportsInterface(bytes4 interfaceId)
         public
         view
-        override(ERC721, ERC721Enumerable, ERC721URIStorage)
+        override(ERC721, ERC2981, ERC721Enumerable, ERC721URIStorage)
         returns (bool)
     {
         return super.supportsInterface(interfaceId);

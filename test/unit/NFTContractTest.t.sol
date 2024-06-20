@@ -17,7 +17,7 @@ contract NFTContractTest is Test {
 
     function setUp() public {
         config = new HelperConfig();
-        deployer = new NFTContract("TestNFT", "TNFT", "baseURI/", 100, address(config));
+        deployer = new NFTContract("TestNFT", "TNFT", "baseURI/", 100, address(config), 10);
         vm.deal(MINTER, INITIAL_STARTING_BALABCE);
     }
 

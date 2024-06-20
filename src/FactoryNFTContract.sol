@@ -5,10 +5,15 @@ import { NFTContract } from "./NFTContract.sol";
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 
 contract FactoryNFTContract is Ownable {
-    address[] public collections;
+    address[] private collections;
 
     event CollectionCreated(
-        address indexed collectionAddress, string indexed name, string indexed symbol, uint256 maxSupply, address owner
+        address indexed collectionAddress,
+        string indexed name,
+        string indexed symbol,
+        uint256 maxSupply,
+        address owner,
+        uint256 royaltyPercentage
     );
 
     constructor(address initialOwner) Ownable(initialOwner) { }
@@ -18,13 +23,14 @@ contract FactoryNFTContract is Ownable {
         string memory symbol,
         string memory s_baseURI,
         uint256 maxSupply,
-        address owner
+        address owner,
+        uint256 royaltyPercentage
     )
-        public
+        external
     {
-        NFTContract newCollection = new NFTContract(name, symbol, s_baseURI, maxSupply, owner);
+        NFTContract newCollection = new NFTContract(name, symbol, s_baseURI, maxSupply, owner, royaltyPercentage);
         collections.push(address(newCollection));
-        emit CollectionCreated(address(newCollection), name, symbol, maxSupply, owner);
+        emit CollectionCreated(address(newCollection), name, symbol, maxSupply, owner, royaltyPercentage);
     }
 
     function getCollections() public view returns (address[] memory) {
