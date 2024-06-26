@@ -5,6 +5,8 @@ import { NFTContract } from "./NFTContract.sol";
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 
 contract FactoryNFTContract is Ownable {
+    error FactoryNFTContract__InvalidInitialOwner();
+
     address[] private collections;
 
     event CollectionCreated(
@@ -16,7 +18,11 @@ contract FactoryNFTContract is Ownable {
         uint256 royaltyPercentage
     );
 
-    constructor(address initialOwner) Ownable(initialOwner) { }
+    constructor(address initialOwner) Ownable(initialOwner) {
+        if (initialOwner == address(0)) {
+            revert FactoryNFTContract__InvalidInitialOwner();
+        }
+    }
 
     function createCollection(
         string memory name,
