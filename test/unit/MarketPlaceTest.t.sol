@@ -4,13 +4,13 @@ pragma solidity 0.8.24;
 
 import { Test, console2, Vm } from "forge-std/Test.sol";
 import { MarketPlace } from "../../src/MarketPlace.sol";
-import { DeployerMarketPlace } from "../../script/DeployMarketPlace.s.sol";
+import { DeployMarketPlace } from "../../script/DeployMarketPlace.s.sol";
 import { HelperConfig } from "../../script/HelperConfig.s.sol";
 import { MockERC721 } from "../mocks/MockERC721.sol";
 
 contract MarketPlaceTest is Test {
     MarketPlace marketPlace;
-    DeployerMarketPlace deployer;
+    DeployMarketPlace deployer;
     HelperConfig config;
     MockERC721 contractCollection1;
     MockERC721 contractCollection2;
@@ -33,7 +33,7 @@ contract MarketPlaceTest is Test {
 
     function setUp() public {
         config = new HelperConfig();
-        deployer = new DeployerMarketPlace(address(config));
+        deployer = new DeployMarketPlace(address(config));
         contractCollection1 = new MockERC721("Collection 1", "COL1");
         contractCollection2 = new MockERC721("Collection 2", "COL2");
         contractCollection3 = new MockERC721("Collection 3", "COL3");
@@ -93,6 +93,57 @@ contract MarketPlaceTest is Test {
         _;
     }
 
+    function testDeployFactoryNFTContractInitialization() public {
+        address configAddress = address(config);
+        DeployMarketPlace testDeployer = new DeployMarketPlace(configAddress);
+        assertEq(address(testDeployer.getHelperConfig()), configAddress);
+    }
+
+    function testHelperConfigSetup() public {
+        // Step 1: Deploy HelperConfig and get its address
+        HelperConfig deployedConfig = new HelperConfig();
+        address deployedConfigAddress = address(deployedConfig);
+
+        // Step 2: Pass this address to DeployerMarketPlace and deploy MarketPlace
+        DeployMarketPlace deployerWithConfig = new DeployMarketPlace(deployedConfigAddress);
+        MarketPlace deployedMarketPlace = deployerWithConfig.run();
+
+        // Step 3: Verify that MarketPlace is deployed with the expected initial owner
+        // This assumes you have a way to check the initial owner in MarketPlace, e.g., an owner() function
+        HelperConfig.NetworkConfig memory expectedConfig = deployedConfig.getActiveNetworkConfig();
+        address expectedOwner = expectedConfig.initialOwner;
+        assertEq(deployedMarketPlace.owner(), expectedOwner, "MarketPlace initial owner does not match expected value");
+    }
+
+    function testConstructorSetsInitialOwnerCorrectly() public {
+        address expectedOwner = makeAddr("testOwner");
+        MarketPlace testFactory = new MarketPlace(expectedOwner);
+        assertEq(testFactory.owner(), expectedOwner);
+    }
+
+    function testInitialTotalSupplyIsZero() public {
+        // Step 1: Deploy the MockERC721 contract
+        MockERC721 mockERC721 = new MockERC721("Test Token", "TT");
+
+        // Step 2: Call getTotalSupply() on the deployed contract
+        uint256 totalSupply = mockERC721.getTotalSupply();
+
+        // Step 3: Assert that the total supply is initially 0
+        assertEq(totalSupply, 0, "Initial total supply should be 0");
+    }
+
+    function testBurn() public {
+        // Mint a token to the seller
+        contractCollection1.mint(SELLER, 1);
+        // Assert that the total supply is now 1
+        assertEq(contractCollection1.getTotalSupply(), 1, "Total supply should be 1 after minting");
+
+        // Burn the minted token
+        contractCollection1.burn(1);
+        // Assert that the total supply is back to 0
+        assertEq(contractCollection1.getTotalSupply(), 0, "Total supply should decrease to 0 after burning");
+    }
+
     function testMintAndSupply()
         public
         contractCollection1SellerMints
@@ -100,14 +151,31 @@ contract MarketPlaceTest is Test {
         contractCollection3SellerAndBuyerMints
     {
         assertEq(contractCollection1.balanceOf(SELLER), 7);
-        assertEq(contractCollection1.totalSupply(), 7);
+        assertEq(contractCollection1.getTotalSupply(), 7);
 
         assertEq(contractCollection2.balanceOf(SELLER), 12);
-        assertEq(contractCollection2.totalSupply(), 12);
+        assertEq(contractCollection2.getTotalSupply(), 12);
 
         assertEq(contractCollection3.balanceOf(SELLER), 6);
         assertEq(contractCollection3.balanceOf(BUYER), 8);
-        assertEq(contractCollection3.totalSupply(), 14);
+        assertEq(contractCollection3.getTotalSupply(), 14);
+    }
+
+    function testTransferFrom() public {
+        // Mint an NFT to the seller
+        contractCollection1.mint(SELLER, 1);
+        assertEq(contractCollection1.ownerOf(1), SELLER, "Seller should own the token after minting");
+
+        // Approve the buyer to transfer the NFT
+        vm.prank(SELLER);
+        contractCollection1.approve(BUYER, 1);
+
+        // Transfer the NFT from seller to buyer
+        vm.prank(BUYER);
+        contractCollection1.transferFrom(SELLER, BUYER, 1);
+
+        // Assert that the buyer is now the owner
+        assertEq(contractCollection1.ownerOf(1), BUYER, "Buyer should own the token after transfer");
     }
 
     function testOwnerIsTheSellerListingNFT() public contractCollection3SellerAndBuyerMints {

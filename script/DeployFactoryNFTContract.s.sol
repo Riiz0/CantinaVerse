@@ -20,4 +20,8 @@ contract DeployFactoryNFTContract is Script {
 
         return factory;
     }
+
+    function getHelperConfig() public view returns (HelperConfig) {
+        return helperConfig;
+    }
 }

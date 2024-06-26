@@ -18,11 +18,7 @@ contract FactoryNFTContract is Ownable {
         uint256 royaltyPercentage
     );
 
-    constructor(address initialOwner) Ownable(initialOwner) {
-        if (initialOwner == address(0)) {
-            revert FactoryNFTContract__InvalidInitialOwner();
-        }
-    }
+    constructor(address initialOwner) Ownable(initialOwner) { }
 
     function createCollection(
         string memory name,

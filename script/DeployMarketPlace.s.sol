@@ -6,7 +6,7 @@ import { Script, console2 } from "forge-std/Script.sol";
 import { MarketPlace } from "../src/MarketPlace.sol";
 import { HelperConfig } from "./HelperConfig.s.sol";
 
-contract DeployerMarketPlace is Script {
+contract DeployMarketPlace is Script {
     HelperConfig helperConfig;
 
     constructor(address helperConfigAddress) {
@@ -19,5 +19,9 @@ contract DeployerMarketPlace is Script {
         MarketPlace marketPlace = new MarketPlace(config.initialOwner);
 
         return marketPlace;
+    }
+
+    function getHelperConfig() public view returns (HelperConfig) {
+        return helperConfig;
     }
 }

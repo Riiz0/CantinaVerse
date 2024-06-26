@@ -38,7 +38,7 @@ contract MockERC721 is ERC721 {
     }
 
     // Corrected the totalSupply function to call the base contract's totalSupply
-    function totalSupply() public view returns (uint256) {
+    function getTotalSupply() public view returns (uint256) {
         return _totalSupply;
     }
 }
