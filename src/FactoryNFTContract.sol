@@ -15,7 +15,7 @@ contract FactoryNFTContract is Ownable {
         string indexed symbol,
         uint256 maxSupply,
         address owner,
-        uint256 royaltyPercentage
+        uint96 royaltyPercentage
     );
 
     constructor(address initialOwner) Ownable(initialOwner) { }
@@ -26,7 +26,7 @@ contract FactoryNFTContract is Ownable {
         string memory s_baseURI,
         uint256 maxSupply,
         address owner,
-        uint256 royaltyPercentage
+        uint96 royaltyPercentage
     )
         external
     {

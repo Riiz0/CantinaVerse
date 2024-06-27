@@ -26,7 +26,7 @@ contract FactoryNFTContractTest is Test {
     string baseURI = "ipfs://";
     uint256 maxSupply = 10;
     address OWNER = makeAddr("owner");
-    uint256 royaltyPercentage = 10;
+    uint96 royaltyPercentage = 10;
 
     function setUp() public {
         config = new HelperConfig();

@@ -24,8 +24,9 @@ contract NFTContract is ERC721, ERC2981, ERC721Enumerable, ERC721URIStorage, Own
     //////////////////////
     uint256 private s_nextTokenId;
     string private s_baseURI;
-    uint256 public s_maxSupply;
-    uint96 private constant MAX_ROYALTY_PERCENTAGE = 30_000; // 30% as maximum royalty fee
+    uint256 private s_maxSupply;
+    uint96 private constant MAX_ROYALTY_PERCENTAGE = 3000; // 30% => (30 / 100) * 10000 = 3000
+    uint96 private s_royaltyPercentage;
 
     //////////////
     // Events   //
@@ -42,7 +43,7 @@ contract NFTContract is ERC721, ERC2981, ERC721Enumerable, ERC721URIStorage, Own
         string memory baseURI,
         uint256 _maxSupply,
         address initialOwner,
-        uint256 royaltyPercentage
+        uint96 royaltyPercentage
     )
         ERC721(name, symbol)
         Ownable(initialOwner)
@@ -52,13 +53,13 @@ contract NFTContract is ERC721, ERC2981, ERC721Enumerable, ERC721URIStorage, Own
         }
         s_baseURI = baseURI;
         s_maxSupply = _maxSupply;
-        _setDefaultRoyalty(initialOwner, uint96(royaltyPercentage));
+        s_royaltyPercentage = royaltyPercentage;
+        _setDefaultRoyalty(initialOwner, s_royaltyPercentage);
     }
 
     /////////////////////////////////
     // External/Public Functions   //
     /////////////////////////////////
-
     /**
      *
      * @param to is the address of the account that will receive the NFT.
@@ -76,22 +77,41 @@ contract NFTContract is ERC721, ERC2981, ERC721Enumerable, ERC721URIStorage, Own
         emit NewTokenMinted(to, tokenId, uri);
     }
 
-    // The following functions are overrides required by Solidity.
-    function _baseURI() internal view override returns (string memory) {
-        return s_baseURI;
+    function updateRoyaltyInfo(address owner, uint96 newRoyaltyPercentage) external onlyOwner {
+        if (newRoyaltyPercentage > MAX_ROYALTY_PERCENTAGE) {
+            revert NFTContract__MaxRoyaltyPercentageReached();
+        }
+        s_royaltyPercentage = newRoyaltyPercentage;
+        _setDefaultRoyalty(owner, newRoyaltyPercentage);
+
+        emit RoyaltyInfoUpdated(owner, newRoyaltyPercentage);
     }
 
     function setBaseURI(string memory baseURI) external onlyOwner {
         s_baseURI = baseURI;
     }
 
-    function updateRoyaltyInfo(address owner, uint96 newRoyaltyPercentage) external onlyOwner {
-        if (newRoyaltyPercentage > MAX_ROYALTY_PERCENTAGE) {
-            revert NFTContract__MaxRoyaltyPercentageReached();
-        }
-        _setDefaultRoyalty(owner, newRoyaltyPercentage);
+    function getBaseURI() public view returns (string memory) {
+        return s_baseURI;
+    }
 
-        emit RoyaltyInfoUpdated(owner, newRoyaltyPercentage);
+    //////////////////////////////////////
+    // External/Public View Functions   //
+    /////////////////////////////////////
+    /**
+     * @notice Returns the maximum supply of NFTs that can be minted.
+     */
+    function getMaxSupply() public view returns (uint256) {
+        return s_maxSupply;
+    }
+
+    function getRoyaltyPercentage() public view returns (uint96) {
+        return s_royaltyPercentage;
+    }
+
+    // The following functions are overrides required by Solidity.
+    function _baseURI() internal view override returns (string memory) {
+        return s_baseURI;
     }
 
     function _update(
