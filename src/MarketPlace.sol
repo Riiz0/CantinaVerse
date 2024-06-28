@@ -1,5 +1,4 @@
 // SPDX-License-Identifier: MIT
-
 pragma solidity 0.8.24;
 
 /**
@@ -14,9 +13,9 @@ import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 import { ReentrancyGuard } from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
 contract MarketPlace is Ownable, ReentrancyGuard {
-    //////////////////
-    // Errors       //
-    //////////////////
+    /////////////
+    // Errors  //
+    /////////////
     error MarketPlace__ListNFTNotTheOwner();
     error MarketPlace__PriceCannotBeZero();
     error MarketPlace__AlreadyListed();
@@ -53,65 +52,65 @@ contract MarketPlace is Ownable, ReentrancyGuard {
     //////////////////
     // Functions    //
     //////////////////
+    /**
+     * @dev Constructor sets the initial owner of the contract.
+     * @param initialOwner The address of the initial owner.
+     */
     constructor(address initialOwner) Ownable(initialOwner) { }
 
     /////////////////////////////////
     // External/Public Functions   //
     /////////////////////////////////
-
     /**
-     *
-     * @param nftContract is the address of the NFT
-     * @param tokenId is the unique identifier of the NFT
-     * @param price is the price at which the NFT is listed
-     * @notice This function is used to list an NFT for sale. The owner of the NFT must be the msg.sender.
+     * @notice Lists an NFT for sale on the marketplace.
+     * @dev Checks ownership, prevents zero pricing, and duplicates listings.
+     * @param nftContract The address of the NFT contract.
+     * @param tokenId The ID of the NFT to be listed.
+     * @param price The price at which the NFT should be listed.
      */
     function listNFT(address nftContract, uint256 tokenId, uint256 price) external {
         IERC721 nft = IERC721(nftContract);
         if (price == 0) {
             revert MarketPlace__PriceCannotBeZero();
         }
+
         if (nft.ownerOf(tokenId) != msg.sender) {
             revert MarketPlace__ListNFTNotTheOwner();
         }
+
         if (s_listings[nftContract][tokenId].price > 0) {
             revert MarketPlace__AlreadyListed();
         }
 
-        // Update the listing mapping with the new listing
         s_listings[nftContract][tokenId] = Listing(price, msg.sender);
 
         emit NFTListed(msg.sender, nftContract, tokenId, price);
     }
 
     /**
-     *
-     * @param nftContract is the address of the NFT
-     * @param tokenId is the unique identifier of the NFT
-     * @notice This function is used to delist an NFT for sale. The owner of the NFT must be the msg.sender.
+     * @notice Delists an NFT from the marketplace.
+     * @dev Ensures the caller is the seller.
+     * @param nftContract The address of the NFT contract.
+     * @param tokenId The ID of the NFT to be delisted.
      */
     function delistNFT(address nftContract, uint256 tokenId) external {
         Listing memory listing = s_listings[nftContract][tokenId];
         address seller = listing.seller;
-        // Ensure that the caller is the seller of the NFT
+
         if (msg.sender != seller) {
             revert MarketPlace__NotTheSeller(nftContract, tokenId);
         }
 
-        // Remove the listing to prevent it from being bought
         delete s_listings[nftContract][tokenId];
 
-        // Emit an event for the delisting
         emit NFTDelisted(seller, nftContract, tokenId);
     }
 
     /**
-     *
-     * @param tokenId is the unique identifier of the NFT
-     * @notice This function is used to buy an NFT that is listed on the marketplace. The buyer has to send the exact
-     * amount the seller listed the nft for. The NFT must not have been sold already, then it would revert. If the
-     * msg.value != to the listing price then the buyer cant buy the NFT.
-     * If the buyer sends the exact amount, then the NFT is transferred to the buyer and the seller receives the funds.
+     * @notice Buys an NFT from the marketplace.
+     * @dev Transfers the NFT to the buyer, removes the listing, and updates seller proceeds.
+     * @param nftContract The address of the NFT contract.
+     * @param tokenId The ID of the NFT to be purchased.
      */
     function buyNFT(address nftContract, uint256 tokenId) external payable nonReentrant {
         IERC721 nft = IERC721(nftContract);
@@ -126,22 +125,16 @@ contract MarketPlace is Ownable, ReentrancyGuard {
             revert MarketPlace__NotTheSeller(nftContract, tokenId);
         }
 
-        // Remove the listing before transferring to prevent reentrancy
         delete s_listings[nftContract][tokenId];
-
-        // Add the sale proceeds to the seller's balance
         proceeds[seller] += msg.value;
-
-        // Transfer the NFT to the buyer
         IERC721(nftContract).safeTransferFrom(seller, msg.sender, tokenId);
 
-        // Emit an event for the sale
         emit NFTSold(msg.sender, nftContract, tokenId, listing.price);
     }
 
     /**
-     *
-     * @notice This function is used to withdraw proceeds from the marketplace
+     * @notice Withdraws proceeds from sales.
+     * @dev Ensures the caller has proceeds to withdraw and resets the withdrawal amount.
      */
     function withdrawProceeds() external nonReentrant {
         uint256 amount = proceeds[msg.sender];
@@ -160,19 +153,19 @@ contract MarketPlace is Ownable, ReentrancyGuard {
     // Public/External View Functions   //
     //////////////////////////////////////
     /**
-     *
-     * @param nftContract is the address of the NFT
-     * @param tokenId is the unique identifier of the NFT
-     * @notice This function is used to get the listing of an NFT
+     * @notice Returns the listing information for an NFT.
+     * @param nftContract The address of the NFT contract.
+     * @param tokenId The ID of the NFT.
+     * @return The listing information for the given NFT.
      */
     function getListing(address nftContract, uint256 tokenId) external view returns (Listing memory) {
         return s_listings[nftContract][tokenId];
     }
 
     /**
-     *
-     * @param seller is the address of the seller
-     * @notice This function is used to get the seller's proceeds
+     * @notice Returns the total proceeds earned by a seller.
+     * @param seller The address of the seller.
+     * @return The total proceeds earned by the seller.
      */
     function getSellerProceeds(address seller) external view returns (uint256) {
         return proceeds[seller];
