@@ -12,8 +12,8 @@ contract NFTContractTest is Test {
     NFTContract nftcontract;
     HelperConfig config;
 
-    event NewTokenMinted(address indexed to, uint256 indexed tokenId, string uri);
-    event RoyaltyInfoUpdated(address recipient, uint96 feeNumerator);
+    event NewTokenMinted(address indexed to, uint256 indexed tokenId, string indexed uri);
+    event RoyaltyInfoUpdated(address indexed recipient, uint96 indexed feeNumerator);
 
     address MINTER = makeAddr("Minter");
     string name = "MY NFT COLLECTION";

@@ -24,15 +24,15 @@ contract NFTContract is ERC721, ERC2981, ERC721Enumerable, ERC721URIStorage, Own
     //////////////////////
     uint256 private s_nextTokenId;
     string private s_baseURI;
-    uint256 private s_maxSupply;
+    uint256 private immutable i_maxSupply;
     uint96 private constant MAX_ROYALTY_PERCENTAGE = 3000; // 30% => (30 / 100) * 10000 = 3000
     uint96 private s_royaltyPercentage;
 
     //////////////
     // Events   //
     //////////////
-    event NewTokenMinted(address indexed to, uint256 indexed tokenId, string uri);
-    event RoyaltyInfoUpdated(address recipient, uint96 feeNumerator);
+    event NewTokenMinted(address indexed to, uint256 indexed tokenId, string indexed uri);
+    event RoyaltyInfoUpdated(address indexed recipient, uint96 indexed feeNumerator);
 
     //////////////////
     // Functions    //
@@ -41,7 +41,7 @@ contract NFTContract is ERC721, ERC2981, ERC721Enumerable, ERC721URIStorage, Own
         string memory name,
         string memory symbol,
         string memory baseURI,
-        uint256 _maxSupply,
+        uint256 maxSupply,
         address initialOwner,
         uint96 royaltyPercentage
     )
@@ -52,7 +52,7 @@ contract NFTContract is ERC721, ERC2981, ERC721Enumerable, ERC721URIStorage, Own
             revert NFTContract__MaxRoyaltyPercentageReached();
         }
         s_baseURI = baseURI;
-        s_maxSupply = _maxSupply;
+        i_maxSupply = maxSupply;
         s_royaltyPercentage = royaltyPercentage;
         _setDefaultRoyalty(initialOwner, s_royaltyPercentage);
     }
@@ -67,7 +67,7 @@ contract NFTContract is ERC721, ERC2981, ERC721Enumerable, ERC721URIStorage, Own
      * @notice This function will mint a new NFT and assign it to the address provided.
      */
     function safeMint(address to, string memory uri) external {
-        if (s_nextTokenId > s_maxSupply) {
+        if (s_nextTokenId > i_maxSupply) {
             revert NFTContract__MaxSupplyReached();
         }
         uint256 tokenId = s_nextTokenId++;
@@ -77,21 +77,21 @@ contract NFTContract is ERC721, ERC2981, ERC721Enumerable, ERC721URIStorage, Own
         emit NewTokenMinted(to, tokenId, uri);
     }
 
-    function updateRoyaltyInfo(address owner, uint96 newRoyaltyPercentage) external onlyOwner {
+    function updateRoyaltyInfo(address contractOwner, uint96 newRoyaltyPercentage) external onlyOwner {
         if (newRoyaltyPercentage > MAX_ROYALTY_PERCENTAGE) {
             revert NFTContract__MaxRoyaltyPercentageReached();
         }
         s_royaltyPercentage = newRoyaltyPercentage;
-        _setDefaultRoyalty(owner, newRoyaltyPercentage);
+        _setDefaultRoyalty(contractOwner, newRoyaltyPercentage);
 
-        emit RoyaltyInfoUpdated(owner, newRoyaltyPercentage);
+        emit RoyaltyInfoUpdated(contractOwner, newRoyaltyPercentage);
     }
 
     function setBaseURI(string memory baseURI) external onlyOwner {
         s_baseURI = baseURI;
     }
 
-    function getBaseURI() public view returns (string memory) {
+    function getBaseURI() external view returns (string memory) {
         return s_baseURI;
     }
 
@@ -101,11 +101,11 @@ contract NFTContract is ERC721, ERC2981, ERC721Enumerable, ERC721URIStorage, Own
     /**
      * @notice Returns the maximum supply of NFTs that can be minted.
      */
-    function getMaxSupply() public view returns (uint256) {
-        return s_maxSupply;
+    function getMaxSupply() external view returns (uint256) {
+        return i_maxSupply;
     }
 
-    function getRoyaltyPercentage() public view returns (uint96) {
+    function getRoyaltyPercentage() external view returns (uint96) {
         return s_royaltyPercentage;
     }
 

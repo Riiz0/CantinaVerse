@@ -20,9 +20,7 @@ contract MarketPlace is Ownable, ReentrancyGuard {
     error MarketPlace__ListNFTNotTheOwner();
     error MarketPlace__PriceCannotBeZero();
     error MarketPlace__AlreadyListed();
-    error MarketPlace__NotListed();
     error MarketPlace__InsufficientFundsOrExcessFundsToPurchase(address nftContract, uint256 tokenId, uint256 price);
-    error MarketPlace__ListNFTNotListed();
     error MarketPlace__NoProceeds();
     error MarketPlace__TransferFailed();
     error MarketPlace__NotTheSeller(address nftContract, uint256 tokenId);
@@ -94,9 +92,9 @@ contract MarketPlace is Ownable, ReentrancyGuard {
      */
     function delistNFT(address nftContract, uint256 tokenId) external {
         Listing memory listing = s_listings[nftContract][tokenId];
-
+        address seller = listing.seller;
         // Ensure that the caller is the seller of the NFT
-        if (listing.seller != msg.sender) {
+        if (msg.sender != seller) {
             revert MarketPlace__NotTheSeller(nftContract, tokenId);
         }
 
@@ -104,7 +102,7 @@ contract MarketPlace is Ownable, ReentrancyGuard {
         delete s_listings[nftContract][tokenId];
 
         // Emit an event for the delisting
-        emit NFTDelisted(msg.sender, nftContract, tokenId);
+        emit NFTDelisted(seller, nftContract, tokenId);
     }
 
     /**
@@ -116,16 +114,17 @@ contract MarketPlace is Ownable, ReentrancyGuard {
      * If the buyer sends the exact amount, then the NFT is transferred to the buyer and the seller receives the funds.
      */
     function buyNFT(address nftContract, uint256 tokenId) external payable nonReentrant {
+        IERC721 nft = IERC721(nftContract);
         Listing storage listing = s_listings[nftContract][tokenId];
-
         uint256 amount = listing.price;
-
         if (msg.value != amount) {
             revert MarketPlace__InsufficientFundsOrExcessFundsToPurchase(nftContract, tokenId, amount);
         }
 
-        // Store seller's address in a temporary variable before deleting the listing
         address seller = listing.seller;
+        if (nft.ownerOf(tokenId) != seller) {
+            revert MarketPlace__NotTheSeller(nftContract, tokenId);
+        }
 
         // Remove the listing before transferring to prevent reentrancy
         delete s_listings[nftContract][tokenId];
@@ -148,11 +147,11 @@ contract MarketPlace is Ownable, ReentrancyGuard {
         uint256 amount = proceeds[msg.sender];
         if (amount <= 0) revert MarketPlace__NoProceeds();
 
+        proceeds[msg.sender] = 0;
+
         // Transfer the proceeds to the seller
         (bool success,) = payable(msg.sender).call{ value: amount }("");
         if (!success) revert MarketPlace__TransferFailed();
-
-        proceeds[msg.sender] = 0;
 
         emit ProceedsWithdrawn(msg.sender, amount);
     }
@@ -166,7 +165,7 @@ contract MarketPlace is Ownable, ReentrancyGuard {
      * @param tokenId is the unique identifier of the NFT
      * @notice This function is used to get the listing of an NFT
      */
-    function getListing(address nftContract, uint256 tokenId) public view returns (Listing memory) {
+    function getListing(address nftContract, uint256 tokenId) external view returns (Listing memory) {
         return s_listings[nftContract][tokenId];
     }
 
@@ -175,7 +174,7 @@ contract MarketPlace is Ownable, ReentrancyGuard {
      * @param seller is the address of the seller
      * @notice This function is used to get the seller's proceeds
      */
-    function getSellerProceeds(address seller) public view returns (uint256) {
+    function getSellerProceeds(address seller) external view returns (uint256) {
         return proceeds[seller];
     }
 }

@@ -1,5 +1,4 @@
 // SPDX-License-Identifier: MIT
-
 pragma solidity 0.8.24;
 
 import { Test, console2, Vm } from "forge-std/Test.sol";
@@ -19,6 +18,7 @@ contract MarketPlaceTest is Test {
     MockERC721 contractCollection5;
 
     address SELLER = makeAddr("seller");
+    address SELLERTWO = makeAddr("sellerTwo");
     address BUYER = makeAddr("buy");
     uint256 constant STARTING_BALANCE = 100 ether;
     uint256 price = 1 ether;
@@ -42,6 +42,7 @@ contract MarketPlaceTest is Test {
         marketPlace = deployer.run();
         vm.deal(BUYER, STARTING_BALANCE);
         vm.deal(SELLER, STARTING_BALANCE);
+        vm.deal(SELLERTWO, STARTING_BALANCE);
     }
 
     modifier contractCollection1SellerMints() {
@@ -271,6 +272,20 @@ contract MarketPlaceTest is Test {
         vm.stopPrank();
     }
 
+    function testIfMarketPlaceContractHasNotBeenApprovedByTheSeller() public contractCollection3SellerAndBuyerMints {
+        vm.startPrank(SELLER);
+        // Approve the marketplace contract to manage the NFT
+        contractCollection3.approve(address(marketPlace), 2);
+        vm.stopPrank();
+
+        address approvedAddress = contractCollection3.getApproved(2);
+        assertTrue(approvedAddress == address(marketPlace), "Marketplace contract should be approved");
+
+        // Optionally, verify that the approval did not change the ownership of the NFT
+        address owner = contractCollection3.ownerOf(2);
+        assertTrue(owner == SELLER, "Ownership should remain unchanged after approval");
+    }
+
     function testSellerCanDelistAndRelistNFT() public contractCollection3SellerAndBuyerMints {
         vm.startPrank(SELLER);
         marketPlace.listNFT(address(contractCollection3), 2, price);
@@ -326,6 +341,35 @@ contract MarketPlaceTest is Test {
             )
         );
         marketPlace.buyNFT{ value: amount }(address(contractCollection3), 2);
+        vm.stopPrank();
+    }
+
+    function testBuyNFTFunctionIfSellerIsNFTOwnerOfNFTListed() public contractCollection3SellerAndBuyerMints {
+        vm.startPrank(SELLER);
+        contractCollection3.approve(address(marketPlace), 2);
+        marketPlace.listNFT(address(contractCollection3), 2, price);
+        vm.stopPrank();
+
+        vm.startPrank(BUYER);
+        assertEq(contractCollection3.ownerOf(2), SELLER);
+        vm.stopPrank();
+    }
+
+    function testBuyNFTRevertIfSellerIsNotOwner() public contractCollection3SellerAndBuyerMints {
+        vm.startPrank(SELLER);
+        contractCollection3.approve(address(marketPlace), 2);
+        marketPlace.listNFT(address(contractCollection3), 2, price);
+        vm.stopPrank();
+
+        vm.startPrank(SELLER);
+        contractCollection3.transferFrom(SELLER, SELLERTWO, 2);
+        vm.stopPrank();
+
+        vm.startPrank(BUYER);
+        vm.expectRevert(
+            abi.encodeWithSelector(MarketPlace.MarketPlace__NotTheSeller.selector, address(contractCollection3), 2)
+        );
+        marketPlace.buyNFT{ value: price }(address(contractCollection3), 2);
         vm.stopPrank();
     }
 
