@@ -330,7 +330,7 @@ body {
 .nav-close-btn ion-icon {
   color: var(--spanish-gray);
   font-size: 2.7rem;
-  --ionicon-stroke-width: 40px;
+  --ionicon-strokeWidth: 40px;
 }
 
 .navbar-link {
@@ -527,7 +527,7 @@ body {
 .instruction-icon ion-icon {
   font-size: 5rem;
   color: var(--han-purple);
-  --ionicon-stroke-width: 25px;
+  --ionicon-strokeWidth: 25px;
 }
 
 .instruction-title {
@@ -627,7 +627,7 @@ body {
   border-radius: 50px 4px 4px 50px;
 }
 
-.newsletter-btn ion-icon { --ionicon-stroke-width: 40px; }
+.newsletter-btn ion-icon { --ionicon-strokeWidth: 40px; }
 
 .footer-bottom {
   color: var(--gainsboro);

@@ -35,13 +35,11 @@ export function HeroContainer() {
         </div>
 
         <svg className="hero-bg-bottom" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 465" version="1.1">
-          <defs>
-            <linearGradient x1="49.7965246%" y1="28.2355058%" x2="49.7778147%" y2="98.4657689%" id="linearGradient-1">
-              <stop stop-color="rgba(69,40,220, 0.15)" offset="0%"></stop>
-              <stop stop-color="rgba(87,4,138, 0.15)" offset="100%"></stop>
+          <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%" gradientUnits="userSpaceOnUse">
+            <stop offset="0%" stopColor="#F8F8F8" />
+            <stop offset="100%" stopColor="#EFEFEF" />
             </linearGradient>
-          </defs>
-          <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+          <g id="Page-1" stroke="none" strokeWidth="1" fill="none" fillRule="evenodd">
             <polygon points="" fill="url(#linearGradient-1)">
               <animate id="graph-animation" xmlns="http://www.w3.org/2000/svg" dur="2s" repeatCount=""
                 attributeName="points"
