@@ -8,7 +8,7 @@ import { Footer } from './main-components/Footer';
 import { IonIcon } from '@ionic/react';
 import { arrowUpOutline } from 'ionicons/icons';
 
-export function MainSection() {
+export default function MainSection() {
     return (
       <main>
         <article>

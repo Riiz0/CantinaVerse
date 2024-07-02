@@ -11,35 +11,18 @@ import { MarketPlace } from "../src/MarketPlace.sol";
 import { HelperConfig } from "./HelperConfig.s.sol";
 
 contract DeployMarketPlace is Script {
-    HelperConfig helperConfig;
-
-    /**
-     * @dev Initializes the DeployMarketPlace with the address of the HelperConfig contract.
-     * @param helperConfigAddress The address of the HelperConfig contract.
-     */
-    constructor(address helperConfigAddress) {
-        helperConfig = HelperConfig(helperConfigAddress);
-    }
-
     /**
      * @notice Deploys the MarketPlace contract with the active network configuration.
      * @dev Fetches the active network configuration from the HelperConfig contract and uses it to deploy the
      * MarketPlace contract.
      * @return The address of the newly deployed MarketPlace contract.
      */
-    function run() external returns (MarketPlace) {
+    function run() external returns (MarketPlace, HelperConfig) {
+        HelperConfig helperConfig = new HelperConfig();
         HelperConfig.NetworkConfig memory config = helperConfig.getActiveNetworkConfig();
 
         MarketPlace marketPlace = new MarketPlace(config.initialOwner);
 
-        return marketPlace;
-    }
-
-    /**
-     * @notice Returns the HelperConfig contract used by this script.
-     * @return The HelperConfig contract.
-     */
-    function getHelperConfig() public view returns (HelperConfig) {
-        return helperConfig;
+        return (marketPlace, helperConfig);
     }
 }

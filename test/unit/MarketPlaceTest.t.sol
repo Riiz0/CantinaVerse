@@ -33,13 +33,13 @@ contract MarketPlaceTest is Test {
 
     function setUp() public {
         config = new HelperConfig();
-        deployer = new DeployMarketPlace(address(config));
+        deployer = new DeployMarketPlace();
         contractCollection1 = new MockERC721("Collection 1", "COL1");
         contractCollection2 = new MockERC721("Collection 2", "COL2");
         contractCollection3 = new MockERC721("Collection 3", "COL3");
         contractCollection4 = new MockERC721("Collection 4", "COL4");
         contractCollection5 = new MockERC721("Collection 5", "COL5");
-        marketPlace = deployer.run();
+        (marketPlace, config) = deployer.run();
         vm.deal(BUYER, STARTING_BALANCE);
         vm.deal(SELLER, STARTING_BALANCE);
         vm.deal(SELLERTWO, STARTING_BALANCE);
@@ -92,28 +92,6 @@ contract MarketPlaceTest is Test {
         contractCollection3.mint(BUYER, 12);
         contractCollection3.mint(BUYER, 13);
         _;
-    }
-
-    function testDeployFactoryNFTContractInitialization() public {
-        address configAddress = address(config);
-        DeployMarketPlace testDeployer = new DeployMarketPlace(configAddress);
-        assertEq(address(testDeployer.getHelperConfig()), configAddress);
-    }
-
-    function testHelperConfigSetup() public {
-        // Step 1: Deploy HelperConfig and get its address
-        HelperConfig deployedConfig = new HelperConfig();
-        address deployedConfigAddress = address(deployedConfig);
-
-        // Step 2: Pass this address to DeployerMarketPlace and deploy MarketPlace
-        DeployMarketPlace deployerWithConfig = new DeployMarketPlace(deployedConfigAddress);
-        MarketPlace deployedMarketPlace = deployerWithConfig.run();
-
-        // Step 3: Verify that MarketPlace is deployed with the expected initial owner
-        // This assumes you have a way to check the initial owner in MarketPlace, e.g., an owner() function
-        HelperConfig.NetworkConfig memory expectedConfig = deployedConfig.getActiveNetworkConfig();
-        address expectedOwner = expectedConfig.initialOwner;
-        assertEq(deployedMarketPlace.owner(), expectedOwner, "MarketPlace initial owner does not match expected value");
     }
 
     function testConstructorSetsInitialOwnerCorrectly() public {

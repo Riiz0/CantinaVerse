@@ -31,14 +31,8 @@ contract FactoryNFTContractTest is Test {
     function setUp() public {
         config = new HelperConfig();
 
-        deployer = new DeployFactoryNFTContract(address(config));
-        factory = deployer.run();
-    }
-
-    function testDeployFactoryNFTContractInitialization() public {
-        address configAddress = address(config);
-        DeployFactoryNFTContract testDeployer = new DeployFactoryNFTContract(configAddress);
-        assertEq(address(testDeployer.getHelperConfig()), configAddress);
+        deployer = new DeployFactoryNFTContract();
+        (factory, config) = deployer.run();
     }
 
     function testConstructorSetsInitialOwnerCorrectly() public {

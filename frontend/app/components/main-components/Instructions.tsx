@@ -9,7 +9,7 @@ export function Instructions() {
 
           <p className="section-subtitle">How It Works</p>
 
-          <h2 className="h2 section-title">Create and sell your NFTs</h2>
+          <h2 className="h2 section-title">Buy, Sell or Create your NFTs</h2>
 
           <ul className="grid-list">
 
@@ -22,7 +22,7 @@ export function Instructions() {
               <h3 className="instruction-title">Set up your wallet</h3>
 
               <p className="instruction-text">
-                Once you’ve set up your wallet of choice, connect it to OpenSea by clicking the NFT Marketplace in the
+                Once you’ve set up your wallet of choice, connect it to Cantina by clicking Connect Wallet on the
                 top right corner.
                 Learn about the wallets we support.
               </p>
@@ -38,9 +38,7 @@ export function Instructions() {
               <h3 className="instruction-title">Create your collection</h3>
 
               <p className="instruction-text">
-                Click Create and set up your collection. Add social links, a description, profile & banner images, and
-                set a secondary
-                sales fee.
+                Click Create and set up your collection. Add name, symbol, a max supply, the owner of the collection, and a royalty percentage.
               </p>
 
             </li>
@@ -51,12 +49,10 @@ export function Instructions() {
                 <IonIcon icon={fileTrayOutline}></IonIcon>
               </div>
 
-              <h3 className="instruction-title">Add your NFTs</h3>
+              <h3 className="instruction-title">List your NFTs</h3>
 
               <p className="instruction-text">
-                Upload your work (image, video, audio, or 3D art), add a title and description, and customize your NFTs
-                with properties,
-                stats, and unlockable content.
+                List your NFT for sale by clicking on the NFT you want to sell and then clicking on the List button. If you want to adjust the listing price, simply delist the nft and relist it with a new price.
               </p>
 
             </li>
@@ -67,11 +63,10 @@ export function Instructions() {
                 <IonIcon icon={bagHandleOutline}></IonIcon>
               </div>
 
-              <h3 className="instruction-title">List them for sale</h3>
+              <h3 className="instruction-title">Buy NFTs</h3>
 
               <p className="instruction-text">
-                Choose between auctions, fixed-price listings, and declining-price listings. You choose how you want to
-                sell your NFTs!
+                 Choose between Explore or Collections to find the NFT you want to buy. Once you’ve found the NFT you want to buy, click on it and then click on the Buy button.
               </p>
             </li>
           </ul>

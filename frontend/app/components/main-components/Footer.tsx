@@ -1,6 +1,6 @@
 'use client';
 import { IonIcon } from '@ionic/react';
-import { logoFacebook, logoTwitter, logoPinterest, logoDiscord, paperPlaneOutline } from 'ionicons/icons';
+import { logoTwitter, paperPlaneOutline, globeOutline } from 'ionicons/icons';
 import Image from 'next/image';
 
 export function Footer() {
@@ -17,18 +17,10 @@ export function Footer() {
             </a>
 
             <p className="footer-text">
-              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quis non, fugit totam vel laboriosam vitae.
+            Discover, collect, and sell extraordinary NFTs on Cantina, the premier marketplace for digital art and collectibles. Your journey into the world of NFTs begins here.
             </p>
 
             <ul className="social-list">
-
-              <li>
-                <a href="#" className="social-link">
-                  <IonIcon icon={logoFacebook}></IonIcon>
-                  <IonIcon icon={logoFacebook}></IonIcon>
-                </a>
-              </li>
-
               <li>
                 <a href="#" className="social-link">
                   <IonIcon icon={logoTwitter}></IonIcon>
@@ -38,20 +30,11 @@ export function Footer() {
 
               <li>
                 <a href="#" className="social-link">
-                  <IonIcon icon={logoPinterest}></IonIcon>
-                  <IonIcon icon={logoPinterest}></IonIcon>
+                  <IonIcon icon={globeOutline}></IonIcon>
+                  <IonIcon icon={globeOutline}></IonIcon>
                 </a>
               </li>
-
-              <li>
-                <a href="#" className="social-link">
-                  <IonIcon icon={logoDiscord}></IonIcon>
-                  <IonIcon icon={logoDiscord}></IonIcon>
-                </a>
-              </li>
-
             </ul>
-
           </div>
 
           <ul className="footer-list">
@@ -69,15 +52,11 @@ export function Footer() {
             </li>
 
             <li>
-              <a href="#" className="footer-link">Create</a>
+              <a href="/create" className="footer-link">Create</a>
             </li>
 
             <li>
-              <a href="#" className="footer-link">Explore</a>
-            </li>
-
-            <li>
-              <a href="#" className="footer-link">Privacy & Terms</a>
+              <a href="/explore" className="footer-link">Explore</a>
             </li>
 
           </ul>
@@ -89,7 +68,7 @@ export function Footer() {
             </li>
 
             <li>
-              <a href="#" className="footer-link">Help Center</a>
+              <a href="https://app.optimism.io/superchain/" className="footer-link">Superchain Docs</a>
             </li>
 
             <li>
@@ -97,38 +76,28 @@ export function Footer() {
             </li>
 
             <li>
-              <a href="#" className="footer-link">Suggestions</a>
+              <a href="#" className="footer-link">Privacy & Terms</a>
             </li>
 
             <li>
-              <a href="#" className="footer-link">Blog</a>
-            </li>
-
-            <li>
-              <a href="#" className="footer-link">Newsletter</a>
+              <a href="#" className="footer-link">Whitepaper</a>
             </li>
 
           </ul>
 
           <div className="footer-list">
-
             <p className="footer-list-title">Subscribe Us</p>
-
             <form action="" className="newsletter-form">
               <input type="email" name="email" placeholder="info@yourmail.com" required className="newsletter-input" />
-
                 <button type="submit" className="newsletter-btn" aria-label="Submit">
                   <IonIcon icon={paperPlaneOutline}></IonIcon>
                 </button>
             </form>
-
           </div>
-
         </div>
-
         <div className="footer-bottom">
           <p className="copyright">
-            &copy; 2024 <a href="#" className="copyright-link">Riiz0</a>. All Rights Reserved
+            &copy; 2023 <div className="copyright-link">Cantina</div>. All Rights Reserved
           </p>
         </div>
 

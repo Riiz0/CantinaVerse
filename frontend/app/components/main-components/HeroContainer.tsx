@@ -8,7 +8,7 @@ export function HeroContainer() {
 
         <div className="container">
 
-          <p className="section-subtitle">Netstorm&apos;s</p>
+          <p className="section-subtitle">Cantina</p>
 
           <h2 className="h1 hero-title">Discover, collect, and sell extraordinary NFTs</h2>
 
@@ -21,13 +21,13 @@ export function HeroContainer() {
             <button className="btn">
               <IonIcon icon={rocketOutline} aria-hidden="true"></IonIcon>
 
-              <span>Explore</span>
+              <a href="/explore">Explore</a>
             </button>
 
             <button className="btn">
               <IonIcon icon={createOutline} aria-hidden="true"></IonIcon>
 
-              <span>Create</span>
+              <a href="/create">Create</a>
             </button>
 
           </div>

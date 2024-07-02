@@ -636,14 +636,10 @@ body {
 }
 
 .copyright-link {
-  text-decoration: underline;
+  text-decoration: none;
   display: inline-block;
   transition: var(--transition-1);
 }
-
-.copyright-link:is(:hover, :focus) { background-color: hsla(0, 0%, 100%, 0.05); }
-
-
 
 
 

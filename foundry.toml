@@ -11,6 +11,13 @@ remappings = ["@openzeppelin/contracts=lib/openzeppelin-contracts/contracts/"]
 #     { access = "read", path = "./reports" },
 # ]
 
+# When working with private keys avoid .env file and use the following code in the terminal
+# cast wallet import NAME_OF_FILE --interactive
+# Then paste in the private key
+# create a password for the wallet you called "NAME_OF_FILE"
+#
+# So when running the deployment script on localhost or testnet it would look something like this,
+# forge script script/DeployFundMe.s.sol --rpc-url http://127.0.0.1:8545 --broadcast --sender PUBLIC_ADDRESS_OF_ACCOUNT_YOU_IMPORTED --account NAME_OF_FILE
 
 [fuzz]
 runs = 1000
@@ -46,13 +53,14 @@ goerli = { key = "${API_KEY_ETHERSCAN}" }
 mainnet = { key = "${API_KEY_ETHERSCAN}" }
 optimism = { key = "${API_KEY_OPTIMISTIC_ETHERSCAN}" }
 polygon = { key = "${API_KEY_POLYGONSCAN}" }
-sepolia = { key = "${API_KEY_ETHERSCAN}" }
+sepolia = { key = "6DGM59A47Z9UZNCSSR44ASZ5NW6ZDDWMK4" }
 mode = { key = "${API_KEY_MODESCAN}" }
 base = { key = "${API_KEY_BASESCAN}" }
 
 [rpc_endpoints]
 # example:
 # zksync = "https://mainnet.era.zksync.io"
+sepolia = "https://eth-sepolia.g.alchemy.com/v2/N-xInl4-MvlVwtClZjoMxNqFyiAP4PcZ"
 
 
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
