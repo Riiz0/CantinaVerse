@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { abi } from '../../abi/FactoryNFTContractABI';
+import { abi } from '../abi/FactoryNFTContractABI';
 import { useWriteContract } from 'wagmi'
 
 export default function Create() {

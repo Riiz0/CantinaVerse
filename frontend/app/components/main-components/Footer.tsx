@@ -17,7 +17,7 @@ export function Footer() {
             </a>
 
             <p className="footer-text">
-            Discover, collect, and sell extraordinary NFTs on Cantina, the premier marketplace for digital art and collectibles. Your journey into the world of NFTs begins here.
+            Explore, Create, and Trade Extraordinary NFTs on Cantina, the premier marketplace for digital art and collectibles. Your journey into the world of NFTs begins here.
             </p>
 
             <ul className="social-list">

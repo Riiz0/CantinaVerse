@@ -4,21 +4,22 @@
    * colors
    */
 
-  --rich-black-fogra-39: hsl(252, 24%, 4%);
-  --spanish-gray: hsl(0, 0%, 56%);
-  --eerie-black-1: hsl(252, 11%, 9%);
-  --eerie-black-2: hsl(0, 0%, 13%);
-  --raisin-black: hsl(249, 9%, 15%);
-  --han-purple: hsl(250, 72%, 51%);
-  --gainsboro: hsl(0, 0%, 88%);
-  --cultured: hsl(0, 0%, 98%);
-  --white_20: hsla(217, 15%, 70%, 0.3);
-  --xiketic: hsl(250, 15%, 8%);
-  --indigo: hsl(277, 94%, 28%);
-  --white: hsl(0, 0%, 100%);
-  --black: hsl(0, 0%, 0%);
-
-  --gradient-1: linear-gradient(150deg, var(--indigo) 0%, var(--han-purple) 78%);
+   --rich-black-fogra-39: hsl(252, 24%, 4%);
+   --spanish-gray: hsl(0, 0%, 56%);
+   --eerie-black-1: hsl(252, 11%, 9%);
+   --eerie-black-2: hsl(0, 0%, 13%);
+   --raisin-black: hsl(249, 9%, 15%);
+   --deep-teal: hsl(180, 54%, 35%); /* New */
+   --light-teal: hsl(180, 54%, 45%); /* New */
+   --gainsboro: hsl(0, 0%, 88%);
+   --cultured: hsl(0, 0%, 98%);
+   --white_20: hsla(217, 15%, 70%, 0.3);
+   --xiketic: hsl(250, 15%, 8%);
+   --complementary-teal: hsl(180, 65%, 30%); /* New */
+   --white: hsl(0, 0%, 100%);
+   --black: hsl(0, 0%, 0%);
+ 
+   --gradient-1: linear-gradient(150deg, var(--complementary-teal) 0%, var(--deep-teal) 78%);
 
   /**
    * typography
@@ -191,9 +192,8 @@ body {
   position: absolute;
   top: 12px;
   right: -60px;
-  width: 50px;
-  height: 3px;
-  background-image: var(--gradient-1);
+  width: 0;
+  height: 0;
 }
 
 .h1,
