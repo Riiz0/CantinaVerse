@@ -1,7 +1,10 @@
 'use client';
-import { IonIcon } from '@ionic/react';
-import { logoTwitter, paperPlaneOutline, globeOutline } from 'ionicons/icons';
+
+import { IoLogoTwitter } from "react-icons/io";
+import { CgWebsite } from "react-icons/cg";
+import { IoPaperPlaneOutline } from "react-icons/io5";
 import Image from 'next/image';
+import Link from 'next/link';
 
 export function Footer() {
   return (
@@ -23,15 +26,15 @@ export function Footer() {
             <ul className="social-list">
               <li>
                 <a href="#" className="social-link">
-                  <IonIcon icon={logoTwitter}></IonIcon>
-                  <IonIcon icon={logoTwitter}></IonIcon>
+                  <IoLogoTwitter />
+                  <IoLogoTwitter />
                 </a>
               </li>
 
               <li>
                 <a href="#" className="social-link">
-                  <IonIcon icon={globeOutline}></IonIcon>
-                  <IonIcon icon={globeOutline}></IonIcon>
+                  <CgWebsite />
+                  <CgWebsite />
                 </a>
               </li>
             </ul>
@@ -51,13 +54,17 @@ export function Footer() {
               <a href="#" className="footer-link">How It Works</a>
             </li>
 
+            <Link href="/create">
             <li>
-              <a href="/create" className="footer-link">Create</a>
+              <div className="footer-link">Create</div>
             </li>
+            </Link>
 
+            <Link href="/explore">
             <li>
-              <a href="/explore" className="footer-link">Explore</a>
+              <div className="footer-link">Explore</div>
             </li>
+            </Link>
 
           </ul>
 
@@ -90,15 +97,15 @@ export function Footer() {
             <form action="" className="newsletter-form">
               <input type="email" name="email" placeholder="info@yourmail.com" required className="newsletter-input" />
                 <button type="submit" className="newsletter-btn" aria-label="Submit">
-                  <IonIcon icon={paperPlaneOutline}></IonIcon>
+                  <IoPaperPlaneOutline />
                 </button>
             </form>
           </div>
         </div>
         <div className="footer-bottom">
-          <p className="copyright">
+          <div className="copyright">
             &copy; 2023 <div className="copyright-link">Cantina</div>. All Rights Reserved
-          </p>
+          </div>
         </div>
 
       </div>

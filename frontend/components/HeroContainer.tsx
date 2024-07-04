@@ -1,6 +1,7 @@
 'use client';
-import { IonIcon } from '@ionic/react';
-import { rocketOutline, createOutline } from 'ionicons/icons';
+
+import { IoRocketOutline, IoCreateOutline  } from "react-icons/io5";
+import Link from 'next/link';
 
 export function HeroContainer() {
     return (
@@ -19,15 +20,15 @@ export function HeroContainer() {
           <div className="btn-group">
 
             <button className="btn">
-              <IonIcon icon={rocketOutline} aria-hidden="true"></IonIcon>
+              <IoRocketOutline aria-hidden="true" />
 
-              <a href="/explore">Explore</a>
+              <Link href="/explore">Explore</Link>
             </button>
 
             <button className="btn">
-              <IonIcon icon={createOutline} aria-hidden="true"></IonIcon>
+            <IoCreateOutline aria-hidden="true" />
 
-              <a href="/create">Create</a>
+              <Link href="/create">Create</Link>
             </button>
 
           </div>

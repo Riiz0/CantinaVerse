@@ -1,8 +1,9 @@
 'use client';
-import { IonIcon } from '@ionic/react';
-import { closeCircleOutline, menuOutline } from 'ionicons/icons';
+
+import { IoIosCloseCircleOutline } from "react-icons/io";
+import { TiThMenuOutline } from "react-icons/ti";
 import Image from 'next/image';
-import { useNavbarToggle } from './hook/UseNavbarToggle';
+import { useNavbarToggle } from './UseNavbarToggle';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import Link from 'next/link';
 
@@ -27,7 +28,7 @@ export default function Header() {
             <p className="navbar-title">Menu</p>
 
             <button className="nav-close-btn" aria-label="Close Menu" data-nav-close-btn>
-              <IonIcon icon={closeCircleOutline}></IonIcon>
+              <IoIosCloseCircleOutline />
             </button>
           </div>
 
@@ -59,7 +60,7 @@ export default function Header() {
         </nav>
   
         <button className="menu-open-btn" aria-label="Open Menu" data-nav-open-btn>
-            <IonIcon icon={menuOutline}></IonIcon >
+          <TiThMenuOutline />
         </button>
   
         <ConnectButton />

@@ -1,6 +1,6 @@
 'use client';
-import { IonIcon } from '@ionic/react';
-import { arrowForwardOutline } from 'ionicons/icons';
+
+import { TiArrowForwardOutline } from "react-icons/ti";
 import Image from 'next/image';
 
 export function Collections() {
@@ -15,8 +15,7 @@ export function Collections() {
 
             <a href="#" className="btn-link">
               <span>View All</span>
-
-              <IonIcon icon={arrowForwardOutline} aria-hidden="true"></IonIcon>
+              <TiArrowForwardOutline aria-hidden="true" />
             </a>
           </div>
 

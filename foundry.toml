@@ -17,7 +17,9 @@ remappings = ["@openzeppelin/contracts=lib/openzeppelin-contracts/contracts/"]
 # create a password for the wallet you called "NAME_OF_FILE"
 #
 # So when running the deployment script on localhost or testnet it would look something like this,
-# forge script script/DeployFundMe.s.sol --rpc-url http://127.0.0.1:8545 --broadcast --sender PUBLIC_ADDRESS_OF_ACCOUNT_YOU_IMPORTED --account NAME_OF_FILE
+# forge script script/ContractScriptName.s.sol:ContractScriptName --rpc-url http://127.0.0.1:8545 --broadcast --sender PUBLIC_ADDRESS_OF_ACCOUNT_YOU_IMPORTED --account NAME_OF_FILE
+
+# jq '.abi' out/ContractName.sol/ContractName.json > ContractNameABI.json
 
 [fuzz]
 runs = 1000
@@ -45,6 +47,7 @@ wrap_comments = true
 
 [etherscan]
 # zksync = no keey needed for zksync
+sepolia = { key = "6DGM59A47Z9UZNCSSR44ASZ5NW6ZDDWMK4" }
 arbitrum = { key = "${API_KEY_ARBISCAN}" }
 avalanche = { key = "${API_KEY_SNOWTRACE}" }
 bnb_smart_chain = { key = "${API_KEY_BSCSCAN}" }
@@ -53,7 +56,6 @@ goerli = { key = "${API_KEY_ETHERSCAN}" }
 mainnet = { key = "${API_KEY_ETHERSCAN}" }
 optimism = { key = "${API_KEY_OPTIMISTIC_ETHERSCAN}" }
 polygon = { key = "${API_KEY_POLYGONSCAN}" }
-sepolia = { key = "6DGM59A47Z9UZNCSSR44ASZ5NW6ZDDWMK4" }
 mode = { key = "${API_KEY_MODESCAN}" }
 base = { key = "${API_KEY_BASESCAN}" }
 

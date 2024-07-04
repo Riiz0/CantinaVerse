@@ -1,6 +1,6 @@
 'use client';
-import { IonIcon } from '@ionic/react';
-import { walletOutline, gridOutline, fileTrayOutline, bagHandleOutline } from 'ionicons/icons';
+
+import { IoWalletOutline, IoGridOutline, IoFileTrayOutline, IoBagHandleOutline } from "react-icons/io5";
 
 export function Instructions() {
     return (
@@ -16,7 +16,7 @@ export function Instructions() {
             <li className="instruction-item">
 
               <div className="instruction-icon">
-                <IonIcon icon={walletOutline}></IonIcon>
+                <IoWalletOutline />
               </div>
 
               <h3 className="instruction-title">Set up your wallet</h3>
@@ -32,7 +32,7 @@ export function Instructions() {
             <li className="instruction-item">
 
               <div className="instruction-icon">
-                <IonIcon icon={gridOutline}></IonIcon>
+                <IoGridOutline />
               </div>
 
               <h3 className="instruction-title">Create your collection</h3>
@@ -46,7 +46,7 @@ export function Instructions() {
             <li className="instruction-item">
 
               <div className="instruction-icon">
-                <IonIcon icon={fileTrayOutline}></IonIcon>
+                <IoFileTrayOutline />
               </div>
 
               <h3 className="instruction-title">List your NFTs</h3>
@@ -60,7 +60,7 @@ export function Instructions() {
             <li className="instruction-item">
 
               <div className="instruction-icon">
-                <IonIcon icon={bagHandleOutline}></IonIcon>
+                <IoBagHandleOutline />
               </div>
 
               <h3 className="instruction-title">Buy NFTs</h3>

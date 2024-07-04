@@ -1,4 +1,6 @@
+import "@rainbow-me/rainbowkit/styles.css";
 import type { Metadata } from "next";
+import Providers from "../providers/providers";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -6,15 +8,14 @@ export const metadata: Metadata = {
   description: "Discover, collect, and sell extraordinary NFTs",
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }
 
+export default RootLayout;

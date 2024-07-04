@@ -1,7 +1,8 @@
 'use client';
-import { IonIcon } from '@ionic/react';
+
 import Image from 'next/image';
-import { arrowForwardOutline, bagAddOutline } from 'ionicons/icons';
+import { TiArrowForwardOutline } from "react-icons/ti";
+import { IoBagAddOutline } from "react-icons/io5";
 
 export function Explorer() {
   return (
@@ -16,7 +17,7 @@ export function Explorer() {
           <a href="#" className="btn-link">
             <span>Explore All</span>
 
-            <IonIcon icon={arrowForwardOutline} aria-hidden="true"></IonIcon>
+            <TiArrowForwardOutline aria-hidden="true" />
           </a>
         </div>
 
@@ -47,8 +48,7 @@ export function Explorer() {
               </div>
 
               <button className="btn">
-                <IonIcon icon={bagAddOutline} aria-hidden="true"></IonIcon>
-
+                <IoBagAddOutline aria-hidden="true" />
                 <span>Place a Bid</span>
               </button>
 
@@ -80,8 +80,7 @@ export function Explorer() {
               </div>
 
               <button className="btn">
-                <IonIcon icon={bagAddOutline} aria-hidden="true"></IonIcon>
-
+              <IoBagAddOutline aria-hidden="true" />
                 <span>Place a Bid</span>
               </button>
 
@@ -113,8 +112,7 @@ export function Explorer() {
               </div>
 
               <button className="btn">
-                <IonIcon icon={bagAddOutline} aria-hidden="true"></IonIcon>
-
+                <IoBagAddOutline aria-hidden="true" />
                 <span>Place a Bid</span>
               </button>
 

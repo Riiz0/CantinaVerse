@@ -116,7 +116,24 @@ contract NFTContractTest is Test {
 
         bytes4 interfaceIdERC2981 = 0x2a55205a; // ERC2981 interface ID
         assertTrue(nftcontract.supportsInterface(interfaceIdERC2981), "Should support ERC2981 interface.");
+    }
 
-        // Add more interface IDs as needed
+    function testFuzz__safeMint(address anyAddress, uint256 anyTokenId) public {
+        uint256 maxFuzzSupply = 10_000;
+
+        config = new HelperConfig();
+        nftcontract = new NFTContract(name, symbol, baseURI, maxFuzzSupply, msg.sender, royaltyPercentage);
+
+        // Skip if anyAddress is the zero address or anyTokenId is out of the valid range
+        if (anyAddress == address(0) || anyTokenId >= maxFuzzSupply) return;
+
+        // Record the initial balance of anyAddress
+        uint256 initialBalance = nftcontract.balanceOf(anyAddress);
+
+        // Attempt to mint a new token
+        nftcontract.safeMint(anyAddress, "tokenURI");
+
+        // Assert that the balance of anyAddress has increased by 1
+        assertEq(nftcontract.balanceOf(anyAddress), initialBalance + 1);
     }
 }

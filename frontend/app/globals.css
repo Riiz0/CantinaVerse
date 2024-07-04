@@ -644,6 +644,126 @@ body {
 
 
 /*-----------------------------------*\
+  #CREATE
+\*-----------------------------------*/
+
+/* Add your custom styles here */
+.create-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 150px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Modern font */
+}
+
+/* Enhanced input styles */
+.create-input {
+  margin-bottom: 15px;
+  padding: 10px;
+  border: 2px solid #007bff; /* Slightly thicker border with primary color */
+  border-radius: 5px;
+  width: 300px;
+  background-color: #222; /* Darker background for better contrast */
+  color: #fff; /* White text color */
+}
+
+.create-input[type="file"] {
+  border: 1px solid #ccc;
+  display: block;
+  padding: 6px;
+  margin-bottom: 20px; /* Consistent spacing */
+}
+
+.create-input[type="file"]::file-selector-button {
+  padding: 8px;
+  margin-right: 4px;
+  background-color: #f0f0f0;
+  border: 1px solid #d1d1d1;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.create-input[type="file"]::file-selector-button:hover {
+  background-color: #e1e1e1;
+}
+
+/* Placeholder color for better visibility */
+.create-input::placeholder {
+  color: #bbb; /* Lighter placeholder text for contrast */
+}
+
+.create-button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  width: 300px;
+  transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+}
+
+.create-button:hover {
+  background-color: #0056b3;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add shadow for depth */
+}
+
+.create-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #007bff; /* Match the primary color theme */
+}
+
+.create-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 400px;
+  background: linear-gradient(to right, #ffffff10, #ffffff10); /* Subtle background gradient */
+  padding: 20px;
+  border-radius: 10px; /* Rounded corners for the form */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
+}
+
+.create-form-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.create-textarea {
+  width: 100%; /* Adjust based on layout */
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  min-height: 100px; /* Adjustable based on preference */
+  margin-bottom: 20px; /* Consistent spacing */
+}
+
+.create-form-row label {
+  width: 30%;
+  text-align: right;
+  padding-right: 10px;
+}
+
+.create-form-row input {
+  width: 65%;
+  padding: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.create-form-row input:focus {
+  outline: none;
+  border: 2px solid #0056b3; /* Focus state with a slightly darker border */
+}
+
+
+
+/*-----------------------------------*\
   #BACK TO TOP
 \*-----------------------------------*/
 
