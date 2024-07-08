@@ -27,13 +27,11 @@ export function Footer() {
               <li>
                 <a href="#" className="social-link">
                   <IoLogoTwitter />
-                  <IoLogoTwitter />
                 </a>
               </li>
 
               <li>
                 <a href="#" className="social-link">
-                  <CgWebsite />
                   <CgWebsite />
                 </a>
               </li>

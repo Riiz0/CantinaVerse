@@ -4,21 +4,21 @@
    * colors
    */
 
-   --rich-black-fogra-39: hsl(252, 24%, 4%);
+   --rich-black-fogra-39: hsl(0, 0%, 0%);
    --spanish-gray: hsl(0, 0%, 56%);
    --eerie-black-1: hsl(252, 11%, 9%);
    --eerie-black-2: hsl(0, 0%, 13%);
    --raisin-black: hsl(249, 9%, 15%);
-   --deep-teal: hsl(180, 54%, 35%); /* New */
-   --light-teal: hsl(180, 54%, 45%); /* New */
+   --deep-teal: hsl(46, 60%, 52%);
+   --light-teal: hsl(46, 60%, 52%);
    --gainsboro: hsl(0, 0%, 88%);
    --cultured: hsl(0, 0%, 98%);
    --white_20: hsla(217, 15%, 70%, 0.3);
-   --xiketic: hsl(250, 15%, 8%);
+   --xiketic: hsl(0, 0%, 0%);
    --complementary-teal: hsl(180, 65%, 30%); /* New */
    --white: hsl(0, 0%, 100%);
    --black: hsl(0, 0%, 0%);
- 
+
    --gradient-1: linear-gradient(150deg, var(--complementary-teal) 0%, var(--deep-teal) 78%);
 
   /**
@@ -368,10 +368,27 @@ body {
 
 .hero {
   position: relative;
-  background-color: var(--xiketic);
+  overflow: hidden; /* Prevents the video from overflowing the container */
+  background-color: transparent; /* Fallback background color */
   padding-block-start: 120px;
   padding-block-end: var(--section-padding);
   z-index: 1;
+}
+
+.text-content {
+  position: relative;
+  z-index: 10; /* Higher than the video's z-index */
+}
+
+.hero-video {
+  min-width: 100%;
+  min-height: 100vh;
+  object-fit: cover;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 5; /* Lower than the text-content z-index */
 }
 
 .hero .section-subtitle { margin-block-end: 30px; }
@@ -566,22 +583,34 @@ body {
   gap: 10px;
 }
 
+.social-list {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
 .social-link {
   background-color: var(--eerie-black-2);
   color: var(--cultured);
   width: 42px;
   height: 42px;
-  font-size: 1.8rem;
   border-radius: var(--radius-4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
   overflow: hidden;
 }
 
-.social-link ion-icon {
-  padding: 12px;
+.social-link svg {
+  width: 24px; /* Adjust as needed */
+  height: 24px; /* Adjust as needed */
   transition: var(--transition-2);
 }
 
-.social-link:is(:hover, :focus) ion-icon { transform: translateY(-42px); }
+.social-link:is(:hover, :focus) svg {
+  /* Adjust or remove this transform as needed */
+  transform: scale(1.1);
+}
 
 .footer-list-title {
   color: var(--cultured);
@@ -646,122 +675,99 @@ body {
 /*-----------------------------------*\
   #CREATE
 \*-----------------------------------*/
-
-/* Add your custom styles here */
 .create-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-top: 150px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Modern font */
+  max-width: 800px;
+  margin: 125px auto;
+  padding: 40px;
+  background-color: var(--white_20);
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
+  z-index: 1;
 }
 
-/* Enhanced input styles */
-.create-input {
-  margin-bottom: 15px;
-  padding: 10px;
-  border: 2px solid #007bff; /* Slightly thicker border with primary color */
-  border-radius: 5px;
-  width: 300px;
-  background-color: #222; /* Darker background for better contrast */
-  color: #fff; /* White text color */
+.create-container::before {
+  content: "";
+  position: absolute;
+  top: -50px;
+  left: -50px;
+  right: -50px;
+  bottom: -50px;
+  background: linear-gradient(145deg, var(--gradient-1), var(--gradient-2));
+  z-index: -1;
+  border-radius: 15px;
 }
 
-.create-input[type="file"] {
-  border: 1px solid #ccc;
-  display: block;
-  padding: 6px;
-  margin-bottom: 20px; /* Consistent spacing */
+/* Enhanced .create-section styling */
+.create-section {
+  background-color: var(--light-teal);
+  border-radius: 10px;
+  padding: 30px;
+  margin-bottom: 30px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
 }
 
-.create-input[type="file"]::file-selector-button {
-  padding: 8px;
-  margin-right: 4px;
-  background-color: #f0f0f0;
-  border: 1px solid #d1d1d1;
-  border-radius: 4px;
-  cursor: pointer;
-}
-
-.create-input[type="file"]::file-selector-button:hover {
-  background-color: #e1e1e1;
-}
-
-/* Placeholder color for better visibility */
-.create-input::placeholder {
-  color: #bbb; /* Lighter placeholder text for contrast */
-}
-
-.create-button {
-  padding: 10px 20px;
-  background-color: #007bff;
-  color: #fff;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  width: 300px;
-  transition: background-color 0.3s ease; /* Smooth transition for hover effect */
-}
-
-.create-button:hover {
-  background-color: #0056b3;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Add shadow for depth */
-}
-
-.create-title {
-  font-size: 24px;
+.create-section-title {
+  color: var(--deep-teal);
+  font-size: 22px;
   font-weight: bold;
-  margin-bottom: 20px;
-  color: #007bff; /* Match the primary color theme */
-}
-
-.create-form {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 400px;
-  background: linear-gradient(to right, #ffffff10, #ffffff10); /* Subtle background gradient */
-  padding: 20px;
-  border-radius: 10px; /* Rounded corners for the form */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
-}
-
-.create-form-row {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  width: 100%;
   margin-bottom: 10px;
 }
 
-.create-textarea {
-  width: 100%; /* Adjust based on layout */
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  min-height: 100px; /* Adjustable based on preference */
-  margin-bottom: 20px; /* Consistent spacing */
+.create-section-description {
+  color: var(--eerie-black-2);
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.create-form-row {
+  margin-bottom: 20px;
 }
 
 .create-form-row label {
-  width: 30%;
-  text-align: right;
-  padding-right: 10px;
+  display: block;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: var(--deep-teal);
 }
 
-.create-form-row input {
-  width: 65%;
-  padding: 5px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
+.create-input,
+.create-textarea {
+  width: 100%;
+  padding: 15px;
+  border: 2px solid var(--spanish-gray);
+  border-radius: 8px;
+  resize: none;
+  font-size: 16px;
 }
 
-.create-form-row input:focus {
+.create-input:focus,
+.create-textarea:focus {
+  border-color: var(--deep-teal);
   outline: none;
-  border: 2px solid #0056b3; /* Focus state with a slightly darker border */
+  box-shadow: 0 0 0 2px rgba(49, 151, 149, 0.2);
 }
 
+.create-button {
+  background-color: var(--deep-teal);
+  color: var(--white);
+  border: none;
+  border-radius: 5px;
+  padding: 15px 30px;
+  cursor: pointer;
+  font-size: 18px;
+  display: block;
+  width: 100%;
+  max-width: 200px;
+  margin: 20px auto 0;
+  transition: all 0.3s ease;
+}
 
+.create-button:hover {
+  background-color: var(--complementary-teal);
+  box-shadow: 0 2px 15px rgba(44, 122, 123, 0.4);
+}
 
 /*-----------------------------------*\
   #BACK TO TOP
@@ -862,6 +868,13 @@ body {
   }
 
   .hero-title { max-width: 650px; }
+
+  .create-container::before {
+    top: -30px;
+    left: -30px;
+    right: -30px;
+    bottom: -30px;
+  }
 
 }
 

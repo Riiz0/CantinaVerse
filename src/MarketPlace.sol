@@ -4,9 +4,13 @@ pragma solidity 0.8.24;
 /**
  * @title MarketPlace
  * @author Shawn Rizo
- * @notice This contract will manage the listing, buying, and selling of NFTs on the marketplace.
- * It will interact with NFT contracts to transfer ownership of NFTs when a sale is made.
- * This contract will also handle the listing of NFTs for sale, the bidding process, and the settlement of sales.
+ * @notice This contract manages the listing, buying, and selling of NFTs on a marketplace. It allows users to list
+ * their NFTs for sale, delist them, purchase NFTs listed by others, and withdraw proceeds from sales. The contract
+ * ensures secure transactions by verifying ownership, preventing reentrancy attacks, and validating transaction
+ * conditions.
+ * @dev The contract uses OpenZeppelin's IERC721 for NFT interactions, Ownable for ownership management, and
+ * ReentrancyGuard for preventing reentrancy attacks. It defines custom errors for various failure conditions, maintains
+ * a mapping of NFT listings and seller proceeds, and emits events for significant actions.
  */
 import { IERC721 } from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
@@ -63,7 +67,8 @@ contract MarketPlace is Ownable, ReentrancyGuard {
     /////////////////////////////////
     /**
      * @notice Lists an NFT for sale on the marketplace.
-     * @dev Checks ownership, prevents zero pricing, and duplicates listings.
+     * @dev Checks ownership, prevents zero pricing, and duplicates listings. Emits an NFTListed event upon successful
+     * listing.
      * @param nftContract The address of the NFT contract.
      * @param tokenId The ID of the NFT to be listed.
      * @param price The price at which the NFT should be listed.
@@ -89,7 +94,7 @@ contract MarketPlace is Ownable, ReentrancyGuard {
 
     /**
      * @notice Delists an NFT from the marketplace.
-     * @dev Ensures the caller is the seller.
+     * @dev Ensures the caller is the seller. Emits an NFTDelisted event upon successful delisting.
      * @param nftContract The address of the NFT contract.
      * @param tokenId The ID of the NFT to be delisted.
      */
@@ -108,7 +113,8 @@ contract MarketPlace is Ownable, ReentrancyGuard {
 
     /**
      * @notice Buys an NFT from the marketplace.
-     * @dev Transfers the NFT to the buyer, removes the listing, and updates seller proceeds.
+     * @dev Transfers the NFT to the buyer, removes the listing, and updates seller proceeds. Emits an NFTSold event
+     * upon successful transaction.
      * @param nftContract The address of the NFT contract.
      * @param tokenId The ID of the NFT to be purchased.
      */
@@ -134,7 +140,8 @@ contract MarketPlace is Ownable, ReentrancyGuard {
 
     /**
      * @notice Withdraws proceeds from sales.
-     * @dev Ensures the caller has proceeds to withdraw and resets the withdrawal amount.
+     * @dev Ensures the caller has proceeds to withdraw and resets the withdrawal amount. Emits a ProceedsWithdrawn
+     * event upon successful withdrawal.
      */
     function withdrawProceeds() external nonReentrant {
         uint256 amount = proceeds[msg.sender];
@@ -154,6 +161,7 @@ contract MarketPlace is Ownable, ReentrancyGuard {
     //////////////////////////////////////
     /**
      * @notice Returns the listing information for an NFT.
+     * @dev Provides read-only access to NFT listings.
      * @param nftContract The address of the NFT contract.
      * @param tokenId The ID of the NFT.
      * @return The listing information for the given NFT.
@@ -164,6 +172,7 @@ contract MarketPlace is Ownable, ReentrancyGuard {
 
     /**
      * @notice Returns the total proceeds earned by a seller.
+     * @dev Provides read-only access to seller proceeds.
      * @param seller The address of the seller.
      * @return The total proceeds earned by the seller.
      */

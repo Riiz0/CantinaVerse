@@ -41,104 +41,104 @@ export default function Create() {
     }
 
     return (
-        <>
-          <Header />
-          <div className="create-container">
-            <h1 className="create-title">Create NFT Collection</h1>
-                <form className="create-form" onSubmit={createCollection}>
-                <div className="create-form-row">
-                  <label htmlFor="coverImage">Cover Image:</label>
-                  <input
-                    id="coverImage"
-                    className="create-input"
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => {
-                        if (e.target.files && e.target.files[0]) {
-                          setCoverImage(e.target.files[0]);
-                        }
-                      }}
-                  />
-                </div>
-                <div className="create-form-row">
-                  <label htmlFor="description">Description:</label>
-                  <textarea
-                    id="description"
-                    className="create-textarea"
-                    placeholder="Enter description here..."
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                  ></textarea>
-                </div>
+      <>
+        <Header />
+        <div className="create-container">
+          <h1 className="create-title">Create NFT Collection</h1>
+              <form className="create-form" onSubmit={createCollection}>
               <div className="create-form-row">
-                <label htmlFor="name">Name:</label>
+                <label htmlFor="coverImage">Cover Image:</label>
                 <input
-                  id="name"
+                  id="coverImage"
                   className="create-input"
-                  type="text"
-                  placeholder="Name"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                      if (e.target.files && e.target.files[0]) {
+                        setCoverImage(e.target.files[0]);
+                      }
+                    }}
                 />
               </div>
               <div className="create-form-row">
-                <label htmlFor="symbol">Symbol:</label>
-                <input
-                  id="symbol"
-                  className="create-input"
-                  type="text"
-                  placeholder="Symbol"
-                  value={symbol}
-                  onChange={(e) => setSymbol(e.target.value)}
-                />
+                <label htmlFor="description">Description:</label>
+                <textarea
+                  id="description"
+                  className="create-textarea"
+                  placeholder="Enter description here..."
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                ></textarea>
               </div>
-              <div className="create-form-row">
-                <label htmlFor="baseURI">Base URI:</label>
-                <input
-                  id="baseURI"
-                  className="create-input"
-                  type="text"
-                  placeholder="Base URI"
-                  value={baseURI}
-                  onChange={(e) => setBaseURI(e.target.value)}
-                />
-              </div>
-              <div className="create-form-row">
-                <label htmlFor="maxSupply">Max Supply:</label>
-                <input
-                  id="maxSupply"
-                  className="create-input"
-                  type="number"
-                  placeholder="Max Supply"
-                  value={maxSupply}
-                  onChange={(e) => setMaxSupply(e.target.value)}
-                />
-                </div>
-                  <div className="create-form-row">
-                  <label htmlFor="owner">Owner:</label>
-                <input
+            <div className="create-form-row">
+              <label htmlFor="name">Name:</label>
+              <input
+                id="name"
                 className="create-input"
                 type="text"
-                placeholder="Owner"
-                value={owner}
-                onChange={(e) => setOwner(e.target.value)}
-                />
-                </div>
-                <div className="create-form-row">
-                <label htmlFor="royaltyPercentage">Royalty Percentage:</label>
-                <input
+                placeholder="Name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+              />
+            </div>
+            <div className="create-form-row">
+              <label htmlFor="symbol">Symbol:</label>
+              <input
+                id="symbol"
+                className="create-input"
+                type="text"
+                placeholder="Symbol"
+                value={symbol}
+                onChange={(e) => setSymbol(e.target.value)}
+              />
+            </div>
+            <div className="create-form-row">
+              <label htmlFor="baseURI">Base URI:</label>
+              <input
+                id="baseURI"
+                className="create-input"
+                type="text"
+                placeholder="Base URI"
+                value={baseURI}
+                onChange={(e) => setBaseURI(e.target.value)}
+              />
+            </div>
+            <div className="create-form-row">
+              <label htmlFor="maxSupply">Max Supply:</label>
+              <input
+                id="maxSupply"
                 className="create-input"
                 type="number"
-                placeholder="Royalty Percentage"
-                value={royaltyPercentage}
-                onChange={(e) => setRoyaltyPercentage(e.target.value)}
-                />
-                </div>
-                    <button className="create-button" type="submit">
-                        Create NFT Collection
-                    </button>
-                </form>
-            </div>
-        </>
-    )
+                placeholder="Max Supply"
+                value={maxSupply}
+                onChange={(e) => setMaxSupply(e.target.value)}
+              />
+              </div>
+                <div className="create-form-row">
+                <label htmlFor="owner">Owner:</label>
+              <input
+              className="create-input"
+              type="text"
+              placeholder="Owner"
+              value={owner}
+              onChange={(e) => setOwner(e.target.value)}
+              />
+              </div>
+              <div className="create-form-row">
+              <label htmlFor="royaltyPercentage">Royalty Percentage:</label>
+              <input
+              className="create-input"
+              type="number"
+              placeholder="Royalty Percentage"
+              value={royaltyPercentage}
+              onChange={(e) => setRoyaltyPercentage(e.target.value)}
+              />
+              </div>
+                  <button className="create-button" type="submit">
+                      Create NFT Collection
+                  </button>
+              </form>
+          </div>
+      </>
+  )
 }
