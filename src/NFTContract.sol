@@ -16,11 +16,13 @@ import { ERC2981 } from "@openzeppelin/contracts/token/common/ERC2981.sol";
 import { ERC721Enumerable } from "@openzeppelin/contracts/token/ERC721/extensions/ERC721Enumerable.sol";
 import { ERC721URIStorage } from "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
+import { ReentrancyGuard } from "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 
-contract NFTContract is ERC721, ERC2981, ERC721Enumerable, ERC721URIStorage, Ownable {
+contract NFTContract is ERC721, ERC2981, ERC721Enumerable, ERC721URIStorage, Ownable, ReentrancyGuard {
     /////////////
     // Errors  //
     /////////////
+    error NFTContract__InsufficientFunds();
     error NFTContract__MaxSupplyReached();
     error NFTContract__MaxRoyaltyPercentageReached();
 
@@ -32,11 +34,12 @@ contract NFTContract is ERC721, ERC2981, ERC721Enumerable, ERC721URIStorage, Own
     uint256 private immutable i_maxSupply;
     uint96 private constant MAX_ROYALTY_PERCENTAGE = 3000; // 30% => (30 / 100) * 10000 = 3000
     uint96 private s_royaltyPercentage;
+    uint256 private s_mintPrice;
 
     //////////////
     // Events   //
     //////////////
-    event NewTokenMinted(address indexed to, uint256 indexed tokenId, string indexed uri);
+    event NewTokenMinted(address indexed to, uint256 indexed tokenId, string indexed uri, uint256 mintPrice);
     event RoyaltyInfoUpdated(address indexed recipient, uint96 indexed feeNumerator);
 
     //////////////////
@@ -58,7 +61,8 @@ contract NFTContract is ERC721, ERC2981, ERC721Enumerable, ERC721URIStorage, Own
         string memory baseURI,
         uint256 maxSupply,
         address initialOwner,
-        uint96 royaltyPercentage
+        uint96 royaltyPercentage,
+        uint256 mintPrice
     )
         ERC721(name, symbol)
         Ownable(initialOwner)
@@ -70,6 +74,7 @@ contract NFTContract is ERC721, ERC2981, ERC721Enumerable, ERC721URIStorage, Own
         i_maxSupply = maxSupply;
         s_royaltyPercentage = royaltyPercentage;
         _setDefaultRoyalty(initialOwner, s_royaltyPercentage);
+        s_mintPrice = mintPrice;
     }
 
     /////////////////////////////////
@@ -83,7 +88,10 @@ contract NFTContract is ERC721, ERC2981, ERC721Enumerable, ERC721URIStorage, Own
      * @param uri The URI for the NFT metadata.
      * Emits a `NewTokenMinted` event upon successful minting.
      */
-    function safeMint(address to, string memory uri) external {
+    function safeMint(address to, string memory uri) external payable nonReentrant {
+        if (s_mintPrice > 0 && msg.value < s_mintPrice) {
+            revert NFTContract__InsufficientFunds();
+        }
         if (s_nextTokenId > i_maxSupply) {
             revert NFTContract__MaxSupplyReached();
         }
@@ -91,7 +99,12 @@ contract NFTContract is ERC721, ERC2981, ERC721Enumerable, ERC721URIStorage, Own
         _safeMint(to, tokenId);
         _setTokenURI(tokenId, uri);
 
-        emit NewTokenMinted(to, tokenId, uri);
+        // Transfer the minting fees to the owner
+        if (msg.value > 0) {
+            payable(owner()).transfer(msg.value);
+        }
+
+        emit NewTokenMinted(to, tokenId, uri, s_mintPrice);
     }
 
     /**
@@ -146,6 +159,10 @@ contract NFTContract is ERC721, ERC2981, ERC721Enumerable, ERC721URIStorage, Own
      */
     function getBaseURI() external view returns (string memory) {
         return s_baseURI;
+    }
+
+    function getMintPrice() external view returns (uint256) {
+        return s_mintPrice;
     }
 
     ////////////////////////////////////////////////////////////

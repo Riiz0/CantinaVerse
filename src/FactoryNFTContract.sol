@@ -24,7 +24,8 @@ contract FactoryNFTContract is Ownable {
         string indexed symbol,
         uint256 maxSupply,
         address owner,
-        uint96 royaltyPercentage
+        uint96 royaltyPercentage,
+        uint256 mintPrice
     );
 
     //////////////////
@@ -55,13 +56,15 @@ contract FactoryNFTContract is Ownable {
         string memory baseURI,
         uint256 maxSupply,
         address owner,
-        uint96 royaltyPercentage
+        uint96 royaltyPercentage,
+        uint256 mintPrice
     )
         external
     {
-        NFTContract newCollection = new NFTContract(name, symbol, baseURI, maxSupply, owner, royaltyPercentage);
+        NFTContract newCollection =
+            new NFTContract(name, symbol, baseURI, maxSupply, owner, royaltyPercentage, mintPrice);
         collections.push(address(newCollection));
-        emit CollectionCreated(address(newCollection), name, symbol, maxSupply, owner, royaltyPercentage);
+        emit CollectionCreated(address(newCollection), name, symbol, maxSupply, owner, royaltyPercentage, mintPrice);
     }
 
     //////////////////////////////////////

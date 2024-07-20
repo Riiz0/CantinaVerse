@@ -36,8 +36,17 @@ contract MarketPlace is Ownable, ReentrancyGuard {
         address seller;
     }
 
-    // Mapping from NFT contract address and token ID to Listing for quick lookup
+    struct Auction {
+        uint256 startingPrice;
+        uint256 highestBid;
+        address highestBidder;
+        uint256 startTime;
+        uint256 endTime;
+        bool active;
+    }
+
     mapping(address => mapping(uint256 => Listing)) private s_listings;
+    mapping(address => mapping(uint256 => Auction)) private s_auctions;
 
     // Mapping to track seller proceeds from sales
     mapping(address => uint256) private proceeds;
@@ -52,6 +61,11 @@ contract MarketPlace is Ownable, ReentrancyGuard {
         address indexed seller, address indexed nftContract, uint256 indexed tokenId, uint256 newPrice
     );
     event ProceedsWithdrawn(address indexed seller, uint256 indexed amount);
+    event AuctionCreated(
+        address indexed nftContract, uint256 indexed tokenId, uint256 startingPrice, uint256 startTime, uint256 endTime
+    );
+    event BidPlaced(address indexed nftContract, uint256 indexed tokenId, address bidder, uint256 bid);
+    event AuctionEnded(address indexed nftContract, uint256 indexed tokenId, address winner, uint256 winningBid);
 
     //////////////////
     // Functions    //
@@ -154,6 +168,32 @@ contract MarketPlace is Ownable, ReentrancyGuard {
         if (!success) revert MarketPlace__TransferFailed();
 
         emit ProceedsWithdrawn(msg.sender, amount);
+    }
+
+    // Function to create an auction
+    function createAuction(address nftContract, uint256 tokenId, uint256 startingPrice, uint256 duration) external {
+        // Require that the NFT is not already listed or part of an active auction
+        // Transfer the NFT to the contract for escrow
+        // Set the auction details in `s_auctions`
+        // Emit AuctionCreated event
+    }
+
+    // Function to bid on an auction
+    function bidOnAuction(address nftContract, uint256 tokenId) external payable {
+        // Require that the auction is active
+        // Require that the bid is higher than the current highest bid
+        // Refund the previous highest bidder
+        // Update the highest bid and bidder
+        // Emit BidPlaced event
+    }
+
+    // Function to end an auction
+    function endAuction(address nftContract, uint256 tokenId) external {
+        // Require that the auction end time has passed
+        // Transfer the NFT to the highest bidder
+        // Transfer the highest bid to the seller
+        // Mark the auction as inactive
+        // Emit AuctionEnded event
     }
 
     //////////////////////////////////////
