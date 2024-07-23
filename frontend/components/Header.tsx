@@ -18,7 +18,7 @@ export default function Header() {
         
         <Link href="/">
           <div className="logo">
-            <Image src="/assets/logo.png" width={68} height={48} alt="NFTC Logo" />
+            <Image src="/assets/CantinaVerse_Transparent.svg" width={68} height={48} alt="NFTC Logo" />
           </div>
         </Link>
 
