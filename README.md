@@ -59,7 +59,7 @@ CantinaVerse boasts a comprehensive suite of features designed to enhance user e
 ### ERC-20 Token Creation Platform
 
 - **Interface Design**: A user-friendly interface for creating ERC20 tokens, with real-time visibility into the creation process.
-- **Liquidity Pooling Option**: Users can opt-in for liquidity pooling thresholds, essential for listing on DEXs, with token locking mechanisms to prevent rug pulls.
+- **Liquidity Pooling Option**: Allowing users to opt-in purchasing these created token providing the initial liquidity pooling once the threshold amount is reached for this tokens to be traded on DEX's.
 
 ### Casino Gaming Platform
 
@@ -81,8 +81,6 @@ Our roadmap delineates the strategic plan for CantinaVerse's evolution, outlinin
 | ERC-20 Token Creation Platform | Q4 2024      |
 | Casino Gaming Platform | Q4 2024     |
 | Governance DAO Platform | Q1 2025   |
-
-This structured approach not only improves the readability of your README file but also makes it easier for readers to quickly grasp the key features and development timeline of CantinaVerse.```
 
 ## Challenge
 
