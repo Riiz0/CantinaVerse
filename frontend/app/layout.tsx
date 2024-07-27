@@ -1,11 +1,12 @@
 import "@rainbow-me/rainbowkit/styles.css";
 import type { Metadata } from "next";
 import Providers from "../providers/providers";
-import "./globals.css";
+// import "./globals.css";
+import "./theme.css";
 
 export const metadata: Metadata = {
-  title: "Cantina | NFT Marketplace",
-  description: "Discover, collect, and sell extraordinary NFTs",
+  title: "CantinaVerse",
+  description: "Building a ecosystem that integrates NFTs, ERC20 tokens, casino games, and DAO governance, aiming to empower creators, gamers, and investors with opportunities for expression, engagement, and financial empowerment.",
 };
 
 function RootLayout({ children }: { children: React.ReactNode }) {

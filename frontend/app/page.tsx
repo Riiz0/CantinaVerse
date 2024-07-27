@@ -1,3 +1,4 @@
+import HomePage from '@/components/HomePage';
 import dynamic from 'next/dynamic';
 const Header = dynamic(() => import('../components/Header'), { ssr: false });
 const MainSection = dynamic(() => import('../components/MainSection'), { ssr: false });
@@ -6,8 +7,9 @@ const MainSection = dynamic(() => import('../components/MainSection'), { ssr: fa
 export default function Home() {
   return (
         <main>
-          <Header />
-          <MainSection />
+          {/* <Header />
+          <MainSection /> */}
+          < HomePage />
           </main>
   );
 }

@@ -96,7 +96,8 @@ contract MarketPlaceTest is Test {
 
     function testConstructorSetsInitialOwnerCorrectly() public {
         address expectedOwner = makeAddr("testOwner");
-        MarketPlace testFactory = new MarketPlace(expectedOwner);
+        address gelatoAddress = makeAddr("testGelatoAddress");
+        MarketPlace testFactory = new MarketPlace(expectedOwner, gelatoAddress);
         assertEq(testFactory.owner(), expectedOwner);
     }
 
@@ -351,25 +352,6 @@ contract MarketPlaceTest is Test {
         vm.stopPrank();
     }
 
-    function testViewProceedsOfSuccessfulListingAndBuyingOfNFT() public contractCollection3SellerAndBuyerMints {
-        vm.startPrank(SELLER);
-        contractCollection3.approve(address(marketPlace), 2);
-        marketPlace.listNFT(address(contractCollection3), 2, price);
-        vm.stopPrank();
-
-        vm.startPrank(BUYER);
-        marketPlace.buyNFT{ value: price }(address(contractCollection3), 2);
-        vm.stopPrank();
-
-        assertEq(contractCollection3.ownerOf(2), BUYER);
-
-        vm.startPrank(SELLER);
-        marketPlace.getSellerProceeds(SELLER);
-        vm.stopPrank();
-
-        assertEq(marketPlace.getSellerProceeds(SELLER), price);
-    }
-
     function test_ExpectEmit_EventNFTSold() public contractCollection3SellerAndBuyerMints {
         vm.startPrank(SELLER);
         contractCollection3.approve(address(marketPlace), 2);
@@ -383,85 +365,6 @@ contract MarketPlaceTest is Test {
         vm.stopPrank();
     }
 
-    function testSuccessfulWithdrawProceeds() public contractCollection3SellerAndBuyerMints {
-        vm.startPrank(SELLER);
-        contractCollection3.approve(address(marketPlace), 2);
-        marketPlace.listNFT(address(contractCollection3), 2, price);
-        vm.stopPrank();
-
-        assertEq(marketPlace.getSellerProceeds(SELLER), 0);
-        uint256 beforeBalanceOfSeller = address(SELLER).balance;
-
-        vm.startPrank(BUYER);
-        marketPlace.buyNFT{ value: price }(address(contractCollection3), 2);
-        vm.stopPrank();
-
-        vm.startPrank(SELLER);
-        uint256 payment = marketPlace.getSellerProceeds(SELLER);
-        assertEq(marketPlace.getSellerProceeds(SELLER), payment);
-        marketPlace.withdrawProceeds();
-        assertEq(marketPlace.getSellerProceeds(SELLER), 0);
-        assertEq(address(SELLER).balance, payment + beforeBalanceOfSeller);
-        vm.stopPrank();
-    }
-
-    function testIfAmountIsLessThanOrEqualToProceeds() public contractCollection3SellerAndBuyerMints {
-        vm.startPrank(SELLER);
-        contractCollection3.approve(address(marketPlace), 2);
-        marketPlace.listNFT(address(contractCollection3), 2, price);
-
-        assertEq(marketPlace.getSellerProceeds(SELLER), 0);
-
-        vm.expectRevert(MarketPlace.MarketPlace__NoProceeds.selector);
-        marketPlace.withdrawProceeds();
-        vm.stopPrank();
-    }
-
-    function testIfBoolCallFails() public {
-        // Deploy the RejectingReceiver contract
-        RejectingReceiver rejectingReceiver = new RejectingReceiver();
-        address rejectAddress = address(rejectingReceiver);
-
-        // Setup the market with the rejecting contract as the seller
-        vm.startPrank(rejectAddress);
-        contractCollection5.mint(rejectAddress, 0);
-        contractCollection5.mint(rejectAddress, 1);
-        vm.stopPrank();
-
-        vm.startPrank(rejectAddress);
-        contractCollection5.approve(address(marketPlace), 1);
-        marketPlace.listNFT(address(contractCollection5), 1, price);
-        vm.stopPrank();
-
-        // Buy the NFT as a different user to ensure there are proceeds to withdraw
-        vm.startPrank(BUYER);
-        marketPlace.buyNFT{ value: price }(address(contractCollection5), 1);
-        vm.stopPrank();
-
-        // Attempt to withdraw proceeds as the rejecting contract and expect failure
-        vm.startPrank(rejectAddress);
-        vm.expectRevert(MarketPlace.MarketPlace__TransferFailed.selector);
-        marketPlace.withdrawProceeds();
-        vm.stopPrank();
-    }
-
-    function test_ExpectEmit_EventProceedsWithdrawn() public contractCollection3SellerAndBuyerMints {
-        vm.startPrank(SELLER);
-        contractCollection3.approve(address(marketPlace), 2);
-        marketPlace.listNFT(address(contractCollection3), 2, price);
-        vm.stopPrank();
-
-        vm.startPrank(BUYER);
-        marketPlace.buyNFT{ value: price }(address(contractCollection3), 2);
-        vm.stopPrank();
-
-        vm.startPrank(SELLER);
-        vm.expectEmit(true, true, false, false);
-        emit ProceedsWithdrawn(SELLER, price);
-        marketPlace.withdrawProceeds();
-        vm.stopPrank();
-    }
-
     function testGetListing() public contractCollection3SellerAndBuyerMints {
         vm.startPrank(SELLER);
         contractCollection3.approve(address(marketPlace), 3);
@@ -470,25 +373,6 @@ contract MarketPlaceTest is Test {
         vm.stopPrank();
 
         assertEq(marketPlace.getListing(address(contractCollection3), 3).seller, SELLER);
-    }
-
-    function testGetSellerProceeds() public contractCollection3SellerAndBuyerMints {
-        vm.startPrank(SELLER);
-        contractCollection3.approve(address(marketPlace), 2);
-        marketPlace.listNFT(address(contractCollection3), 2, price);
-        marketPlace.getSellerProceeds(SELLER);
-        assertEq(marketPlace.getSellerProceeds(BUYER), 0);
-
-        vm.startPrank(BUYER);
-        marketPlace.buyNFT{ value: price }(address(contractCollection3), 2);
-        vm.stopPrank();
-
-        vm.startPrank(SELLER);
-        marketPlace.getSellerProceeds(BUYER);
-        vm.stopPrank();
-
-        assertEq(marketPlace.getSellerProceeds(SELLER), 1 ether);
-        assertEq(marketPlace.getSellerProceeds(BUYER), 0);
     }
 
     ////////////////////

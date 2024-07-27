@@ -14,6 +14,7 @@ contract HelperConfig is Script {
     //////////////////////////////////////////////////////////////*/
     struct NetworkConfig {
         address initialOwner;
+        address initialGelatoAddress;
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -75,47 +76,47 @@ contract HelperConfig is Script {
                                 CONFIGS
     //////////////////////////////////////////////////////////////*/
     function getEthMainnetConfig() public pure returns (NetworkConfig memory) {
-        return NetworkConfig({ initialOwner: address(1) });
+        return NetworkConfig({ initialOwner: address(1), initialGelatoAddress: address(2) });
     }
 
     function getZkSyncConfig() public pure returns (NetworkConfig memory) {
-        return NetworkConfig({ initialOwner: address(1) });
+        return NetworkConfig({ initialOwner: address(1), initialGelatoAddress: address(2) });
     }
 
     function getZkSyncSepoliaConfig() public pure returns (NetworkConfig memory) {
-        return NetworkConfig({ initialOwner: address(1) });
+        return NetworkConfig({ initialOwner: address(1), initialGelatoAddress: address(2) });
     }
 
     function getPolygonMainnetConfig() public pure returns (NetworkConfig memory) {
-        return NetworkConfig({ initialOwner: address(1) });
+        return NetworkConfig({ initialOwner: address(1), initialGelatoAddress: address(2) });
     }
 
     function getPolygonMumbaiConfig() public pure returns (NetworkConfig memory) {
-        return NetworkConfig({ initialOwner: address(1) });
+        return NetworkConfig({ initialOwner: address(1), initialGelatoAddress: address(2) });
     }
 
     function getModeMainnetConfig() public pure returns (NetworkConfig memory) {
-        return NetworkConfig({ initialOwner: address(1) });
+        return NetworkConfig({ initialOwner: address(1), initialGelatoAddress: address(2) });
     }
 
     function getModeSepoliaConfig() public pure returns (NetworkConfig memory) {
-        return NetworkConfig({ initialOwner: address(1) });
+        return NetworkConfig({ initialOwner: address(1), initialGelatoAddress: address(2) });
     }
 
     function getOpMainnetConfig() public pure returns (NetworkConfig memory) {
-        return NetworkConfig({ initialOwner: address(1) });
+        return NetworkConfig({ initialOwner: address(1), initialGelatoAddress: address(2) });
     }
 
     function getOpSepoliaConfig() public pure returns (NetworkConfig memory) {
-        return NetworkConfig({ initialOwner: address(1) });
+        return NetworkConfig({ initialOwner: address(1), initialGelatoAddress: address(2) });
     }
 
     function getBaseMainnetConfig() public pure returns (NetworkConfig memory) {
-        return NetworkConfig({ initialOwner: address(1) });
+        return NetworkConfig({ initialOwner: address(1), initialGelatoAddress: address(2) });
     }
 
     function getBaseSepoliaConfig() public pure returns (NetworkConfig memory) {
-        return NetworkConfig({ initialOwner: address(1) });
+        return NetworkConfig({ initialOwner: address(1), initialGelatoAddress: address(2) });
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -130,7 +131,7 @@ contract HelperConfig is Script {
 
         _deployMocks();
 
-        localNetworkConfig = NetworkConfig({ initialOwner: address(1) });
+        localNetworkConfig = NetworkConfig({ initialOwner: address(1), initialGelatoAddress: address(2) });
         return localNetworkConfig;
     }
 

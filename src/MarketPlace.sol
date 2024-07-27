@@ -25,18 +25,27 @@ contract MarketPlace is Ownable, ReentrancyGuard {
     error MarketPlace__AlreadyListed();
     error MarketPlace__InsufficientFundsOrExcessFundsToPurchase(address nftContract, uint256 tokenId, uint256 price);
     error MarketPlace__NoProceeds();
+    error MarketPlace__InsufficientFees();
     error MarketPlace__TransferFailed();
     error MarketPlace__NotTheSeller(address nftContract, uint256 tokenId);
+    error MarketPlace__AuctionNotTheOwner();
+    error MarketPlace__NFTAlreadyInAuction();
+    error MarketPlace__StartingPriceMustBeGreaterThanZero();
+    error MarketPlace__NFTAuctionIsNotActive();
+    error MarketPlace__BidIsLessThanHighestBid();
+    error MarketPlace__NFTAuctionHasEnded();
 
     //////////////////////
     // State Variables  //
     //////////////////////
+
     struct Listing {
         uint256 price;
         address seller;
     }
 
     struct Auction {
+        address seller;
         uint256 startingPrice;
         uint256 highestBid;
         address highestBidder;
@@ -47,9 +56,8 @@ contract MarketPlace is Ownable, ReentrancyGuard {
 
     mapping(address => mapping(uint256 => Listing)) private s_listings;
     mapping(address => mapping(uint256 => Auction)) private s_auctions;
-
-    // Mapping to track seller proceeds from sales
-    mapping(address => uint256) private proceeds;
+    address private gelatoAddress;
+    uint256 private s_fee; // Fee required to buy an NFT
 
     //////////////
     // Events   //
@@ -57,10 +65,6 @@ contract MarketPlace is Ownable, ReentrancyGuard {
     event NFTListed(address indexed seller, address indexed nftContract, uint256 indexed tokenId, uint256 price);
     event NFTDelisted(address indexed seller, address indexed nftContract, uint256 indexed tokenId);
     event NFTSold(address indexed buyer, address indexed nftContract, uint256 indexed tokenId, uint256 price);
-    event NewNFTListingPrice(
-        address indexed seller, address indexed nftContract, uint256 indexed tokenId, uint256 newPrice
-    );
-    event ProceedsWithdrawn(address indexed seller, uint256 indexed amount);
     event AuctionCreated(
         address indexed nftContract, uint256 indexed tokenId, uint256 startingPrice, uint256 startTime, uint256 endTime
     );
@@ -74,7 +78,14 @@ contract MarketPlace is Ownable, ReentrancyGuard {
      * @dev Constructor sets the initial owner of the contract.
      * @param initialOwner The address of the initial owner.
      */
-    constructor(address initialOwner) Ownable(initialOwner) { }
+    constructor(address initialOwner, address _gelatoAddress) Ownable(initialOwner) {
+        gelatoAddress = _gelatoAddress;
+    }
+
+    modifier onlyGelato() {
+        require(msg.sender == gelatoAddress, "Caller is not Gelato");
+        _;
+    }
 
     /////////////////////////////////
     // External/Public Functions   //
@@ -88,12 +99,11 @@ contract MarketPlace is Ownable, ReentrancyGuard {
      * @param price The price at which the NFT should be listed.
      */
     function listNFT(address nftContract, uint256 tokenId, uint256 price) external {
-        IERC721 nft = IERC721(nftContract);
         if (price == 0) {
             revert MarketPlace__PriceCannotBeZero();
         }
 
-        if (nft.ownerOf(tokenId) != msg.sender) {
+        if (IERC721(nftContract).ownerOf(tokenId) != msg.sender) {
             revert MarketPlace__ListNFTNotTheOwner();
         }
 
@@ -133,72 +143,155 @@ contract MarketPlace is Ownable, ReentrancyGuard {
      * @param tokenId The ID of the NFT to be purchased.
      */
     function buyNFT(address nftContract, uint256 tokenId) external payable nonReentrant {
-        IERC721 nft = IERC721(nftContract);
         Listing storage listing = s_listings[nftContract][tokenId];
         uint256 amount = listing.price;
-        if (msg.value != amount) {
-            revert MarketPlace__InsufficientFundsOrExcessFundsToPurchase(nftContract, tokenId, amount);
+        uint256 serviceFee = s_fee; // Assuming s_fee is the service fee for purchasing an NFT.
+        uint256 totalCost = amount + serviceFee;
+        if (msg.value != totalCost) {
+            revert MarketPlace__InsufficientFundsOrExcessFundsToPurchase(nftContract, tokenId, totalCost);
         }
 
         address seller = listing.seller;
-        if (nft.ownerOf(tokenId) != seller) {
+        if (IERC721(nftContract).ownerOf(tokenId) != seller) {
             revert MarketPlace__NotTheSeller(nftContract, tokenId);
         }
 
         delete s_listings[nftContract][tokenId];
-        proceeds[seller] += msg.value;
+
         IERC721(nftContract).safeTransferFrom(seller, msg.sender, tokenId);
+        // Transfer the sale amount to the seller
+        (bool success,) = payable(seller).call{ value: amount }("");
+        if (!success) revert MarketPlace__TransferFailed();
 
         emit NFTSold(msg.sender, nftContract, tokenId, listing.price);
     }
 
+    function createAuction(
+        address nftContract,
+        uint256 tokenId,
+        uint256 startingPrice,
+        uint256 durationInDays
+    )
+        external
+    {
+        if (IERC721(nftContract).ownerOf(tokenId) != msg.sender) {
+            revert MarketPlace__AuctionNotTheOwner();
+        }
+        if (s_listings[nftContract][tokenId].price > 0) {
+            revert MarketPlace__AlreadyListed();
+        }
+
+        if (s_auctions[nftContract][tokenId].active == true) {
+            revert MarketPlace__NFTAlreadyInAuction();
+        }
+        if (startingPrice == 0) {
+            revert MarketPlace__StartingPriceMustBeGreaterThanZero();
+        }
+
+        IERC721(nftContract).safeTransferFrom(msg.sender, address(this), tokenId);
+
+        uint256 durationInSeconds = durationInDays * 1 days; // Convert duration from days to seconds
+        uint256 endTime = block.timestamp + durationInSeconds; // Calculate endTime based on duration in seconds
+
+        s_auctions[nftContract][tokenId] = Auction({
+            seller: msg.sender,
+            startingPrice: startingPrice,
+            highestBid: 0,
+            highestBidder: address(0),
+            startTime: block.timestamp,
+            endTime: endTime,
+            active: true
+        });
+
+        emit AuctionCreated(nftContract, tokenId, startingPrice, block.timestamp, endTime);
+    }
+
+    function bidOnAuction(address nftContract, uint256 tokenId) external payable nonReentrant {
+        Auction storage auction = s_auctions[nftContract][tokenId];
+        if (auction.active == false) {
+            revert MarketPlace__NFTAuctionIsNotActive();
+        }
+        if (msg.value < auction.highestBid) {
+            revert MarketPlace__BidIsLessThanHighestBid();
+        }
+        if (auction.highestBidder != address(0)) {
+            // Refund the previous highest bidder
+            (bool refundSuccess,) = payable(auction.highestBidder).call{ value: auction.highestBid }("");
+            if (!refundSuccess) revert MarketPlace__TransferFailed();
+        }
+
+        auction.highestBid = msg.value;
+        auction.highestBidder = msg.sender;
+
+        emit BidPlaced(nftContract, tokenId, msg.sender, msg.value);
+    }
+
+    function endAuction(address nftContract, uint256 tokenId) external onlyGelato nonReentrant {
+        Auction storage auction = s_auctions[nftContract][tokenId];
+        if (auction.active == false) {
+            revert MarketPlace__NFTAuctionIsNotActive();
+        }
+        if (block.timestamp < auction.endTime) {
+            revert MarketPlace__NFTAuctionHasEnded();
+        }
+
+        auction.active = false;
+
+        if (auction.highestBidder != address(0)) {
+            IERC721(nftContract).safeTransferFrom(address(this), auction.highestBidder, tokenId);
+            (bool sellerPaid,) = payable(auction.seller).call{ value: auction.highestBid }("");
+            if (!sellerPaid) revert MarketPlace__TransferFailed();
+        } else {
+            // No bids were placed, return NFT to the seller
+            IERC721(nftContract).safeTransferFrom(address(this), auction.seller, tokenId);
+        }
+
+        emit AuctionEnded(nftContract, tokenId, auction.highestBidder, auction.highestBid);
+    }
+
+    function setGelatoAddress(address _newGelatoAddress) external onlyOwner {
+        gelatoAddress = _newGelatoAddress;
+    }
+
     /**
-     * @notice Withdraws proceeds from sales.
-     * @dev Ensures the caller has proceeds to withdraw and resets the withdrawal amount. Emits a ProceedsWithdrawn
-     * event upon successful withdrawal.
+     * @notice Sets the fee required to create a new NFT collection.
+     * @dev Can only be called by the contract owner. Updates the fee for creating new NFT collections.
+     * @param _fee The new fee amount in wei.
      */
-    function withdrawProceeds() external nonReentrant {
-        uint256 amount = proceeds[msg.sender];
-        if (amount <= 0) revert MarketPlace__NoProceeds();
-
-        proceeds[msg.sender] = 0;
-
-        // Transfer the proceeds to the seller
-        (bool success,) = payable(msg.sender).call{ value: amount }("");
-        if (!success) revert MarketPlace__TransferFailed();
-
-        emit ProceedsWithdrawn(msg.sender, amount);
+    function setFee(uint256 _fee) external onlyOwner {
+        s_fee = _fee;
     }
 
-    // Function to create an auction
-    function createAuction(address nftContract, uint256 tokenId, uint256 startingPrice, uint256 duration) external {
-        // Require that the NFT is not already listed or part of an active auction
-        // Transfer the NFT to the contract for escrow
-        // Set the auction details in `s_auctions`
-        // Emit AuctionCreated event
-    }
-
-    // Function to bid on an auction
-    function bidOnAuction(address nftContract, uint256 tokenId) external payable {
-        // Require that the auction is active
-        // Require that the bid is higher than the current highest bid
-        // Refund the previous highest bidder
-        // Update the highest bid and bidder
-        // Emit BidPlaced event
-    }
-
-    // Function to end an auction
-    function endAuction(address nftContract, uint256 tokenId) external {
-        // Require that the auction end time has passed
-        // Transfer the NFT to the highest bidder
-        // Transfer the highest bid to the seller
-        // Mark the auction as inactive
-        // Emit AuctionEnded event
+    /**
+     * @notice Withdraws the accumulated fees to the contract owner's address.
+     * @dev Transfers the entire balance of the contract to the owner. Can only be called by the owner.
+     * @custom:reverts FactoryNFTContract__InsufficientFunds if there are no funds to withdraw.
+     */
+    function withdraw() external onlyOwner {
+        if (address(this).balance == 0) {
+            revert MarketPlace__InsufficientFees();
+        }
+        payable(owner()).transfer(address(this).balance);
     }
 
     //////////////////////////////////////
     // Public/External View Functions   //
     //////////////////////////////////////
+    function checkAuctionEndCondition(
+        address nftContract,
+        uint256 tokenId
+    )
+        external
+        view
+        returns (bool canExec, bytes memory execPayload)
+    {
+        Auction memory auction = s_auctions[nftContract][tokenId];
+        canExec = (auction.active && block.timestamp >= auction.endTime);
+
+        execPayload = canExec ? abi.encodeWithSelector(this.endAuction.selector, nftContract, tokenId) : bytes("");
+
+        return (canExec, execPayload);
+    }
     /**
      * @notice Returns the listing information for an NFT.
      * @dev Provides read-only access to NFT listings.
@@ -206,17 +299,28 @@ contract MarketPlace is Ownable, ReentrancyGuard {
      * @param tokenId The ID of the NFT.
      * @return The listing information for the given NFT.
      */
+
     function getListing(address nftContract, uint256 tokenId) external view returns (Listing memory) {
         return s_listings[nftContract][tokenId];
     }
 
     /**
-     * @notice Returns the total proceeds earned by a seller.
-     * @dev Provides read-only access to seller proceeds.
-     * @param seller The address of the seller.
-     * @return The total proceeds earned by the seller.
+     * @notice Returns the auction information for an NFT.
+     * @dev Provides read-only access to NFT auction.
+     * @param nftContract The address of the NFT contract.
+     * @param tokenId The ID of the NFT.
+     * @return The auction information for the given NFT.
      */
-    function getSellerProceeds(address seller) external view returns (uint256) {
-        return proceeds[seller];
+    function getAuction(address nftContract, uint256 tokenId) external view returns (Auction memory) {
+        return s_auctions[nftContract][tokenId];
+    }
+
+    /**
+     * @notice Returns the current fee for creating a new NFT collection.
+     * @dev Provides a view function to see the current fee required to create a new NFT collection.
+     * @return The fee amount in wei required to create a new NFT collection.
+     */
+    function getFee() external view returns (uint256) {
+        return s_fee;
     }
 }

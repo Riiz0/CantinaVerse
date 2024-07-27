@@ -21,7 +21,7 @@ contract DeployMarketPlace is Script {
         HelperConfig helperConfig = new HelperConfig();
         HelperConfig.NetworkConfig memory config = helperConfig.getActiveNetworkConfig();
 
-        MarketPlace marketPlace = new MarketPlace(config.initialOwner);
+        MarketPlace marketPlace = new MarketPlace(config.initialOwner, config.initialGelatoAddress);
 
         return (marketPlace, helperConfig);
     }
