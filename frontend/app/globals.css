@@ -270,14 +270,14 @@ body {
 \*-----------------------------------*/
 .homepage-container {
   width: 100%;
-  font-family: var(--ff-jost), sans-serif; /* Apply Jost font to the entire container */
+  font-family: var(--ff-jost), sans-serif; 
   display: flex;
-  flex-direction: column; /* Stack children vertically */
+  flex-direction: column;
 }
 
 .homepage-navbar {
   display: flex;
-  justify-content: space-between; /* Adjust this to space-between */
+  justify-content: space-between; 
   align-items: center;
   padding: 25px 42px;
   background-color: var(--navbar-bg-color);
@@ -291,7 +291,7 @@ body {
 .homepage-navbar ul {
   display: flex;
   gap: 40px;
-  list-style-type: none; /* Remove default list styling */
+  list-style-type: none; 
 }
 
 .homepage-navbar ul li {
@@ -299,28 +299,28 @@ body {
 }
 
 .homepage-navbar a {
-  text-decoration: none; /* Remove underline */
-  color: inherit; /* Inherit the parent's color */
+  text-decoration: none; 
+  color: inherit; 
 }
 
 .homepage-navbar a:hover {
-  opacity: 0.8; /* Slight hover effect for links */
+  opacity: 0.8; 
 }
 
 .homepage-navbar .logo {
-  height: 40px; /* Adjusted for visibility */
-  filter: brightness(70%); /* Lighten the logo slightly */
+  height: 40px;
+  filter: brightness(70%); 
 }
 
 .homepage-top-container {
-  background-color: var(--navbar-bg-color); /* Use navbar bg color for consistency */
+  background-color: var(--navbar-bg-color); 
   padding: 130px;
   text-align: center;
-  color: var(--text-color); /* Ensure text color matches the variable */
+  color: var(--text-color);
 }
 
 .logo-and-title, .hidden-element {
-  flex: 1; /* This makes both elements take equal space */
+  flex: 1; 
   display: flex;
   align-items: center;
   gap: 10px;
@@ -328,7 +328,7 @@ body {
 }
 
 .navbar-title {
-  font-size: 25px; /* Adjust font size as needed */
+  font-size: 25px;
   color: var(--text-color);
 }
 
@@ -356,16 +356,16 @@ body {
 
 .main-heading {
   color: white;
-  font-size: 4.5em; /* Larger font size */
+  font-size: 4.5em; 
   margin-bottom: 25px;
 }
 
 .join-us-btn {
-  display: flex; /* Enable Flexbox */
-  justify-content: center; /* Center items horizontally */
-  align-items: center; /* Center items vertically */
-  gap: 5px; /* Space between text and icon */
-  margin: 20px auto 0; /* Add margin on top and auto on the sides to center it */
+  display: flex; 
+  justify-content: center; 
+  align-items: center; 
+  gap: 5px; 
+  margin: 20px auto 0; 
   background-color: white;
   color: black;
   padding: 20px 70px;
@@ -378,7 +378,7 @@ body {
 }
 
 .join-us-btn:hover {
-  background-color: rgb(200, 200, 200); /* Light-mid grey hover effect */
+  background-color: rgb(200, 200, 200); 
 }
 
 .image-container {
@@ -391,36 +391,36 @@ body {
 }
 
 .image-1 {
-  background-image: url('/assets/4.svg');
-  background-size: cover; /* Cover the entire area of the container */
-  background-position: center; /* Center the background image */
-  border-radius: 32px; /* Adjust as needed to match the button's border-radius */
-  width: 650px; /* Adjust based on your design needs */
-  height: 550px; /* Adjust based on your design needs */
+  background-image: url('/assets/1.svg');
+  background-size: cover; 
+  background-position: center; 
+  border-radius: 32px; 
+  width: 650px; 
+  height: 550px; 
 }
 
 .image-2 {
-  background-image:url('/assets/10.svg');
-  background-size: cover; /* Cover the entire area of the container */
-  background-position: center; /* Center the background image */
-  border-radius: 32px; /* Adjust as needed to match the button's border-radius */
-  width: 350px; /* Adjust based on your design needs */
-  height: 500px; /* Adjust based on your design needs */
+  background-image:url('/assets/2.svg');
+  background-size: cover; 
+  background-position: center; 
+  border-radius: 32px; 
+  width: 350px; 
+  height: 500px; 
 }
 
 .image-3 {
-  background-image:url('/assets/12.svg');
-  background-size: cover; /* Cover the entire area of the container */
-  background-position: center; /* Center the background image */
-  border-radius: 32px; /* Adjust as needed to match the button's border-radius */
-  width: 400px; /* Adjust based on your design needs */
-  height: 300px; /* Adjust based on your design needs */
+  background-image:url('/assets/3.svg');
+  background-size: cover; 
+  background-position: center; 
+  border-radius: 32px; 
+  width: 400px; 
+  height: 300px; 
 }
 
 .right-aligned-container {
   display: flex;
   flex-direction: column;
-  align-items: flex-end; /* This aligns the container's children to the right */
+  align-items: flex-end; 
   max-width: 50%;
   padding: 0 50px;
 }
@@ -442,14 +442,14 @@ body {
   flex-direction: column;
   align-items: flex-start;
   text-align: left;
-  max-width: 50%; /* Prevent the container from expanding too wide */
+  max-width: 50%; 
   padding: 0 50px;
 }
 
 .product-design-strategy {
   color: var(--text-color);
   font-size: 28px;
-  position: relative; /* Needed for the pseudo-element to work correctly */
+  position: relative; 
 }
 
 .development-engineering{
@@ -460,11 +460,12 @@ body {
 .additional-info {
   color: rgb(138, 138, 142, 1);
   font-size: 20px;
-  margin-top: 20px; /* Add more space above */
+  margin-top: 20px; 
 }
 .tell-me-more {
-  color: #FFFFFF; /* White color */
-  margin-top: 10px; /* Space above the new paragraph */
+  color: #FFFFFF; 
+  margin-top: 10px; 
+  max-width: 125px;
 }
 
 .line-break {
@@ -482,6 +483,8 @@ body {
   align-items: center; 
   gap: 5px; 
   text-decoration: underline;
+  margin-top: 10px;
+  margin-bottom:10px;
 }
 
 .tell-me-more:hover, .tell-me-more-2:hover {
@@ -489,63 +492,159 @@ body {
 }
 
 .tell-me-more-content:hover > svg, .tell-me-more-content:hover > svg {
-  transform: translateX(5px); /* Move the arrow icon slightly to the right */
-  transition: transform 0.3s ease; /* Smooth transition for the movement */
+  transform: translateX(5px); 
+  transition: transform 0.3s ease; 
 }
 
 .top-section, .bottom-section {
-  margin: 10px 0; /* Add some vertical spacing between sections */
+  margin: 10px 0; 
 }
 
 .what-we-do-sections {
   background-color: var(--other-sections-bg-color);
-  display: flex; /* Use Flexbox to layout the containers */
-  justify-content: space-around; /* Distribute space around the containers */
-  align-items: flex-start; /* Align items to the start */
-  padding: 50px 0;
+  display: flex; 
+  justify-content: space-around; 
+  align-items: flex-start; 
+  padding: 75px 0;
   text-align: center;
   color: var(--text-color);
-  width: 100%; /* Optional: Set a maximum width for the section */
-  margin: 0 auto; /* Center the section horizontally */
+  width: 100%; 
+  margin: 0 auto; 
 }
 
 .ecosystem-sections {
   background-color: var(--navbar-bg-color);
-  display: flex; /* Use Flexbox to layout the containers */
-  justify-content: space-around; /* Distribute space around the containers */
-  align-items: flex-start; /* Align items to the start */
-  padding: 50px 0;
-  text-align: center;
+  display: flex; 
+  justify-content: space-between; 
+  padding: 80px 200px;
+  text-align: left;
   color: var(--text-color);
-  width: 100%; /* Optional: Set a maximum width for the section */
-  margin: 0 auto; /* Center the section horizontally */
+  width: 100%;
+  margin: 0 auto;
 }
 
-.problem-we-solve-sections {
+.left-column,
+.right-column {
+  display: flex;
+  flex-direction: column; 
+  align-items: flex-start; 
+  width: 48%;
+}
+
+.text-container {
+  width: 100%; 
+  margin-bottom: 5%; 
+}
+
+.diagonal-container-1,
+.diagonal-container-3 {
   background-color: var(--other-sections-bg-color);
-  display: flex; /* Use Flexbox to layout the containers */
-  justify-content: space-around; /* Distribute space around the containers */
-  align-items: flex-start; /* Align items to the start */
+  width: 95%; 
+  margin-bottom: 10%; 
+  border-radius: 32px; 
+}
+
+.diagonal-container-2,
+.diagonal-container-4 {
+  background-color: var(--other-sections-bg-color);
+  width: 95%; 
+  margin-top: 10%; 
+  border-radius: 32px;
+}
+
+.container-image {
+  border-top-left-radius: 32px;
+  border-top-right-radius: 32px; 
+}
+
+.ecosystem-section-subtitle {
+  color: rgb(138, 138, 142, 1);
+  font-size: 25px;
+  text-align: left;
+}
+
+.ecosystem-section-text {
+  font-size: 3.5em;
+  color: var(--text-color);
+  text-align: left;
+}
+
+.ecosystem-header-name {
+  color: var(--text-color);
+  font-size: 28px;
+  position: relative;
+  margin-top: 40px;
+  margin-left: 40px;
+  padding: 0 10px;
+}
+
+.eco-additional-info {
+  color: rgb(138, 138, 142, 1);
+  font-size: 18px;
+  margin-top: 10px; 
+  margin-left: 40px;
+  margin-right: 40px;
+  padding: 0 10px;
+}
+.eco-tell-me-more {
+  color: #FFFFFF; 
+  margin-top: 40px; 
+  margin-left: 40px;
+  margin-bottom: 50px;
+  max-width: 100px;
+}
+
+.eco-tell-me-more-content {
+  display: inline-flex; 
+  align-items: center; 
+  gap: 5px; 
+  text-decoration: underline;
+}
+
+.eco-tell-me-more:hover, .eco-tell-me-more-2:hover {
+  color: rgb(138, 138, 142, 1);
+}
+
+.eco-tell-me-more-content:hover > svg, .eco-tell-me-more-content:hover > svg {
+  transform: translateX(5px); 
+  transition: transform 0.3s ease; 
+}
+
+.road-map-sections {
+  background-color: var(--other-sections-bg-color);
+  display: flex;
+  justify-content: space-around; 
+  align-items: flex-start; 
   padding: 50px 0;
   text-align: center;
   color: var(--text-color);
-  width: 100%; /* Optional: Set a maximum width for the section */
-  margin: 0 auto; /* Center the section horizontally */
+  width: 100%; 
+  margin: 0 auto; 
 }
 
 .what-others-have-to-say-sections {
   background-color: var(--navbar-bg-color);
-  display: flex; /* Use Flexbox to layout the containers */
-  justify-content: space-around; /* Distribute space around the containers */
-  align-items: flex-start; /* Align items to the start */
+  display: flex;
+  justify-content: space-around; 
+  align-items: flex-start; 
   padding: 50px 0;
   text-align: center;
   color: var(--text-color);
-  width: 100%; /* Optional: Set a maximum width for the section */
-  margin: 0 auto; /* Center the section horizontally */
+  width: 100%; 
+  margin: 0 auto; 
 }
 
-
+.getting-started-section {
+  background-color: var(--other-sections-bg-color);
+  display: flex; 
+  justify-content: space-around; 
+  align-items: flex-start; 
+  padding: 50px 0;
+  text-align: center;
+  color: var(--text-color);
+  width: 100%; 
+  margin: 0 auto; 
+}
 
 /*-----------------------------------*\
   #HEADER
@@ -1079,6 +1178,31 @@ body {
 .back-to-top:is(:hover, :focus) { background-color: var(--raisin-black); }
 
 
+/*-----------------------------------*\
+  #COMING SOON
+\*-----------------------------------*/
+.coming-soon-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 90vh; /* Adjusted from 100vh to give some space at the top and bottom */
+  text-align: center;
+  background-color: var(--navbar-bg-color);
+  color: #f0f4f8;
+  padding: 20px; /* Adds some padding around the content */
+}
+
+.coming-soon-container h1 {
+  font-size: 2.5rem;
+  margin-bottom: 1rem; /* Adjusted for better spacing */
+}
+
+.coming-soon-container p {
+  font-size: 1.2rem;
+  color: #666;
+  margin-bottom: 1rem; /* Adds space between paragraphs */
+}
 
 
 
