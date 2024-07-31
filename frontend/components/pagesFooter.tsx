@@ -1,4 +1,5 @@
 'use client';
+
 import { IoLogoTwitter } from "react-icons/io";
 import { CgWebsite } from "react-icons/cg";
 import { IoPaperPlaneOutline } from "react-icons/io5";
@@ -7,7 +8,7 @@ import Link from 'next/link';
 
 export function Footer() {
   return (
-    <footer className="homepage-footer">
+    <footer className="footer">
       <div className="container">
 
         <div className="footer-top">
@@ -19,7 +20,7 @@ export function Footer() {
             </a>
 
             <p className="footer-text">
-            Our mission is to empower creators, gamers, and investors with unparalleled opportunities for expression, engagement, and financial empowerment.
+            Explore, Create, and Trade Extraordinary NFTs on Cantina, the premier marketplace for digital art and collectibles. Your journey into the world of NFTs begins here.
             </p>
 
             <ul className="social-list">

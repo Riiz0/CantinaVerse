@@ -9,7 +9,7 @@ export function Explorer() {
     <section className="section explore" id="explore">
       <div className="container">
 
-        <p className="section-subtitle">Exclusive Assets</p>
+        <p className="section-subtitle">Collections</p>
 
         <div className="title-wrapper">
           <h2 className="h2 section-title">Explore</h2>

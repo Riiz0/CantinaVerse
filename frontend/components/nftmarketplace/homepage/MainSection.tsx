@@ -2,10 +2,10 @@
 
 import { Explorer } from "./Explorer";
 import { HeroContainer } from "./HeroContainer";
-import { TopSeller } from "./TopSeller";
-import { Collections } from './Collections';
+import { RecentListings } from "./RecentListings";
+import { RecentAuctions } from './RecentAuctions';
 import { Instructions } from './Instructions';
-import { Footer } from './Footer';
+import { Footer } from '../../pagesFooter';
 import { TiArrowUpOutline } from "react-icons/ti";
 
 
@@ -15,8 +15,8 @@ export default function MainSection() {
         <article>
           <HeroContainer />
           <Explorer />
-          <TopSeller />
-          <Collections />
+          <RecentListings />
+          <RecentAuctions />
           <Instructions />
           <Footer />
           <a href="#top" className="back-to-top" aria-label="Back to Top" data-back-top-btn>

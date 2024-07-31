@@ -36,25 +36,22 @@ export default function Header() {
             <li>
               <Link href="/"><div className="navbar-link" data-navlink>Home</div></Link>
             </li>
-
+            <li>
+              <Link href="/explore"><div className="navbar-link" data-navlink>Explore</div></Link>
+              </li>
             <li>
               <Link href="/create"><div className="navbar-link" data-navlink>Create</div></Link>
             </li>
             
             <li>
-              <Link href="/explore"><div className="navbar-link" data-navlink>Explore</div></Link>
+              <Link href="/mint"><div className="navbar-link" data-navlink>Mint</div></Link>
+            </li>              
+            <li>
+              <Link href="/trade"><div className="navbar-link" data-navlink>Trade</div></Link>
             </li>
 
             <li>
-              <Link href="/collections"><div className="navbar-link" data-navlink>Collections</div></Link>
-              </li>
-              
-            <li>
-              <Link href="/aboutus"><div className="navbar-link" data-navlink>About Us</div></Link>
-            </li>
-
-            <li>
-              <Link href="/contact"><div className="navbar-link" data-navlink>Contact</div></Link>
+              <Link href="/auction"><div className="navbar-link" data-navlink>Auction</div></Link>
             </li>
           </ul>
         </nav>

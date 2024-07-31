@@ -3,7 +3,10 @@
   /**
    * colors
    */
-
+   --navbar-bg-color: #111111;
+   --top-container-bg-color: #111111;
+   --other-sections-bg-color: #202020;
+   --text-color: #ffffff;
    --rich-black-fogra-39: hsl(0, 0%, 0%);
    --spanish-gray: hsl(0, 0%, 56%);
    --eerie-black-1: hsl(252, 11%, 9%);
@@ -262,13 +265,291 @@ body {
 .card-title > a { transition: var(--transition-2); }
 
 
+/*-----------------------------------*\
+  #HOMEPAGE
+\*-----------------------------------*/
+.homepage-container {
+  width: 100%;
+  font-family: var(--ff-jost), sans-serif; /* Apply Jost font to the entire container */
+  display: flex;
+  flex-direction: column; /* Stack children vertically */
+}
+
+.homepage-navbar {
+  display: flex;
+  justify-content: space-between; /* Adjust this to space-between */
+  align-items: center;
+  padding: 25px 42px;
+  background-color: var(--navbar-bg-color);
+  color: var(--text-color);
+  font-family: var(--ff-poppins), sans-serif;
+  width: 100%;
+  position: sticky;
+  z-index: 1030;
+}
+
+.homepage-navbar ul {
+  display: flex;
+  gap: 40px;
+  list-style-type: none; /* Remove default list styling */
+}
+
+.homepage-navbar ul li {
+  cursor: pointer;
+}
+
+.homepage-navbar a {
+  text-decoration: none; /* Remove underline */
+  color: inherit; /* Inherit the parent's color */
+}
+
+.homepage-navbar a:hover {
+  opacity: 0.8; /* Slight hover effect for links */
+}
+
+.homepage-navbar .logo {
+  height: 40px; /* Adjusted for visibility */
+  filter: brightness(70%); /* Lighten the logo slightly */
+}
+
+.homepage-top-container {
+  background-color: var(--navbar-bg-color); /* Use navbar bg color for consistency */
+  padding: 130px;
+  text-align: center;
+  color: var(--text-color); /* Ensure text color matches the variable */
+}
+
+.logo-and-title, .hidden-element {
+  flex: 1; /* This makes both elements take equal space */
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding-left: 75px;
+}
+
+.navbar-title {
+  font-size: 25px; /* Adjust font size as needed */
+  color: var(--text-color);
+}
+
+.navbar-links {
+  font-size: 25px;
+  flex: 2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  list-style-type: none;
+}
+
+.mission-statement, .mission-description {
+  color: rgb(138, 138, 142, 1);
+  font-size: 25px;
+  margin-bottom: 10px;
+  padding: 0 300px;
+}
+
+.mission-description {
+  color: rgb(138, 138, 142, 1);
+  font-size: 25px;
+  margin-bottom: 35px;
+}
+
+.main-heading {
+  color: white;
+  font-size: 4.5em; /* Larger font size */
+  margin-bottom: 25px;
+}
+
+.join-us-btn {
+  display: flex; /* Enable Flexbox */
+  justify-content: center; /* Center items horizontally */
+  align-items: center; /* Center items vertically */
+  gap: 5px; /* Space between text and icon */
+  margin: 20px auto 0; /* Add margin on top and auto on the sides to center it */
+  background-color: white;
+  color: black;
+  padding: 20px 70px;
+  border: none;
+  border-radius: 32px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-size: 20px;
+  margin-bottom: 50px; 
+}
+
+.join-us-btn:hover {
+  background-color: rgb(200, 200, 200); /* Light-mid grey hover effect */
+}
+
+.image-container {
+  background: linear-gradient(var(--navbar-bg-color), var(--other-sections-bg-color));
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 100px 50px;
+  gap: 50px;
+}
+
+.image-1 {
+  background-image: url('/assets/4.svg');
+  background-size: cover; /* Cover the entire area of the container */
+  background-position: center; /* Center the background image */
+  border-radius: 32px; /* Adjust as needed to match the button's border-radius */
+  width: 650px; /* Adjust based on your design needs */
+  height: 550px; /* Adjust based on your design needs */
+}
+
+.image-2 {
+  background-image:url('/assets/10.svg');
+  background-size: cover; /* Cover the entire area of the container */
+  background-position: center; /* Center the background image */
+  border-radius: 32px; /* Adjust as needed to match the button's border-radius */
+  width: 350px; /* Adjust based on your design needs */
+  height: 500px; /* Adjust based on your design needs */
+}
+
+.image-3 {
+  background-image:url('/assets/12.svg');
+  background-size: cover; /* Cover the entire area of the container */
+  background-position: center; /* Center the background image */
+  border-radius: 32px; /* Adjust as needed to match the button's border-radius */
+  width: 400px; /* Adjust based on your design needs */
+  height: 300px; /* Adjust based on your design needs */
+}
+
+.right-aligned-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end; /* This aligns the container's children to the right */
+  max-width: 50%;
+  padding: 0 50px;
+}
+
+.homepage-section-subtitle {
+  color: rgb(138, 138, 142, 1);
+  font-size: 25px;
+  text-align: right;
+}
+
+.homepage-section-text {
+  font-size: 3.5em;
+  color: var(--text-color);
+  text-align: right;
+}
+
+.left-aligned-container {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  max-width: 50%; /* Prevent the container from expanding too wide */
+  padding: 0 50px;
+}
+
+.product-design-strategy {
+  color: var(--text-color);
+  font-size: 28px;
+  position: relative; /* Needed for the pseudo-element to work correctly */
+}
+
+.development-engineering{
+  color: var(--text-color);
+  font-size: 28px;
+}
+
+.additional-info {
+  color: rgb(138, 138, 142, 1);
+  font-size: 20px;
+  margin-top: 20px; /* Add more space above */
+}
+.tell-me-more {
+  color: #FFFFFF; /* White color */
+  margin-top: 10px; /* Space above the new paragraph */
+}
+
+.line-break {
+  content: "";
+  display: block;
+  width: 100%;
+  height: 2px;
+  background-color: currentColor;
+  margin-top: 40px;
+  margin-bottom: 20px;
+}
+
+.tell-me-more-content {
+  display: inline-flex; 
+  align-items: center; 
+  gap: 5px; 
+  text-decoration: underline;
+}
+
+.tell-me-more:hover, .tell-me-more-2:hover {
+  color: rgb(138, 138, 142, 1);
+}
+
+.tell-me-more-content:hover > svg, .tell-me-more-content:hover > svg {
+  transform: translateX(5px); /* Move the arrow icon slightly to the right */
+  transition: transform 0.3s ease; /* Smooth transition for the movement */
+}
+
+.top-section, .bottom-section {
+  margin: 10px 0; /* Add some vertical spacing between sections */
+}
+
+.what-we-do-sections {
+  background-color: var(--other-sections-bg-color);
+  display: flex; /* Use Flexbox to layout the containers */
+  justify-content: space-around; /* Distribute space around the containers */
+  align-items: flex-start; /* Align items to the start */
+  padding: 50px 0;
+  text-align: center;
+  color: var(--text-color);
+  width: 100%; /* Optional: Set a maximum width for the section */
+  margin: 0 auto; /* Center the section horizontally */
+}
+
+.ecosystem-sections {
+  background-color: var(--navbar-bg-color);
+  display: flex; /* Use Flexbox to layout the containers */
+  justify-content: space-around; /* Distribute space around the containers */
+  align-items: flex-start; /* Align items to the start */
+  padding: 50px 0;
+  text-align: center;
+  color: var(--text-color);
+  width: 100%; /* Optional: Set a maximum width for the section */
+  margin: 0 auto; /* Center the section horizontally */
+}
+
+.problem-we-solve-sections {
+  background-color: var(--other-sections-bg-color);
+  display: flex; /* Use Flexbox to layout the containers */
+  justify-content: space-around; /* Distribute space around the containers */
+  align-items: flex-start; /* Align items to the start */
+  padding: 50px 0;
+  text-align: center;
+  color: var(--text-color);
+  width: 100%; /* Optional: Set a maximum width for the section */
+  margin: 0 auto; /* Center the section horizontally */
+}
+
+.what-others-have-to-say-sections {
+  background-color: var(--navbar-bg-color);
+  display: flex; /* Use Flexbox to layout the containers */
+  justify-content: space-around; /* Distribute space around the containers */
+  align-items: flex-start; /* Align items to the start */
+  padding: 50px 0;
+  text-align: center;
+  color: var(--text-color);
+  width: 100%; /* Optional: Set a maximum width for the section */
+  margin: 0 auto; /* Center the section horizontally */
+}
 
 
 
 /*-----------------------------------*\
   #HEADER
 \*-----------------------------------*/
-
 .header .btn > span { display: none; }
 
 .header {
@@ -562,7 +843,7 @@ body {
 /*-----------------------------------*\
   #FOOTER
 \*-----------------------------------*/
-
+.homepage-footer { background-color: var(--navbar-bg-color); }
 .footer { background-color: var(--xiketic); }
 
 .footer-top {

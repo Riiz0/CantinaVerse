@@ -2,14 +2,14 @@
 
 import Image from 'next/image';
 
-export function TopSeller() {
+export function RecentListings() {
     return (
       <section className="section top-seller" id="top-seller">
         <div className="container">
 
-          <p className="section-subtitle">Creative Artist</p>
+          <p className="section-subtitle">Listings</p>
 
-          <h2 className="h2 section-title">Top Sellers</h2>
+          <h2 className="h2 section-title">Top Listings</h2>
 
           <ul className="grid-list">
 

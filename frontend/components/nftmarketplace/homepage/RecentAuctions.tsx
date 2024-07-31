@@ -3,15 +3,15 @@
 import { TiArrowForwardOutline } from "react-icons/ti";
 import Image from 'next/image';
 
-export function Collections() {
+export function RecentAuctions() {
     return (
       <section className="section collection" id="collection">
         <div className="container">
 
-          <p className="section-subtitle">Most Popular</p>
+          <p className="section-subtitle">Auctions</p>
 
           <div className="title-wrapper">
-            <h2 className="h2 section-title">Popular Collections</h2>
+            <h2 className="h2 section-title">Popular Auctions</h2>
 
             <a href="#" className="btn-link">
               <span>View All</span>
