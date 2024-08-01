@@ -35,7 +35,7 @@ export default function HomePage() {
           <p className="mission-statement">Our Mission</p>
           <h1 className="main-heading">Building an ecosystem for all</h1>
           <p className="mission-description">Empowering creators, gamers, and investors with unparalleled opportunities for expression, engagement, and financial empowerment...</p>
-          <button className="join-us-btn">Join us <TiArrowForwardOutline aria-hidden="true" /></button>
+          <button className="join-us-btn">Learn More<TiArrowForwardOutline aria-hidden="true" /></button>
         </div>
 
         <div className="image-container">
@@ -47,12 +47,14 @@ export default function HomePage() {
         <section className="what-we-do-sections">
           <div className="right-aligned-container">
             <p className="homepage-section-subtitle">What we do</p>
-            <p className="homepage-section-text">Redefining the digital asset landscape, meticulously crafted to serve a broad spectrum of users, anchored on the robust Superchain infrastructure.</p>
+            <p className="homepage-section-text spacing-class">Redefining the digital asset landscape.</p>
+            <p className="homepage-section-text spacing-class">Meticulously crafted to serve a broad spectrum of users.</p>
+            <p className="homepage-section-text">Anchored on the robust Superchain infrastructure.</p>
           </div>
           <div className="left-aligned-container">
             <div className="top-section">
               <p className="product-design-strategy">Challenge</p>
-              <p className="additional-info">In the rapidly evolving blockchain landscape, standing out is not just about introducing innovative features—it's about deeply understanding user needs, uncompromisingly prioritizing quality and security, and steadfastly committing to community engagement. The challenge lies in creating a platform that resonates with a diverse audience, from seasoned crypto enthusiasts to newcomers, while ensuring that every transaction is secure, every interaction is meaningful, and every contribution is valued.</p>
+              <p className="additional-info">Navigating the fast-paced blockchain landscape demands more than just innovative features—it requires a profound understanding of user needs, an unwavering commitment to quality and security, and a steadfast dedication to community engagement. The true challenge is crafting a platform that appeals to a wide audience, ranging from seasoned crypto enthusiasts to those new to the space, while guaranteeing secure transactions, meaningful interactions, and valuing every contribution.</p>
               <p className="tell-me-more">
                 <a href="https://example.com/whitepaper" target="_blank" rel="noopener noreferrer">
                   <span className="tell-me-more-content">Tell me more <TiArrowForwardOutline aria-hidden="true" /></span>
@@ -62,7 +64,7 @@ export default function HomePage() {
             </div>
             <div className="bottom-section">
               <p className="development-engineering">Solution</p>
-              <p className="additional-info">CantinaVerse rises to meet these challenges head-on by weaving together a comprehensive ecosystem tailored to a broad spectrum of interests and expertise. We prioritize user experience at every turn, implementing stringent security measures to safeguard transactions, and fostering an active community where every voice counts. Our platform is designed to be a beacon of innovation, a hub for creative expression, and a catalyst for meaningful engagement within the blockchain space.</p>
+              <p className="additional-info">CantinaVerse confronts these challenges directly by crafting a comprehensive ecosystem designed to cater to a wide range of interests and expertise. Prioritizing user experience at every stage, we enforce rigorous security measures to protect transactions and cultivate an active community where every voice matters. Our platform aims to serve as a beacon of innovation, a nexus for creative expression, and a driving force for meaningful engagement across the blockchain ecosystem.</p>
               <p className="tell-me-more">
                 <a href="https://example.com/whitepaper" target="_blank" rel="noopener noreferrer">
                   <span className="tell-me-more-content">Tell me more <TiArrowForwardOutline aria-hidden="true" /></span>

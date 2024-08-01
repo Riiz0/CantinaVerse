@@ -286,6 +286,8 @@ body {
   width: 100%;
   position: sticky;
   z-index: 1030;
+  position: sticky;
+  top: 0;
 }
 
 .homepage-navbar ul {
@@ -436,6 +438,10 @@ body {
   font-size: 3.5em;
   color: var(--text-color);
   text-align: right;
+}
+
+.spacing-class {
+  margin-bottom: 55px; /* Adjust this value as needed */
 }
 
 .left-aligned-container {
@@ -669,6 +675,20 @@ body {
   display: flex;
   align-items: center;
   gap: 30px;
+}
+
+.logo-wrapper {
+  display: flex;
+  align-items: center;
+  text-decoration: none; /* Remove underline from link */
+  color: inherit; /* Inherit text color */
+}
+
+.logo-text {
+  margin-left: 10px; /* Space between logo and text */
+  font-size: 24px; /* Example size, adjust as needed */
+  color: #fff; /* Example color, adjust as needed */
+  font-weight: var(--fw-600)
 }
 
 .menu-open-btn {
