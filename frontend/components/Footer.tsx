@@ -19,7 +19,7 @@ export function Footer() {
             </a>
 
             <p className="footer-text">
-            Our mission is to empower creators, gamers, and investors with unparalleled opportunities for expression, engagement, and financial empowerment.
+              Our mission is to empower creators, gamers, and investors with unparalleled opportunities for expression, engagement, and financial empowerment.
             </p>
 
             <ul className="social-list">
@@ -38,41 +38,42 @@ export function Footer() {
           </div>
 
           <ul className="footer-list">
-
             <li>
-              <p className="footer-list-title">Useful Links</p>
+              <p className="footer-list-title">Ecosystem</p>
             </li>
 
-            <li>
-              <a href="#" className="footer-link">All NFTs</a>
-            </li>
-
-            <li>
-              <a href="#" className="footer-link">How It Works</a>
-            </li>
-
-            <Link href="/create">
-            <li>
-              <div className="footer-link">Create</div>
-            </li>
+            <Link href="/marketplace">
+              <li>
+                <div className="footer-link">Marketplace</div>
+              </li>
             </Link>
 
-            <Link href="/explore">
-            <li>
-              <div className="footer-link">Explore</div>
-            </li>
+            <Link href="/tokencreation">
+              <li>
+                <div className="footer-link">Token Creation</div>
+              </li>
             </Link>
 
+            <Link href="/casinogames">
+              <li>
+                <div className="footer-link">Gaming</div>
+              </li>
+            </Link>
+
+            <Link href="/governance">
+              <li>
+                <div className="footer-link">DAO</div>
+              </li>
+            </Link>
           </ul>
 
           <ul className="footer-list">
-
             <li>
               <p className="footer-list-title">Community</p>
             </li>
 
             <li>
-              <a href="https://app.optimism.io/superchain/" className="footer-link">Superchain Docs</a>
+              <a href="https://app.optimism.io/superchain/" className="footer-link">Superchain</a>
             </li>
 
             <li>
@@ -86,16 +87,15 @@ export function Footer() {
             <li>
               <a href="#" className="footer-link">Whitepaper</a>
             </li>
-
           </ul>
 
           <div className="footer-list">
             <p className="footer-list-title">Subscribe Us</p>
             <form action="" className="newsletter-form">
               <input type="email" name="email" placeholder="info@yourmail.com" required className="newsletter-input" />
-                <button type="submit" className="newsletter-btn" aria-label="Submit">
-                  <IoPaperPlaneOutline />
-                </button>
+              <button type="submit" className="newsletter-btn" aria-label="Submit">
+                <IoPaperPlaneOutline />
+              </button>
             </form>
           </div>
         </div>
@@ -104,7 +104,6 @@ export function Footer() {
             &copy; 2024 <div className="copyright-link">CantinaVerse</div>. All Rights Reserved
           </div>
         </div>
-
       </div>
     </footer>
   );

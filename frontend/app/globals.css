@@ -429,6 +429,7 @@ body {
   color: rgb(138, 138, 142, 1);
   font-size: 25px;
   text-align: right;
+  margin: 10px 0; 
 }
 
 .homepage-section-text {

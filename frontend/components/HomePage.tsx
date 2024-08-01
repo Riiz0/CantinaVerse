@@ -47,7 +47,7 @@ export default function HomePage() {
         <section className="what-we-do-sections">
           <div className="right-aligned-container">
             <p className="homepage-section-subtitle">What we do</p>
-            <p className="homepage-section-text">A pioneering blockchain ecosystem that redefines the digital asset landscape. Meticulously crafted to serve a broad spectrum of users, anchored on the robust Superchain infrastructure.</p>
+            <p className="homepage-section-text">Redefining the digital asset landscape, meticulously crafted to serve a broad spectrum of users, anchored on the robust Superchain infrastructure.</p>
           </div>
           <div className="left-aligned-container">
             <div className="top-section">
