@@ -52,9 +52,9 @@ contract MarketPlace is Ownable, ReentrancyGuard, IERC721Receiver {
         InAuction
     }
 
-    mapping(address => mapping(uint256 => NFTStatus)) public s_nftStatuses;
-    mapping(uint256 => Listing) public s_listings;
-    mapping(uint256 => Auction) public s_auctions;
+    mapping(address => mapping(uint256 => NFTStatus)) private s_nftStatuses;
+    mapping(uint256 => Listing) private s_listings;
+    mapping(uint256 => Auction) private s_auctions;
 
     uint256 private s_listingIdCounter = 1;
     uint256 private s_auctionIdCounter = 1;
