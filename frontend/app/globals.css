@@ -393,7 +393,7 @@ body {
 }
 
 .image-1 {
-  background-image: url('/assets/1.svg');
+  background-image: url('/assets/9.svg');
   background-size: cover; 
   background-position: center; 
   border-radius: 32px; 
@@ -402,7 +402,7 @@ body {
 }
 
 .image-2 {
-  background-image:url('/assets/2.svg');
+  background-image:url('/assets/1.svg');
   background-size: cover; 
   background-position: center; 
   border-radius: 32px; 
@@ -411,7 +411,7 @@ body {
 }
 
 .image-3 {
-  background-image:url('/assets/3.svg');
+  background-image:url('/assets/2.svg');
   background-size: cover; 
   background-position: center; 
   border-radius: 32px; 
@@ -438,10 +438,11 @@ body {
   font-size: 3.5em;
   color: var(--text-color);
   text-align: right;
+  margin-top: 30px; 
 }
 
 .spacing-class {
-  margin-bottom: 55px; /* Adjust this value as needed */
+  margin-bottom: 10px; /* Adjust this value as needed */
 }
 
 .left-aligned-container {
@@ -468,6 +469,8 @@ body {
   color: rgb(138, 138, 142, 1);
   font-size: 20px;
   margin-top: 20px; 
+  letter-spacing: 0.03em; /* Adjust as needed */
+  line-height: 1.4; /* Adjust as needed */
 }
 .tell-me-more {
   color: #FFFFFF; 
@@ -592,6 +595,8 @@ body {
   margin-left: 40px;
   margin-right: 40px;
   padding: 0 10px;
+  letter-spacing: 0.03em; /* Adjust as needed */
+  line-height: 1.4; /* Adjust as needed */
 }
 .eco-tell-me-more {
   color: #FFFFFF; 
@@ -1070,6 +1075,134 @@ body {
   display: inline-block;
   transition: var(--transition-1);
 }
+
+
+
+
+/*-----------------------------------*\
+  #ABOUTUS
+\*-----------------------------------*/
+/* AboutUs.css */
+.aboutus-top-section {
+  text-align: left;
+  padding: 20px 475px;
+  background-color: var(--navbar-bg-color);
+}
+
+.aboutus-big-text {
+  font-size: 72px; 
+  margin-bottom: 35px; 
+  color:#fff;
+  width: 50%;
+}
+
+.aboutus-horizontal-line {
+  border: none;
+  border-top: 1px solid #ffffff; 
+  width: 100%; 
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 35px; 
+}
+
+.aboutus-medium-text {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  color: #fff;
+  font-size: 22px; 
+  max-width: 100%; 
+  margin-left: auto;
+  margin-right: auto;
+  letter-spacing: 0.03em; 
+  line-height: 1.6; 
+  padding-bottom: 30px;
+}
+
+/* .aboutus-medium-text-1 {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  color: #fff;
+  font-size: 22px; 
+  max-width: 100%; 
+  margin-left: auto;
+  margin-right: auto;
+  letter-spacing: 0.03em; 
+  line-height: 1.6; 
+  margin-bottom: 5px;
+  padding: 0px 50px;
+}
+
+.aboutus-medium-text-margin-down { 
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  color: #fff;
+  font-size: 22px;
+  max-width: 100%; 
+  margin-left: auto;
+  margin-right: auto;
+  letter-spacing: 0.03em;
+  line-height: 1.6; 
+  padding-bottom: 20px;
+  padding-left: 50px;
+}
+
+.aboutus-smaller-text {
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  padding: 0px 20px;
+  font-size: 18px; 
+} */
+
+.svg-section {
+  padding:10px 0;
+  background-color: var(--navbar-bg-color);
+  display: flex; 
+  justify-content: center; 
+  align-items: center; 
+}
+
+.svg-image {
+  width: 75%;
+  height: auto;
+  border-radius: 42px;
+}
+
+.team-section {
+  background-color: var(--navbar-bg-color);
+  display: flex;
+  justify-content: space-between;
+  padding: 50px 415px; 
+}
+
+.aboutus-team-horizontal-line {
+  border: none;
+  border-top: 1px solid #ffffff; 
+  width: 100%; 
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 35px; 
+}
+
+.team-text-column, .team-image-column {
+  flex: 1;
+  padding: 0 20px;
+  color: #ffffff; 
+}
+
+.team-text-column ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.team-text-column li {
+  margin-bottom: 20px; 
+}
+
+.team-image-column img {
+  max-width: 100%;
+  height: auto;
+  margin-bottom: 20px; 
+}
+
+
+
+
 
 
 

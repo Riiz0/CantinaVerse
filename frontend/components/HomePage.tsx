@@ -4,6 +4,7 @@ import { Footer } from './Footer';
 import { TiArrowForwardOutline } from "react-icons/ti";
 import Header from './Header';
 import AOS from 'aos';
+import Link from 'next/link';
 import 'aos/dist/aos.css';
 
 export default function HomePage() {
@@ -35,7 +36,9 @@ export default function HomePage() {
           <p className="mission-statement">Our Mission</p>
           <h1 className="main-heading">Building an ecosystem for all</h1>
           <p className="mission-description">Empowering creators, gamers, and investors with unparalleled opportunities for expression, engagement, and financial empowerment...</p>
-          <button className="join-us-btn">Learn More<TiArrowForwardOutline aria-hidden="true" /></button>
+          <Link href="/aboutus">
+            <button className="join-us-btn">Learn More <TiArrowForwardOutline aria-hidden="true" /></button>
+          </Link>
         </div>
 
         <div className="image-container">
@@ -45,20 +48,20 @@ export default function HomePage() {
         </div>
 
         <section className="what-we-do-sections">
-          <div className="right-aligned-container">
+          <div className="right-aligned-container" data-aos="fade-up">
             <p className="homepage-section-subtitle">What we do</p>
             <p className="homepage-section-text spacing-class">Redefining the digital asset landscape.</p>
             <p className="homepage-section-text spacing-class">Meticulously crafted to serve a broad spectrum of users.</p>
             <p className="homepage-section-text">Anchored on the robust Superchain infrastructure.</p>
           </div>
-          <div className="left-aligned-container">
+          <div className="left-aligned-container" data-aos="fade-up">
             <div className="top-section">
               <p className="product-design-strategy">Challenge</p>
               <p className="additional-info">Navigating the fast-paced blockchain landscape demands more than just innovative features—it requires a profound understanding of user needs, an unwavering commitment to quality and security, and a steadfast dedication to community engagement. The true challenge is crafting a platform that appeals to a wide audience, ranging from seasoned crypto enthusiasts to those new to the space, while guaranteeing secure transactions, meaningful interactions, and valuing every contribution.</p>
               <p className="tell-me-more">
-                <a href="https://example.com/whitepaper" target="_blank" rel="noopener noreferrer">
+                <Link href="/aboutus">
                   <span className="tell-me-more-content">Tell me more <TiArrowForwardOutline aria-hidden="true" /></span>
-                </a>
+                </Link>
               </p>
               <div className="line-break"></div>
             </div>
@@ -66,9 +69,9 @@ export default function HomePage() {
               <p className="development-engineering">Solution</p>
               <p className="additional-info">CantinaVerse confronts these challenges directly by crafting a comprehensive ecosystem designed to cater to a wide range of interests and expertise. Prioritizing user experience at every stage, we enforce rigorous security measures to protect transactions and cultivate an active community where every voice matters. Our platform aims to serve as a beacon of innovation, a nexus for creative expression, and a driving force for meaningful engagement across the blockchain ecosystem.</p>
               <p className="tell-me-more">
-                <a href="https://example.com/whitepaper" target="_blank" rel="noopener noreferrer">
+                <Link href="/aboutus">
                   <span className="tell-me-more-content">Tell me more <TiArrowForwardOutline aria-hidden="true" /></span>
-                </a>
+                </Link>
               </p>
             </div>
           </div>
@@ -81,9 +84,9 @@ export default function HomePage() {
               <p className="ecosystem-header-name">NFT Marketplace</p>
               <p className="eco-additional-info">A robust platform for buying, selling, create, mint and auctioning NFTs, facilitating seamless connections between artists and collectors.</p>
               <p className="eco-tell-me-more">
-                <a href="https://example.com/whitepaper" target="_blank" rel="noopener noreferrer">
+                <Link href="/nftmarketplace">
                   <span className="eco-tell-me-more-content">Go there <TiArrowForwardOutline aria-hidden="true" /></span>
-                </a>
+                </Link>
               </p>
             </div>
             <div className="diagonal-container-3" data-aos="fade-up">
@@ -91,9 +94,9 @@ export default function HomePage() {
               <p className="ecosystem-header-name">Casino Gaming</p>
               <p className="eco-additional-info">A variety of casino games, ensuring a fair and transparent gaming experience through partnerships with trusted networks like Gelato.</p>
               <p className="eco-tell-me-more">
-                <a href="https://example.com/whitepaper" target="_blank" rel="noopener noreferrer">
+                <Link href="/casinogames">
                   <span className="eco-tell-me-more-content">Go there <TiArrowForwardOutline aria-hidden="true" /></span>
-                </a>
+                </Link>
               </p>
             </div>
           </div>
@@ -108,9 +111,9 @@ export default function HomePage() {
               <p className="eco-additional-info">A user-friendly interface for creating ERC20 tokens, allowing users to opt-in purchasing these created token providing the initial liquidity pooling once the threshold amount is reached for this tokens to be traded on DEX's.
               </p>
               <p className="eco-tell-me-more">
-                <a href="https://example.com/whitepaper" target="_blank" rel="noopener noreferrer">
+                <Link href="/tokencreation">
                   <span className="eco-tell-me-more-content">Go there <TiArrowForwardOutline aria-hidden="true" /></span>
-                </a>
+                </Link>
               </p>
             </div>
             <div className="diagonal-container-4" data-aos="fade-up">
@@ -118,9 +121,9 @@ export default function HomePage() {
               <p className="ecosystem-header-name">Governance Voting</p>
               <p className="eco-additional-info">Empowers users to vote on new platform upgrades, giveaways, game integrations, and community-sponsored incentives.</p>
               <p className="eco-tell-me-more">
-                <a href="https://example.com/whitepaper" target="_blank" rel="noopener noreferrer">
+                <Link href="/governance">
                   <span className="eco-tell-me-more-content">Go there <TiArrowForwardOutline aria-hidden="true" /></span>
-                </a>
+                </Link>
               </p>
             </div>
           </div>
