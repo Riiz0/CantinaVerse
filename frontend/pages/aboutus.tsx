@@ -15,31 +15,32 @@ export default function AboutUs() {
             <section className="svg-section">
                 <Image src="/assets/8.svg" width={500} height={500} alt="Team Image" className="svg-image" />
             </section>
-            <section className="team-section">
+            {/*<section className="newsletter-section">
+                <h2 className="newsletter-title">Stay Updated</h2>
+                <p className="newsletter-description">Subscribe to our newsletter to stay up to date with CantinaVerse.</p>
+                <form className="newsletter-form">
+                    <input type="email" placeholder="Your Email Address" className="newsletter-input" />
+                    <button type="submit" className="newsletter-button">Subscribe Now</button>
+                </form>
+            </section> */}
+
+            {/* Commented Out Team Section */}
+            {/* <section className="team-section">
                 <div className="team-text-column">
                     <hr className="aboutus-team-horizontal-line" />
                     <h2>Meet the Team</h2>
                     <ul>
                         <li><strong>Founder:</strong> John Doe - A visionary leader driving the future of CantinaVerse.</li>
                         <li><strong>UX/UI Designer:</strong> Jane Smith - Crafting intuitive interfaces for seamless user experiences.</li>
-                        {/* Add more team members here */}
                     </ul>
                 </div>
                 <div className="team-image-column">
                     <img src="path/to/founder-image.jpg" alt="Founder" className="team-member-image" />
                     <img src="path/to/ui-designer-image.jpg" alt="UI Designer" className="team-member-image" />
-                    {/* Add more team member images here */}
                 </div>
-            </section>
+            </section> */}
+
             <Footer />
         </main>
     );
 }
-
-/* 
-
-               <p className="aboutus-medium-text-1"><b>Diverse Ecosystem:</b><span className="aboutus-smaller-text">Catering to NFT collectors, ERC20 token creators, casino gamers, and governance enthusiasts, CantinaVerse ensures there's something for everyone, fostering a rich, dynamic environment.</span></p>
-                <p className="aboutus-medium-text-1"><b>User-Friendly Interface:</b><span className="aboutus-smaller-text">Designed with simplicity and accessibility in mind, CantinaVerse streamlines the processes for buying, selling, auctioning NFTs, creating ERC20 tokens, participating in gaming, and contributing to governance.</span></p>
-                <p className="aboutus-medium-text-1"><b>Secure Transactions:</b><span className="aboutus-smaller-text">Leveraging advanced blockchain technology, CantinaVerse guarantees secure, verifiable, and immutable transactions, laying a solid foundation of trust.</span></p>
-                <p className="aboutus-medium-text-margin-down"><b>Community Engagement:</b><span className="aboutus-smaller-text">CantinaVerse prioritizes fostering a vibrant, engaged community through interactive gaming, participatory governance, and shared economic opportunities.</span></p>
-*/

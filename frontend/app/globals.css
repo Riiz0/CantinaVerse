@@ -622,41 +622,7 @@ body {
   transition: transform 0.3s ease; 
 }
 
-.road-map-sections {
-  background-color: var(--other-sections-bg-color);
-  display: flex;
-  justify-content: space-around; 
-  align-items: flex-start; 
-  padding: 50px 0;
-  text-align: center;
-  color: var(--text-color);
-  width: 100%; 
-  margin: 0 auto; 
-}
 
-.what-others-have-to-say-sections {
-  background-color: var(--navbar-bg-color);
-  display: flex;
-  justify-content: space-around; 
-  align-items: flex-start; 
-  padding: 50px 0;
-  text-align: center;
-  color: var(--text-color);
-  width: 100%; 
-  margin: 0 auto; 
-}
-
-.getting-started-section {
-  background-color: var(--other-sections-bg-color);
-  display: flex; 
-  justify-content: space-around; 
-  align-items: flex-start; 
-  padding: 50px 0;
-  text-align: center;
-  color: var(--text-color);
-  width: 100%; 
-  margin: 0 auto; 
-}
 
 /*-----------------------------------*\
   #HEADER
@@ -1117,38 +1083,6 @@ body {
   padding-bottom: 30px;
 }
 
-/* .aboutus-medium-text-1 {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  color: #fff;
-  font-size: 22px; 
-  max-width: 100%; 
-  margin-left: auto;
-  margin-right: auto;
-  letter-spacing: 0.03em; 
-  line-height: 1.6; 
-  margin-bottom: 5px;
-  padding: 0px 50px;
-}
-
-.aboutus-medium-text-margin-down { 
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  color: #fff;
-  font-size: 22px;
-  max-width: 100%; 
-  margin-left: auto;
-  margin-right: auto;
-  letter-spacing: 0.03em;
-  line-height: 1.6; 
-  padding-bottom: 20px;
-  padding-left: 50px;
-}
-
-.aboutus-smaller-text {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  padding: 0px 20px;
-  font-size: 18px; 
-} */
-
 .svg-section {
   padding:10px 0;
   background-color: var(--navbar-bg-color);
@@ -1161,6 +1095,52 @@ body {
   width: 75%;
   height: auto;
   border-radius: 42px;
+}
+
+.newsletter-section {
+  background-color: var(--navbar-bg-color);
+  padding: 75px 415px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.newsletter-title {
+  font-size: 36px;
+  color: #fff;
+  margin-bottom: 20px;
+}
+
+.newsletter-description {
+  font-family: inherit;
+  color: #fff;
+  font-size: 18px;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.newsletter-form {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  width: 50%; 
+}
+
+.newsletter-input {
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  flex-grow: 1; 
+}
+
+.newsletter-button {
+  background-color: #fff;
+  color: var(--other-sections-bg-color);
+  border: none;
+  padding: 10px 0px;
+  cursor: pointer;
+  border-radius: 5px;
+  width: 50%; 
 }
 
 .team-section {

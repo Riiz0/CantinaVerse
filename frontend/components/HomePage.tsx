@@ -128,15 +128,6 @@ export default function HomePage() {
             </div>
           </div>
         </section>
-
-        <section className="road-map-sections">
-        </section>
-
-        <section className="what-others-have-to-say-sections">
-        </section>
-
-        <section className="getting-started-section">
-        </section>
         <Footer />
       </div>
     </main>

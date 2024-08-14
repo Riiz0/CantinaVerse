@@ -20,7 +20,7 @@ export function Footer() {
             </a>
 
             <p className="footer-text">
-            Explore, Create, and Trade Extraordinary NFTs on Cantina, the premier marketplace for digital art and collectibles. Your journey into the world of NFTs begins here.
+              Explore, Create, and Trade Extraordinary NFTs on Cantina, the premier marketplace for digital art and collectibles. Your journey into the world of NFTs begins here.
             </p>
 
             <ul className="social-list">
@@ -53,15 +53,15 @@ export function Footer() {
             </li>
 
             <Link href="/create">
-            <li>
-              <div className="footer-link">Create</div>
-            </li>
+              <li>
+                <div className="footer-link">Create</div>
+              </li>
             </Link>
 
             <Link href="/explore">
-            <li>
-              <div className="footer-link">Explore</div>
-            </li>
+              <li>
+                <div className="footer-link">Explore</div>
+              </li>
             </Link>
 
           </ul>
@@ -91,12 +91,12 @@ export function Footer() {
           </ul>
 
           <div className="footer-list">
-            <p className="footer-list-title">Subscribe Us</p>
+            <p className="footer-list-title">Subscribe To Us</p>
             <form action="" className="newsletter-form">
               <input type="email" name="email" placeholder="info@yourmail.com" required className="newsletter-input" />
-                <button type="submit" className="newsletter-btn" aria-label="Submit">
-                  <IoPaperPlaneOutline />
-                </button>
+              <button type="submit" className="newsletter-btn" aria-label="Submit">
+                <IoPaperPlaneOutline />
+              </button>
             </form>
           </div>
         </div>
