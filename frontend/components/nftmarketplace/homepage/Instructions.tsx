@@ -3,74 +3,74 @@
 import { IoWalletOutline, IoGridOutline, IoFileTrayOutline, IoBagHandleOutline } from "react-icons/io5";
 
 export function Instructions() {
-    return (
-      <section className="section instruction" id="instruction">
-        <div className="container">
+  return (
+    <section className="section instruction" id="instruction">
+      <div className="container">
 
-          <p className="section-subtitle">How It Works</p>
+        <p className="section-subtitle">How It Works</p>
 
-          <h2 className="h2 section-title">Buy, Sell or Create your NFTs</h2>
+        <h2 className="h2 section-title">Buy, Sell, Create and Mint NFTs</h2>
 
-          <ul className="grid-list">
+        <ul className="grid-list">
 
-            <li className="instruction-item">
+          <li className="instruction-item">
 
-              <div className="instruction-icon">
-                <IoWalletOutline />
-              </div>
+            <div className="instruction-icon">
+              <IoWalletOutline />
+            </div>
 
-              <h3 className="instruction-title">Set up your wallet</h3>
 
-              <p className="instruction-text">
-                Once you’ve set up your wallet of choice, connect it to Cantina by clicking Connect Wallet on the
-                top right corner.
-                Learn about the wallets we support.
-              </p>
+            <h3 className="instruction-title">Buy NFTs</h3>
 
-            </li>
+            <p className="instruction-text">
+              Choose between Listings or Auctions to find the NFT you want to buy. Once you’ve found the NFT you want to buy, click on it and then click on the Buy or Bid button.
+            </p>
 
-            <li className="instruction-item">
+          </li>
 
-              <div className="instruction-icon">
-                <IoGridOutline />
-              </div>
+          <li className="instruction-item">
 
-              <h3 className="instruction-title">Create your collection</h3>
+            <div className="instruction-icon">
+              <IoGridOutline />
+            </div>
 
-              <p className="instruction-text">
-                Click Create and set up your collection. Add name, symbol, a max supply, the owner of the collection, and a royalty percentage.
-              </p>
+            <h3 className="instruction-title">Sell NFTs</h3>
 
-            </li>
+            <p className="instruction-text">
+              List or Auction out your NFT for sale by clicking on the NFT you want to sell and then clicking on the List or Auction button.
+            </p>
 
-            <li className="instruction-item">
 
-              <div className="instruction-icon">
-                <IoFileTrayOutline />
-              </div>
+          </li>
 
-              <h3 className="instruction-title">List your NFTs</h3>
+          <li className="instruction-item">
 
-              <p className="instruction-text">
-                List your NFT for sale by clicking on the NFT you want to sell and then clicking on the List button. If you want to adjust the listing price, simply delist the nft and relist it with a new price.
-              </p>
+            <div className="instruction-icon">
+              <IoFileTrayOutline />
+            </div>
 
-            </li>
+            <h3 className="instruction-title">Create Collections</h3>
 
-            <li className="instruction-item">
+            <p className="instruction-text">
+              Click the Create tab and set up your collection. Add name, symbol, a max supply, the owner of the collection, and a royalty percentage.
+            </p>
 
-              <div className="instruction-icon">
-                <IoBagHandleOutline />
-              </div>
+          </li>
 
-              <h3 className="instruction-title">Buy NFTs</h3>
+          <li className="instruction-item">
 
-              <p className="instruction-text">
-                 Choose between Explore or Collections to find the NFT you want to buy. Once you’ve found the NFT you want to buy, click on it and then click on the Buy button.
-              </p>
-            </li>
-          </ul>
-        </div>
+            <div className="instruction-icon">
+              <IoBagHandleOutline />
+            </div>
+
+            <h3 className="instruction-title">Mint NFTs</h3>
+
+            <p className="instruction-text">
+              Click the Mint tab and select from any of the collections created in CantinaVerse to mint. Depending on the collection some may require a fee to mint.
+            </p>
+          </li>
+        </ul>
+      </div>
     </section>
   );
 }

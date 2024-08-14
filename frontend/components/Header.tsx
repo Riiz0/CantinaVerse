@@ -14,7 +14,7 @@ export default function Header() {
                 </Link>
             </div>
             <ul className="navbar-links">
-                <li><Link href="/nftmarketplace">Marketplace</Link></li>
+                <li><Link href="/marketplace">Marketplace</Link></li>
                 <li><Link href="/tokencreation">Token Creation</Link></li>
                 <li><Link href="/casinogames">Gaming</Link></li>
                 <li><Link href="/governance">DAO</Link></li>

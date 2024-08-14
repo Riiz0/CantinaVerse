@@ -22,7 +22,7 @@ export function HeroContainer() {
           </button>
           <button className="btn">
             <IoCreateOutline aria-hidden="true" />
-            <Link href="/create">Create</Link>
+            <Link href="/marketplace/create">Create</Link>
           </button>
         </div>
       </div>
