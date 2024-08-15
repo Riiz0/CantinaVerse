@@ -16,16 +16,14 @@ contract MarketPlace is Ownable, ReentrancyGuard, IERC721Receiver {
     error MarketPlace__NFTAlreadyListedOrInAuction();
     error MarketPlace__ListNFTNotTheOwner();
     error MarketPlace__NFTNotListed();
-    error MarketPlace__NotTheSeller();
     error MarketPlace__InsufficientFundsOrExcessFundsToPurchase();
-    error MarketPlace__SellerApprovalRequired();
-    error MarketPlace__SellerNoLongerOwnsNFT();
-    error MarketPlace__ApprovalCheckFailed();
     error MarketPlace__TransferFailed();
     error MarketPlace__AuctionNotTheOwner();
     error MarketPlace__BidIsLessThanHighestBid();
+    error MarketPlace__NFTInAuctionStatus();
     error MarketPlace__NFTAuctionHasEnded();
-    error MarketPlace__InsufficientFees();
+    error MarketPlace__CantBeZeroAmount();
+    error MarketPlace__InsufficientFunds();
     error MarketPlace__CantBeZeroAddress();
     error MarketPlace__InvalidListingId();
 
@@ -170,9 +168,8 @@ contract MarketPlace is Ownable, ReentrancyGuard, IERC721Receiver {
         IERC721(nftAddress).safeTransferFrom(seller, msg.sender, tokenId);
 
         (bool success,) = payable(seller).call{ value: price }("");
-        if (!success) {
-            revert MarketPlace__TransferFailed();
-        }
+        if (!success) revert MarketPlace__TransferFailed();
+
         emit NFTSold(msg.sender, nftAddress, tokenId, price);
     }
 
@@ -216,7 +213,7 @@ contract MarketPlace is Ownable, ReentrancyGuard, IERC721Receiver {
     function bidOnAuction(uint256 auctionId) external payable nonReentrant {
         Auction storage auction = s_auctions[auctionId];
         if (s_nftStatuses[auction.nftAddress][auction.tokenId] != NFTStatus.InAuction) {
-            revert MarketPlace__NFTNotListed();
+            revert MarketPlace__NFTInAuctionStatus();
         }
         if (block.timestamp >= auction.endTime) {
             revert MarketPlace__NFTAuctionHasEnded();
@@ -278,11 +275,19 @@ contract MarketPlace is Ownable, ReentrancyGuard, IERC721Receiver {
         emit FeeUpdated(_fee);
     }
 
-    function withdraw() external onlyOwner {
-        if (address(this).balance == 0) {
-            revert MarketPlace__InsufficientFees();
+    function withdraw(address payable recipient, uint256 amount) public onlyOwner {
+        if (recipient == address(0)) {
+            revert MarketPlace__CantBeZeroAddress();
         }
-        payable(owner()).transfer(address(this).balance);
+        if (amount == 0) {
+            revert MarketPlace__CantBeZeroAmount();
+        }
+        if (amount > address(this).balance) {
+            revert MarketPlace__InsufficientFunds();
+        }
+
+        (bool success,) = recipient.call{ value: amount }("");
+        if (!success) revert MarketPlace__TransferFailed();
     }
 
     function onERC721Received(
