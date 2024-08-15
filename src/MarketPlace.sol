@@ -162,12 +162,6 @@ contract MarketPlace is Ownable, ReentrancyGuard, IERC721Receiver {
         if (msg.value != totalCost) {
             revert MarketPlace__InsufficientFundsOrExcessFundsToPurchase();
         }
-        if (IERC721(listing.nftAddress).getApproved(listing.tokenId) != address(this)) {
-            revert MarketPlace__SellerApprovalRequired();
-        }
-        if (IERC721(listing.nftAddress).ownerOf(listing.tokenId) != listing.seller) {
-            revert MarketPlace__SellerNoLongerOwnsNFT();
-        }
 
         s_listingIdCounter--;
         s_nftStatuses[listing.nftAddress][listing.tokenId] = NFTStatus.None;

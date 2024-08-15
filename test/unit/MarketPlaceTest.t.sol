@@ -19,6 +19,7 @@ contract MarketPlaceTest is Test {
 
     address SELLER = makeAddr("seller");
     address SELLERTWO = makeAddr("sellerTwo");
+    address SELLERTHREE = makeAddr("sellerThree");
     address BUYER = makeAddr("buy");
     uint256 constant STARTING_BALANCE = 100 ether;
     uint256 price = 1 ether;
@@ -46,6 +47,7 @@ contract MarketPlaceTest is Test {
         uint256 tokenId
     );
     event FeeUpdated(uint256 indexed newFee);
+    event GelatoAddressUpdated(address indexed newGelatoAddress);
 
     function setUp() public {
         config = new HelperConfig();
@@ -278,6 +280,13 @@ contract MarketPlaceTest is Test {
         vm.stopPrank();
     }
 
+    function test_DelistNFT_MarketPlace__NFTNotListed() public contractCollection3SellerAndBuyerMints {
+        vm.startPrank(SELLER);
+        vm.expectRevert(MarketPlace.MarketPlace__NFTNotListed.selector);
+        marketPlace.delistNFT(0);
+        vm.stopPrank();
+    }
+
     function testIfBuyerValueEqualsAmount() public contractCollection3SellerAndBuyerMints {
         uint256 testPrice = 5 ether;
         vm.startPrank(SELLER);
@@ -295,23 +304,13 @@ contract MarketPlaceTest is Test {
 
         // Calculate expected total cost
         uint256 currentFee = marketPlace.getFee();
-        console2.log("Initial Service Fee:", currentFee);
         uint256 expectedTotalCost = testPrice + currentFee;
-
-        // Debugging: Log approval status
-        // Ensure we're checking the approval status against the correct contract instance
-        bool isApproved = contractCollection3.isApprovedForAll(SELLER, address(marketPlace));
-        console2.log("Is Approved?", isApproved ? "Yes" : "No");
-
-        // Advance block time and mine a new block
-        vm.warp(block.timestamp + 10 minutes); // Simulate another 10 minutes passing
 
         vm.startPrank(BUYER);
         marketPlace.buyNFT{ value: expectedTotalCost }(0);
         marketPlace.getNFTStatus(address(contractCollection3), 2);
         vm.stopPrank();
 
-        // Verify NFT ownership transferred to buyer
         assertEq(contractCollection3.ownerOf(2), BUYER);
     }
 
@@ -338,6 +337,13 @@ contract MarketPlaceTest is Test {
         vm.stopPrank();
     }
 
+    function test_BuyNFT_MarketPlace__NFTNotListed() public contractCollection3SellerAndBuyerMints {
+        vm.startPrank(SELLER);
+        vm.expectRevert(MarketPlace.MarketPlace__NFTNotListed.selector);
+        marketPlace.buyNFT{ value: price }(0);
+        vm.stopPrank();
+    }
+
     function test_ExpectEmit_EventNFTSold() public contractCollection3SellerAndBuyerMints {
         uint256 testPrice = 5 ether;
         vm.startPrank(SELLER);
@@ -354,6 +360,47 @@ contract MarketPlaceTest is Test {
         vm.stopPrank();
     }
 
+    function test_MarketPlace__NFTAlreadyListedOrInAuction() public contractCollection3SellerAndBuyerMints {
+        vm.startPrank(SELLER);
+        contractCollection3.approve(address(marketPlace), 2);
+        marketPlace.createAuction(address(contractCollection3), 2, price, 1 days);
+
+        vm.expectRevert(MarketPlace.MarketPlace__NFTAlreadyListedOrInAuction.selector);
+        marketPlace.createAuction(address(contractCollection3), 2, price, 5 days);
+        vm.stopPrank();
+    }
+
+    function test_MarketPlace__AuctionNotTheOwner() public contractCollection3SellerAndBuyerMints {
+        vm.startPrank(BUYER);
+        vm.expectRevert(MarketPlace.MarketPlace__AuctionNotTheOwner.selector);
+        marketPlace.createAuction(address(contractCollection3), 2, price, 5 days);
+        vm.stopPrank();
+    }
+
+    function test_MarketPlace__PriceCannotBeZero() public contractCollection3SellerAndBuyerMints {
+        vm.startPrank(SELLER);
+        vm.expectRevert(MarketPlace.MarketPlace__PriceCannotBeZero.selector);
+        marketPlace.createAuction(address(contractCollection3), 2, 0, 1 days);
+        vm.stopPrank();
+    }
+
+    function test_ExpectEmit_CreateAuctionSuccessfulWithEmit() public contractCollection3SellerAndBuyerMints {
+        uint256 testStartTime = block.timestamp;
+        uint256 durationOfDays = 1 days;
+        uint256 durationInMinutes = durationOfDays * 60;
+        uint256 endTime = block.timestamp + durationInMinutes;
+
+        vm.startPrank(SELLER);
+        contractCollection3.approve(address(marketPlace), 2);
+        vm.expectEmit(true, true, true, true);
+        emit AuctionCreated(0, testStartTime, endTime, address(contractCollection3), 2, price);
+        marketPlace.createAuction(address(contractCollection3), 2, price, 1 days);
+
+        vm.stopPrank();
+
+        assertEq(contractCollection3.ownerOf(2), address(marketPlace));
+    }
+
     function testGetListingDetails() public contractCollection3SellerAndBuyerMints {
         vm.startPrank(SELLER);
         contractCollection3.approve(address(marketPlace), 3);
@@ -368,12 +415,5 @@ contract MarketPlaceTest is Test {
         assertEq(nftAddress, address(contractCollection3), "NFT address does not match");
         assertEq(tokenId, 3, "Token ID does not match");
         assertEq(listedPrice, price, "Price does not match");
-    }
-}
-
-// Contract that rejects receiving Ether for testIfBoolSuccessFails()
-contract RejectingReceiver {
-    receive() external payable {
-        revert("RejectingReceiver: reject Ether");
     }
 }
