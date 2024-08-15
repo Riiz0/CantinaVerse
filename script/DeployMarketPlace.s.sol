@@ -19,9 +19,9 @@ contract DeployMarketPlace is Script {
      */
     function run() external returns (MarketPlace, HelperConfig) {
         HelperConfig helperConfig = new HelperConfig();
-        HelperConfig.NetworkConfig memory config = helperConfig.getActiveNetworkConfig();
+        HelperConfig.NetworkConfig memory config = helperConfig.getSepoliaConfig();
 
-        MarketPlace marketPlace = new MarketPlace(config.initialOwner, config.initialGelatoAddress);
+        MarketPlace marketPlace = new MarketPlace(config.initialOwner, config.initialGelatoAddress, 0);
 
         return (marketPlace, helperConfig);
     }

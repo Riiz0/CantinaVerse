@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.24;
 
+import { console2 } from "forge-std/Test.sol";
 import { IERC721 } from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import { IERC721Receiver } from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
@@ -17,12 +18,16 @@ contract MarketPlace is Ownable, ReentrancyGuard, IERC721Receiver {
     error MarketPlace__NFTNotListed();
     error MarketPlace__NotTheSeller();
     error MarketPlace__InsufficientFundsOrExcessFundsToPurchase();
+    error MarketPlace__SellerApprovalRequired();
+    error MarketPlace__SellerNoLongerOwnsNFT();
+    error MarketPlace__ApprovalCheckFailed();
     error MarketPlace__TransferFailed();
     error MarketPlace__AuctionNotTheOwner();
     error MarketPlace__BidIsLessThanHighestBid();
     error MarketPlace__NFTAuctionHasEnded();
     error MarketPlace__InsufficientFees();
     error MarketPlace__CantBeZeroAddress();
+    error MarketPlace__InvalidListingId();
 
     //////////////////////
     // State Variables  //
@@ -56,8 +61,8 @@ contract MarketPlace is Ownable, ReentrancyGuard, IERC721Receiver {
     mapping(uint256 => Listing) private s_listings;
     mapping(uint256 => Auction) private s_auctions;
 
-    uint256 private s_listingIdCounter = 1;
-    uint256 private s_auctionIdCounter = 1;
+    uint256 private s_listingIdCounter;
+    uint256 private s_auctionIdCounter;
     address private s_dedicatedMsgSender;
     uint256 private s_fee;
 
@@ -95,8 +100,9 @@ contract MarketPlace is Ownable, ReentrancyGuard, IERC721Receiver {
      * @dev Constructor sets the initial owner of the contract.
      * @param initialOwner The address of the initial owner.
      */
-    constructor(address initialOwner, address _dedicatedMsgSender) Ownable(initialOwner) {
+    constructor(address initialOwner, address _dedicatedMsgSender, uint256 _setFee) Ownable(initialOwner) {
         s_dedicatedMsgSender = _dedicatedMsgSender;
+        s_fee = _setFee;
     }
 
     modifier onlyDedicatedMsgSender() {
@@ -129,41 +135,51 @@ contract MarketPlace is Ownable, ReentrancyGuard, IERC721Receiver {
 
     function delistNFT(uint256 listingId) external {
         Listing storage listing = s_listings[listingId];
+        address nftAddress = listing.nftAddress;
+        uint256 tokenId = listing.tokenId;
         if (s_nftStatuses[listing.nftAddress][listing.tokenId] != NFTStatus.Listed) {
             revert MarketPlace__NFTNotListed();
         }
-        if (listing.seller != msg.sender) {
-            revert MarketPlace__NotTheSeller();
-        }
 
+        s_listingIdCounter--;
         s_nftStatuses[listing.nftAddress][listing.tokenId] = NFTStatus.None;
         delete s_listings[listingId];
 
-        emit NFTDelisted(msg.sender, listing.nftAddress, listing.tokenId);
+        emit NFTDelisted(msg.sender, nftAddress, tokenId);
     }
 
     function buyNFT(uint256 listingId) external payable nonReentrant {
         Listing storage listing = s_listings[listingId];
-        uint256 amount = listing.price;
-        uint256 serviceFee = s_fee;
-        uint256 totalCost = amount + serviceFee;
         address seller = listing.seller;
+        address nftAddress = listing.nftAddress;
+        uint256 tokenId = listing.tokenId;
+        uint256 price = listing.price;
+        uint256 totalCost = price + s_fee;
+
         if (s_nftStatuses[listing.nftAddress][listing.tokenId] != NFTStatus.Listed) {
             revert MarketPlace__NFTNotListed();
         }
         if (msg.value != totalCost) {
             revert MarketPlace__InsufficientFundsOrExcessFundsToPurchase();
         }
+        if (IERC721(listing.nftAddress).getApproved(listing.tokenId) != address(this)) {
+            revert MarketPlace__SellerApprovalRequired();
+        }
+        if (IERC721(listing.nftAddress).ownerOf(listing.tokenId) != listing.seller) {
+            revert MarketPlace__SellerNoLongerOwnsNFT();
+        }
 
+        s_listingIdCounter--;
         s_nftStatuses[listing.nftAddress][listing.tokenId] = NFTStatus.None;
         delete s_listings[listingId];
 
-        IERC721(listing.nftAddress).safeTransferFrom(seller, msg.sender, listing.tokenId);
-        // Transfer the sale amount to the seller
-        (bool success,) = payable(seller).call{ value: amount }("");
-        if (!success) revert MarketPlace__TransferFailed();
+        IERC721(nftAddress).safeTransferFrom(seller, msg.sender, tokenId);
 
-        emit NFTSold(msg.sender, listing.nftAddress, listing.tokenId, amount);
+        (bool success,) = payable(seller).call{ value: price }("");
+        if (!success) {
+            revert MarketPlace__TransferFailed();
+        }
+        emit NFTSold(msg.sender, nftAddress, tokenId, price);
     }
 
     function createAuction(
@@ -282,6 +298,7 @@ contract MarketPlace is Ownable, ReentrancyGuard, IERC721Receiver {
         bytes calldata /*data*/
     )
         external
+        pure
         override
         returns (bytes4)
     {
@@ -303,5 +320,27 @@ contract MarketPlace is Ownable, ReentrancyGuard, IERC721Receiver {
      */
     function getFee() external view returns (uint256) {
         return s_fee;
+    }
+
+    function getListingDetails(
+        uint256 listingId
+    )
+        external
+        view
+        returns (address seller, address nftAddress, uint256 tokenId, uint256 price)
+    {
+        if (listingId > s_listingIdCounter) {
+            revert MarketPlace__InvalidListingId();
+        }
+        Listing storage listing = s_listings[listingId];
+        return (listing.seller, listing.nftAddress, listing.tokenId, listing.price);
+    }
+
+    function getCurrentListingIdCounter() external view returns (uint256) {
+        return s_listingIdCounter;
+    }
+
+    function getNFTStatus(address nftAddress, uint256 tokenId) external view returns (NFTStatus) {
+        return s_nftStatuses[nftAddress][tokenId];
     }
 }

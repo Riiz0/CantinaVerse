@@ -47,7 +47,7 @@ contract HelperConfig is Script {
     //////////////////////////////////////////////////////////////*/
     constructor() {
         networkConfigs[ETH_MAINNET_CHAIN_ID] = getEthMainnetConfig();
-        networkConfigs[ETH_SEPOLIA_CHAIN_ID] = getZkSyncSepoliaConfig();
+        networkConfigs[ETH_SEPOLIA_CHAIN_ID] = getSepoliaConfig();
         networkConfigs[ZKSYNC_MAINNET_CHAIN_ID] = getZkSyncConfig();
         networkConfigs[ZKSYNC_SEPOLIA_CHAIN_ID] = getZkSyncSepoliaConfig();
         networkConfigs[POLYGON_MAINNET_CHAIN_ID] = getPolygonMainnetConfig();
@@ -76,6 +76,10 @@ contract HelperConfig is Script {
                                 CONFIGS
     //////////////////////////////////////////////////////////////*/
     function getEthMainnetConfig() public pure returns (NetworkConfig memory) {
+        return NetworkConfig({ initialOwner: address(1), initialGelatoAddress: address(2) });
+    }
+
+    function getSepoliaConfig() public pure returns (NetworkConfig memory) {
         return NetworkConfig({ initialOwner: address(1), initialGelatoAddress: address(2) });
     }
 
