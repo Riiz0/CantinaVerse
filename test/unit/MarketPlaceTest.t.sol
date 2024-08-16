@@ -126,6 +126,7 @@ contract MarketPlaceTest is Test {
         contractCollection2SellerMintsMore
         contractCollection3SellerAndBuyerMints
     {
+        contractCollection1.getCurrentTokenId();
         assertEq(contractCollection1.balanceOf(SELLER), 7);
         assertEq(contractCollection1.getTotalSupply(), 7);
 
