@@ -129,6 +129,10 @@ contract NFTContractTest is Test {
         vm.stopPrank();
     }
 
+    function testGetMintPrice() public view {
+        assertEq(nftcontract.getMintPrice(), mintPrice);
+    }
+
     function testRevertNFTContractMaxRoyaltyPercentageReached() public SafeMintRevert {
         uint96 newRoyaltyPercentage = 3100;
 
