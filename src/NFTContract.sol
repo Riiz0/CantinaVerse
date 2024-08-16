@@ -101,7 +101,8 @@ contract NFTContract is ERC721, ERC2981, ERC721Enumerable, ERC721URIStorage, Own
 
         // Transfer the minting fees to the owner
         if (msg.value > 0) {
-            payable(owner()).transfer(msg.value);
+            (bool success,) = payable(owner()).call{ value: msg.value }("");
+            require(success, "Transfer failed");
         }
 
         emit NewTokenMinted(to, tokenId, uri, s_mintPrice);
@@ -221,7 +222,9 @@ contract NFTContract is ERC721, ERC2981, ERC721Enumerable, ERC721URIStorage, Own
      * @param interfaceId The ID of the interface to check support for.
      * @return bool Whether the contract supports the specified interface.
      */
-    function supportsInterface(bytes4 interfaceId)
+    function supportsInterface(
+        bytes4 interfaceId
+    )
         public
         view
         override(ERC721, ERC2981, ERC721Enumerable, ERC721URIStorage)

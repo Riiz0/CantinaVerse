@@ -23,7 +23,6 @@ contract MarketPlace is Ownable, ReentrancyGuard, IERC721Receiver {
     error MarketPlace__NFTInAuctionStatus();
     error MarketPlace__NFTAuctionHasEnded();
     error MarketPlace__CantBeZeroAmount();
-    error MarketPlace__InsufficientFunds();
     error MarketPlace__CantBeZeroAddress();
     error MarketPlace__InvalidListingId();
 
@@ -99,15 +98,11 @@ contract MarketPlace is Ownable, ReentrancyGuard, IERC721Receiver {
      * @param initialOwner The address of the initial owner.
      */
     constructor(address initialOwner, address _dedicatedMsgSender, uint256 _setFee) Ownable(initialOwner) {
+        if (_dedicatedMsgSender == address(0)) {
+            revert MarketPlace__CantBeZeroAddress();
+        }
         s_dedicatedMsgSender = _dedicatedMsgSender;
         s_fee = _setFee;
-    }
-
-    modifier onlyDedicatedMsgSender() {
-        if (msg.sender != s_dedicatedMsgSender) {
-            revert MarketPlace__CallerIsNotGelato();
-        }
-        _;
     }
 
     /////////////////////////////////
@@ -237,8 +232,11 @@ contract MarketPlace is Ownable, ReentrancyGuard, IERC721Receiver {
         emit BidPlaced(auctionId, msg.sender, msg.value, auction.nftAddress, auction.tokenId);
     }
 
-    function endAuction(uint256 auctionId) external onlyDedicatedMsgSender nonReentrant {
+    function endAuction(uint256 auctionId) external nonReentrant {
         Auction storage auction = s_auctions[auctionId];
+        if (msg.sender != s_dedicatedMsgSender) {
+            revert MarketPlace__CallerIsNotGelato();
+        }
         if (s_nftStatuses[auction.nftAddress][auction.tokenId] != NFTStatus.InAuction) {
             revert MarketPlace__NFTNotListed();
         }

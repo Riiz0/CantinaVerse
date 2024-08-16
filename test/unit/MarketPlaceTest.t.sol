@@ -155,6 +155,16 @@ contract MarketPlaceTest is Test {
         assertEq(contractCollection1.ownerOf(0), BUYER, "Buyer should own the token after transfer");
     }
 
+    function test_DedicatedMsgSender_MarketPlace__CantBeZeroAddress() public {
+        vm.expectRevert(MarketPlace.MarketPlace__CantBeZeroAddress.selector);
+
+        address zeroAddress = address(0);
+        uint256 setFee = 1 ether; // Example fee, adjust as necessary
+        address initialOwner = address(this); // Using the test contract as the initial owner for simplicity
+
+        new MarketPlace(initialOwner, zeroAddress, setFee);
+    }
+
     function testOwnerIsTheSellerListingNFT() public contractCollection3SellerAndBuyerMints {
         vm.prank(SELLER);
         marketPlace.listNFT(address(contractCollection3), 1, price);
