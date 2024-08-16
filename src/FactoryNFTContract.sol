@@ -15,6 +15,9 @@ import { ReentrancyGuard } from "@openzeppelin/contracts/utils/ReentrancyGuard.s
 
 contract FactoryNFTContract is Ownable, ReentrancyGuard {
     error FactoryNFTContract__InsufficientFunds();
+    error FactoryNFTContract__CantBeZeroAddress();
+    error FactoryNFTContract__CantBeZeroAmount();
+    error FactoryNFTContract__TransferFailed();
 
     //////////////////////
     // State Variables  //
@@ -42,7 +45,9 @@ contract FactoryNFTContract is Ownable, ReentrancyGuard {
      * @dev Initializes the contract by setting the initial owner.
      * @param initialOwner The address to be set as the initial owner of the contract.
      */
-    constructor(address initialOwner) Ownable(initialOwner) { }
+    constructor(address initialOwner, uint256 _sFee) Ownable(initialOwner) {
+        s_fee = _sFee;
+    }
 
     /////////////////////////////////
     // External/Public Functions   //
@@ -73,7 +78,7 @@ contract FactoryNFTContract is Ownable, ReentrancyGuard {
         payable
         nonReentrant
     {
-        if (msg.value < s_fee) {
+        if (msg.value != s_fee) {
             revert FactoryNFTContract__InsufficientFunds();
         }
         NFTContract newCollection =
@@ -91,16 +96,16 @@ contract FactoryNFTContract is Ownable, ReentrancyGuard {
         s_fee = _fee;
     }
 
-    /**
-     * @notice Withdraws the accumulated fees to the contract owner's address.
-     * @dev Transfers the entire balance of the contract to the owner. Can only be called by the owner.
-     * @custom:reverts FactoryNFTContract__InsufficientFunds if there are no funds to withdraw.
-     */
-    function withdraw() external onlyOwner {
-        if (address(this).balance == 0) {
-            revert FactoryNFTContract__InsufficientFunds();
+    function withdraw(address payable recipient, uint256 amount) external onlyOwner {
+        if (recipient == address(0)) {
+            revert FactoryNFTContract__CantBeZeroAddress();
         }
-        payable(owner()).transfer(address(this).balance);
+        if (amount == 0) {
+            revert FactoryNFTContract__CantBeZeroAmount();
+        }
+
+        (bool success,) = recipient.call{ value: amount }("");
+        if (!success) revert FactoryNFTContract__TransferFailed();
     }
 
     //////////////////////////////////////

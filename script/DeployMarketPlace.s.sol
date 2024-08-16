@@ -17,12 +17,12 @@ contract DeployMarketPlace is Script {
      * MarketPlace contract.
      * @return The address of the newly deployed MarketPlace contract.
      */
-    function run() external returns (MarketPlace, HelperConfig) {
+    function run() external returns (MarketPlace) {
         HelperConfig helperConfig = new HelperConfig();
         HelperConfig.NetworkConfig memory config = helperConfig.getOrCreateAnvilEthConfig();
 
         MarketPlace marketPlace = new MarketPlace(config.initialOwner, config.initialGelatoAddress, 0);
 
-        return (marketPlace, helperConfig);
+        return (marketPlace);
     }
 }

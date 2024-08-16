@@ -17,12 +17,12 @@ contract DeployFactoryNFTContract is Script {
      * FactoryNFTContract.
      * @return The address of the newly deployed FactoryNFTContract.
      */
-    function run() external returns (FactoryNFTContract, HelperConfig) {
+    function run() external returns (FactoryNFTContract) {
         HelperConfig helperConfig = new HelperConfig();
         HelperConfig.NetworkConfig memory config = helperConfig.getActiveNetworkConfig();
 
-        FactoryNFTContract factory = new FactoryNFTContract(config.initialOwner);
+        FactoryNFTContract factory = new FactoryNFTContract(config.initialOwner, 0);
 
-        return (factory, helperConfig);
+        return (factory);
     }
 }

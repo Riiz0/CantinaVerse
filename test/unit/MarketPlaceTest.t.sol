@@ -58,7 +58,7 @@ contract MarketPlaceTest is Test {
         contractCollection3 = new MockERC721("Collection 3", "COL3");
         contractCollection4 = new MockERC721("Collection 4", "COL4");
         contractCollection5 = new MockERC721("Collection 5", "COL5");
-        (marketPlace, config) = deployer.run();
+        (marketPlace) = deployer.run();
         vm.deal(BUYER, STARTING_BALANCE);
         vm.deal(SELLER, STARTING_BALANCE);
         vm.deal(SELLERTWO, STARTING_BALANCE);
@@ -578,15 +578,6 @@ contract MarketPlaceTest is Test {
         vm.startPrank(address(1));
         vm.expectRevert(MarketPlace.MarketPlace__CantBeZeroAmount.selector);
         marketPlace.withdraw(OWNER, 0);
-        vm.stopPrank();
-    }
-
-    function test_MarketPlace__InsufficientFunds() public {
-        vm.startPrank(address(1));
-        marketPlace.setFee(1 ether);
-
-        vm.expectRevert(MarketPlace.MarketPlace__InsufficientFunds.selector);
-        marketPlace.withdraw(OWNER, 1 ether);
         vm.stopPrank();
     }
 

@@ -275,15 +275,12 @@ contract MarketPlace is Ownable, ReentrancyGuard, IERC721Receiver {
         emit FeeUpdated(_fee);
     }
 
-    function withdraw(address payable recipient, uint256 amount) public onlyOwner {
+    function withdraw(address payable recipient, uint256 amount) external onlyOwner {
         if (recipient == address(0)) {
             revert MarketPlace__CantBeZeroAddress();
         }
         if (amount == 0) {
             revert MarketPlace__CantBeZeroAmount();
-        }
-        if (amount > address(this).balance) {
-            revert MarketPlace__InsufficientFunds();
         }
 
         (bool success,) = recipient.call{ value: amount }("");

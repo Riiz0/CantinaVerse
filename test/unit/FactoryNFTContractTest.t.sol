@@ -27,6 +27,7 @@ contract FactoryNFTContractTest is Test {
     string baseURI = "ipfs://";
     uint256 maxSupply = 10;
     address OWNER = makeAddr("owner");
+    address payable PERSONAL = payable(address(uint160(123)));
     uint96 royaltyPercentage = 10;
     uint256 mintPrice = 0;
 
@@ -34,13 +35,15 @@ contract FactoryNFTContractTest is Test {
         config = new HelperConfig();
 
         deployer = new DeployFactoryNFTContract();
-        (factory, config) = deployer.run();
+        (factory) = deployer.run();
+
+        vm.deal(OWNER, 10 ether);
     }
 
     function testConstructorSetsInitialOwnerCorrectly() public {
         console2.log(factory.owner());
         address expectedOwner = makeAddr("testOwner");
-        FactoryNFTContract testFactory = new FactoryNFTContract(expectedOwner);
+        FactoryNFTContract testFactory = new FactoryNFTContract(expectedOwner, 0);
         assertEq(testFactory.owner(), expectedOwner);
     }
 
@@ -50,6 +53,79 @@ contract FactoryNFTContractTest is Test {
         assertEq(factory.getCollections().length, 1);
     }
 
+    function test_FactoryNFTContract__InsufficientFunds() public {
+        uint256 testPrice = 1 ether;
+
+        vm.startPrank(address(1));
+        factory.setFee(1 ether);
+        vm.stopPrank();
+
+        vm.startPrank(address(1));
+        vm.expectRevert(FactoryNFTContract.FactoryNFTContract__InsufficientFunds.selector);
+        factory.createCollection{ value: 0 }(name, symbol, baseURI, maxSupply, OWNER, royaltyPercentage, testPrice);
+        vm.stopPrank();
+    }
+
+    function test_FactoryNFTContract_WithdrawSuccessful() public {
+        uint256 testPrice = 1 ether;
+
+        vm.startPrank(address(1));
+        factory.setFee(1 ether);
+        vm.stopPrank();
+
+        vm.startPrank(OWNER);
+        factory.createCollection{ value: testPrice }(
+            name, symbol, baseURI, maxSupply, OWNER, royaltyPercentage, mintPrice
+        );
+        vm.stopPrank();
+
+        assertEq(factory.getCollections().length, 1);
+
+        vm.startPrank(address(1));
+        factory.withdraw(PERSONAL, testPrice);
+        vm.stopPrank();
+
+        assertEq(address(PERSONAL).balance, testPrice);
+    }
+
+    function test_FactoryNFTContract__CantBeZeroAddress() public {
+        uint256 testPrice = 1 ether;
+
+        vm.startPrank(address(1));
+        factory.setFee(1 ether);
+        vm.stopPrank();
+
+        vm.startPrank(OWNER);
+        factory.createCollection{ value: testPrice }(
+            name, symbol, baseURI, maxSupply, OWNER, royaltyPercentage, mintPrice
+        );
+        vm.stopPrank();
+
+        vm.startPrank(address(1));
+        vm.expectRevert(FactoryNFTContract.FactoryNFTContract__CantBeZeroAddress.selector);
+        factory.withdraw(payable(address(0)), testPrice);
+        vm.stopPrank();
+    }
+
+    function test_FactoryNFTContract__CantBeZeroAmount() public {
+        uint256 testPrice = 1 ether;
+
+        vm.startPrank(address(1));
+        factory.setFee(1 ether);
+        vm.stopPrank();
+
+        vm.startPrank(OWNER);
+        factory.createCollection{ value: testPrice }(
+            name, symbol, baseURI, maxSupply, OWNER, royaltyPercentage, mintPrice
+        );
+        vm.stopPrank();
+
+        vm.startPrank(address(1));
+        vm.expectRevert(FactoryNFTContract.FactoryNFTContract__CantBeZeroAmount.selector);
+        factory.withdraw(PERSONAL, 0);
+        vm.stopPrank();
+    }
+
     function testGetCollections() public {
         vm.prank(OWNER);
         factory.createCollection(name, symbol, baseURI, maxSupply, OWNER, royaltyPercentage, mintPrice);
@@ -57,5 +133,14 @@ contract FactoryNFTContractTest is Test {
         address[] memory collections = factory.getCollections();
         assertEq(collections.length, 1, "Should have exactly one collection");
         assertEq(expectedAddress, factory.getCollections()[0]);
+    }
+
+    function testSetFee() public {
+        vm.startPrank(address(1));
+        uint256 expectedFee = 1 ether;
+        factory.setFee(expectedFee);
+        vm.stopPrank();
+
+        assertEq(factory.getFee(), expectedFee);
     }
 }
