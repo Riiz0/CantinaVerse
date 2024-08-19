@@ -14,7 +14,7 @@ contract HelperConfig is Script {
     //////////////////////////////////////////////////////////////*/
     struct NetworkConfig {
         address initialOwner;
-        address initialGelatoAddress;
+        address GelatoDedicatedMsgSender;
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -76,54 +76,54 @@ contract HelperConfig is Script {
                                 CONFIGS
     //////////////////////////////////////////////////////////////*/
     function getEthMainnetConfig() public pure returns (NetworkConfig memory) {
-        return NetworkConfig({ initialOwner: address(1), initialGelatoAddress: address(2) });
+        return NetworkConfig({ initialOwner: address(1), GelatoDedicatedMsgSender: address(2) });
     }
 
     function getSepoliaConfig() public pure returns (NetworkConfig memory) {
         return NetworkConfig({
             initialOwner: address(0xfe63Ba8189215E5C975e73643b96066B6aD41A45),
-            initialGelatoAddress: address(0x823F9f50f6A6E52CC4073Ff1493D4a8482D8Aba4)
+            GelatoDedicatedMsgSender: address(0x823F9f50f6A6E52CC4073Ff1493D4a8482D8Aba4)
         });
     }
 
     function getZkSyncConfig() public pure returns (NetworkConfig memory) {
-        return NetworkConfig({ initialOwner: address(1), initialGelatoAddress: address(2) });
+        return NetworkConfig({ initialOwner: address(1), GelatoDedicatedMsgSender: address(2) });
     }
 
     function getZkSyncSepoliaConfig() public pure returns (NetworkConfig memory) {
-        return NetworkConfig({ initialOwner: address(1), initialGelatoAddress: address(2) });
+        return NetworkConfig({ initialOwner: address(1), GelatoDedicatedMsgSender: address(2) });
     }
 
     function getPolygonMainnetConfig() public pure returns (NetworkConfig memory) {
-        return NetworkConfig({ initialOwner: address(1), initialGelatoAddress: address(2) });
+        return NetworkConfig({ initialOwner: address(1), GelatoDedicatedMsgSender: address(2) });
     }
 
     function getPolygonMumbaiConfig() public pure returns (NetworkConfig memory) {
-        return NetworkConfig({ initialOwner: address(1), initialGelatoAddress: address(2) });
+        return NetworkConfig({ initialOwner: address(1), GelatoDedicatedMsgSender: address(2) });
     }
 
     function getModeMainnetConfig() public pure returns (NetworkConfig memory) {
-        return NetworkConfig({ initialOwner: address(1), initialGelatoAddress: address(2) });
+        return NetworkConfig({ initialOwner: address(1), GelatoDedicatedMsgSender: address(2) });
     }
 
     function getModeSepoliaConfig() public pure returns (NetworkConfig memory) {
-        return NetworkConfig({ initialOwner: address(1), initialGelatoAddress: address(2) });
+        return NetworkConfig({ initialOwner: address(1), GelatoDedicatedMsgSender: address(2) });
     }
 
     function getOpMainnetConfig() public pure returns (NetworkConfig memory) {
-        return NetworkConfig({ initialOwner: address(1), initialGelatoAddress: address(2) });
+        return NetworkConfig({ initialOwner: address(1), GelatoDedicatedMsgSender: address(2) });
     }
 
     function getOpSepoliaConfig() public pure returns (NetworkConfig memory) {
-        return NetworkConfig({ initialOwner: address(1), initialGelatoAddress: address(2) });
+        return NetworkConfig({ initialOwner: address(1), GelatoDedicatedMsgSender: address(2) });
     }
 
     function getBaseMainnetConfig() public pure returns (NetworkConfig memory) {
-        return NetworkConfig({ initialOwner: address(1), initialGelatoAddress: address(2) });
+        return NetworkConfig({ initialOwner: address(1), GelatoDedicatedMsgSender: address(2) });
     }
 
     function getBaseSepoliaConfig() public pure returns (NetworkConfig memory) {
-        return NetworkConfig({ initialOwner: address(1), initialGelatoAddress: address(2) });
+        return NetworkConfig({ initialOwner: address(1), GelatoDedicatedMsgSender: address(2) });
     }
 
     /*//////////////////////////////////////////////////////////////
@@ -138,7 +138,7 @@ contract HelperConfig is Script {
 
         _deployMocks();
 
-        localNetworkConfig = NetworkConfig({ initialOwner: address(1), initialGelatoAddress: address(2) });
+        localNetworkConfig = NetworkConfig({ initialOwner: address(1), GelatoDedicatedMsgSender: address(2) });
         return localNetworkConfig;
     }
 
