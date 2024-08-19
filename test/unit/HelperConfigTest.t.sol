@@ -31,6 +31,10 @@ contract HelperConfigTest is Test {
         uint256 chainId = 11_155_111;
         HelperConfig.NetworkConfig memory config = helperConfig.getConfigByChainId(chainId);
         // Verify that the returned config matches the expected initialOwner set in the constructor
-        assertEq(config.initialOwner, address(1), "The initialOwner should be address(1) for predefined chain IDs");
+        assertEq(
+            config.initialOwner,
+            address(0xfe63Ba8189215E5C975e73643b96066B6aD41A45),
+            "The initialOwner should be address(1) for predefined chain IDs"
+        );
     }
 }

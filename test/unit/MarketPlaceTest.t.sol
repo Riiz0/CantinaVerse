@@ -2,15 +2,20 @@
 pragma solidity 0.8.24;
 
 import { Test, console2, Vm } from "forge-std/Test.sol";
-import { MarketPlace } from "../../src/MarketPlace.sol";
+import { MarketPlace } from "../../src/marketplace/MarketPlace.sol";
+import { IMarketPlace } from "../../src/marketplace/interfaces/IMarketPlace.sol";
+import { AuctionEndChecker } from "../../src/marketplace/AuctionEndChecker.sol";
 import { DeployMarketPlace } from "../../script/DeployMarketPlace.s.sol";
 import { HelperConfig } from "../../script/HelperConfig.s.sol";
+import { MockMarketPlace } from "../mocks/MockMarketPlace.sol";
 import { MockERC721 } from "../mocks/MockERC721.sol";
 
 contract MarketPlaceTest is Test {
     MarketPlace marketPlace;
     DeployMarketPlace deployer;
     HelperConfig config;
+    AuctionEndChecker auctionEndChecker;
+    MockMarketPlace mockMarketPlace;
     MockERC721 contractCollection1;
     MockERC721 contractCollection2;
     MockERC721 contractCollection3;
@@ -22,9 +27,11 @@ contract MarketPlaceTest is Test {
     address SELLERTWO = makeAddr("sellerTwo");
     address SELLERTHREE = makeAddr("sellerThree");
     address BUYER = makeAddr("buy");
+    address DEDICATEDMSGSENDER = makeAddr("dedicatedMsgSender");
     uint256 constant STARTING_BALANCE = 100 ether;
     uint256 price = 1 ether;
     uint256 serviceFee = 1 ether;
+    uint256 constant DURATION = 14 days;
 
     event NFTListed(address indexed seller, address indexed nftAddress, uint256 indexed tokenId, uint256 price);
     event NFTDelisted(address indexed seller, address indexed nftAddress, uint256 indexed tokenId);
@@ -48,11 +55,13 @@ contract MarketPlaceTest is Test {
         uint256 tokenId
     );
     event FeeUpdated(uint256 indexed newFee);
-    event GelatoAddressUpdated(address indexed newGelatoAddress);
+    event NewGelatoDedicatedMsgSender(address indexed newGelatoAddress);
 
     function setUp() public {
         config = new HelperConfig();
         deployer = new DeployMarketPlace();
+        mockMarketPlace = new MockMarketPlace(DEDICATEDMSGSENDER);
+        auctionEndChecker = new AuctionEndChecker(mockMarketPlace);
         contractCollection1 = new MockERC721("Collection 1", "COL1");
         contractCollection2 = new MockERC721("Collection 2", "COL2");
         contractCollection3 = new MockERC721("Collection 3", "COL3");
@@ -377,38 +386,37 @@ contract MarketPlaceTest is Test {
     {
         vm.startPrank(SELLER);
         contractCollection3.approve(address(marketPlace), 2);
-        marketPlace.createAuction(address(contractCollection3), 2, price, 1 days);
+        marketPlace.createAuction(address(contractCollection3), 2, price);
 
         vm.expectRevert(MarketPlace.MarketPlace__NFTAlreadyListedOrInAuction.selector);
-        marketPlace.createAuction(address(contractCollection3), 2, price, 5 days);
+        marketPlace.createAuction(address(contractCollection3), 2, price);
         vm.stopPrank();
     }
 
     function test_MarketPlace__AuctionNotTheOwner() public contractCollection3SellerAndBuyerMints {
         vm.startPrank(BUYER);
         vm.expectRevert(MarketPlace.MarketPlace__AuctionNotTheOwner.selector);
-        marketPlace.createAuction(address(contractCollection3), 2, price, 5 days);
+        marketPlace.createAuction(address(contractCollection3), 2, price);
         vm.stopPrank();
     }
 
     function test_MarketPlace__PriceCannotBeZero() public contractCollection3SellerAndBuyerMints {
         vm.startPrank(SELLER);
         vm.expectRevert(MarketPlace.MarketPlace__PriceCannotBeZero.selector);
-        marketPlace.createAuction(address(contractCollection3), 2, 0, 1 days);
+        marketPlace.createAuction(address(contractCollection3), 2, 0);
         vm.stopPrank();
     }
 
     function test_ExpectEmit_CreateAuctionSuccessfulWithEmit() public contractCollection3SellerAndBuyerMints {
         uint256 testStartTime = block.timestamp;
-        uint256 durationOfDays = 1 days;
-        uint256 durationInMinutes = durationOfDays * 60;
+        uint256 durationInMinutes = DURATION * 60;
         uint256 endTime = block.timestamp + durationInMinutes;
 
         vm.startPrank(SELLER);
         contractCollection3.approve(address(marketPlace), 2);
         vm.expectEmit(true, true, true, true);
         emit AuctionCreated(0, testStartTime, endTime, address(contractCollection3), 2, price);
-        marketPlace.createAuction(address(contractCollection3), 2, price, 1 days);
+        marketPlace.createAuction(address(contractCollection3), 2, price);
         vm.stopPrank();
 
         assertEq(contractCollection3.ownerOf(2), address(marketPlace));
@@ -429,18 +437,17 @@ contract MarketPlaceTest is Test {
 
     function test_MarketPlace__NFTAuctionHasEnded() public contractCollection3SellerAndBuyerMints {
         uint256 testStartTime = block.timestamp;
-        uint256 durationOfDays = 1 days;
-        uint256 durationInMinutes = durationOfDays * 60;
+        uint256 durationInMinutes = DURATION * 60;
         uint256 endTime = block.timestamp + durationInMinutes;
 
-        uint256 daysAfterEnd = 2 days;
+        uint256 daysAfterEnd = DURATION + 1 minutes;
         uint256 durationInMinutesAfterEnd = daysAfterEnd * 60;
 
         vm.startPrank(SELLER);
         contractCollection3.approve(address(marketPlace), 2);
         vm.expectEmit(true, true, true, true);
         emit AuctionCreated(0, testStartTime, endTime, address(contractCollection3), 2, price);
-        marketPlace.createAuction(address(contractCollection3), 2, price, 1 days);
+        marketPlace.createAuction(address(contractCollection3), 2, price);
         vm.stopPrank();
         vm.warp(durationInMinutesAfterEnd);
         vm.startPrank(BUYER);
@@ -451,15 +458,14 @@ contract MarketPlaceTest is Test {
 
     function test_MarketPlace__BidIsLessThanHighestBid() public contractCollection3SellerAndBuyerMints {
         uint256 testStartTime = block.timestamp;
-        uint256 durationOfDays = 1 days;
-        uint256 durationInMinutes = durationOfDays * 60;
+        uint256 durationInMinutes = DURATION * 60;
         uint256 endTime = block.timestamp + durationInMinutes;
 
         vm.startPrank(SELLER);
         contractCollection3.approve(address(marketPlace), 2);
         vm.expectEmit(true, true, true, true);
         emit AuctionCreated(0, testStartTime, endTime, address(contractCollection3), 2, price);
-        marketPlace.createAuction(address(contractCollection3), 2, price, 1 days);
+        marketPlace.createAuction(address(contractCollection3), 2, price);
         vm.stopPrank();
 
         vm.startPrank(BUYER);
@@ -476,8 +482,7 @@ contract MarketPlaceTest is Test {
         uint256 highBid = 5 ether;
         uint256 HighestBid = 6 ether;
         uint256 testStartTime = block.timestamp;
-        uint256 durationOfDays = 1 days;
-        uint256 durationInMinutes = durationOfDays * 60;
+        uint256 durationInMinutes = DURATION * 60;
         uint256 endTime = block.timestamp + durationInMinutes;
 
         uint256 daysAfterEnd = 2 days;
@@ -487,7 +492,7 @@ contract MarketPlaceTest is Test {
         contractCollection3.approve(address(marketPlace), 2);
         vm.expectEmit(true, true, true, true);
         emit AuctionCreated(0, testStartTime, endTime, address(contractCollection3), 2, price);
-        marketPlace.createAuction(address(contractCollection3), 2, price, 1 days);
+        marketPlace.createAuction(address(contractCollection3), 2, price);
         vm.stopPrank();
 
         vm.startPrank(BUYER);
@@ -501,6 +506,147 @@ contract MarketPlaceTest is Test {
         marketPlace.bidOnAuction{ value: HighestBid }(0);
         vm.stopPrank();
         vm.warp(durationInMinutesAfterEnd);
+    }
+
+    function testEndAuctionSuccessful() public contractCollection3SellerAndBuyerMints {
+        uint256 sellerInitialBalance = SELLER.balance;
+        uint256 highBid = 5 ether;
+        uint256 HighestBid = 6 ether;
+        uint256 durationInMinutes = DURATION * 60;
+        uint256 endTime = block.timestamp + durationInMinutes;
+
+        uint256 TimeAfterEnd = endTime + 1 minutes;
+
+        vm.startPrank(SELLER);
+        contractCollection3.approve(address(mockMarketPlace), 3);
+        mockMarketPlace.createAuction(address(contractCollection3), 3, price);
+        vm.stopPrank();
+
+        vm.startPrank(BUYER);
+        mockMarketPlace.placeMockBid{ value: highBid }(0, BUYER);
+        vm.stopPrank();
+
+        vm.startPrank(SELLERTWO);
+        mockMarketPlace.placeMockBid{ value: HighestBid }(0, SELLERTWO);
+        vm.stopPrank();
+
+        vm.warp(TimeAfterEnd);
+
+        vm.startPrank(DEDICATEDMSGSENDER);
+        (bool canExec, bytes memory execPayload) = auctionEndChecker.checker();
+        require(canExec, "Auction cannot be ended yet");
+        (bool success,) = address(mockMarketPlace).call(execPayload);
+        require(success, "Failed to end auction");
+        vm.stopPrank();
+
+        uint256 sellerFinalBalance = SELLER.balance;
+        uint256 expectedSellerBalance = sellerInitialBalance + 6 ether;
+        assertEq(sellerFinalBalance, expectedSellerBalance);
+
+        address nftOwner = contractCollection3.ownerOf(3);
+        assertEq(nftOwner, SELLERTWO);
+    }
+
+    function test_MarketPlace__CallerIsNotGelato() public {
+        vm.startPrank(SELLER);
+        vm.expectRevert(MarketPlace.MarketPlace__CallerIsNotGelato.selector);
+        marketPlace.endAuction(0);
+        vm.stopPrank();
+    }
+
+    function test_EndAuction_MarketPlace__NFTNotInAuction() public contractCollection3SellerAndBuyerMints {
+        vm.startPrank(address(2));
+        vm.expectRevert(MarketPlace.MarketPlace__NFTNotInAuction.selector);
+        marketPlace.endAuction(0);
+        vm.stopPrank();
+    }
+
+    function test_MarketPlace__NFTAuctionHasNotEnded() public contractCollection3SellerAndBuyerMints {
+        vm.startPrank(SELLER);
+        contractCollection3.approve(address(marketPlace), 0);
+        marketPlace.createAuction(address(contractCollection3), 0, price);
+        vm.stopPrank();
+
+        vm.startPrank(address(2));
+        vm.expectRevert(MarketPlace.MarketPlace__NFTAuctionHasNotEnded.selector);
+        marketPlace.endAuction(0);
+        vm.stopPrank();
+    }
+
+    function test_NoBidsPlacedReturnNFTTOSELLER() public contractCollection3SellerAndBuyerMints {
+        uint256 sellerInitialBalance = SELLER.balance;
+        uint256 durationInMinutes = DURATION * 1 minutes;
+        uint256 endTime = block.timestamp + durationInMinutes;
+
+        uint256 TimeAfterEnd = endTime + 1 minutes;
+
+        vm.startPrank(SELLER);
+        contractCollection3.approve(address(marketPlace), 3);
+        marketPlace.createAuction(address(contractCollection3), 3, price);
+        vm.stopPrank();
+
+        vm.warp(TimeAfterEnd);
+
+        vm.startPrank(address(2));
+        (bool canExec, bytes memory execPayload) = auctionEndChecker.checker();
+        if (!canExec) {
+            marketPlace.endAuction(0);
+        } else {
+            (bool success,) = address(marketPlace).call(execPayload);
+            require(success, "Failed to end auction");
+        }
+        vm.stopPrank();
+
+        uint256 sellerFinalBalance = SELLER.balance;
+        uint256 expectedSellerBalance = sellerInitialBalance + 0 ether;
+        assertEq(sellerFinalBalance, expectedSellerBalance);
+
+        address nftOwner = contractCollection3.ownerOf(3);
+        assertEq(nftOwner, SELLER);
+    }
+
+    function test_MarketPlace_EndAuctionSuccessful() public contractCollection3SellerAndBuyerMints {
+        uint256 sellerInitialBalance = SELLER.balance;
+        uint256 highBid = 5 ether;
+        uint256 HighestBid = 6 ether;
+        uint256 durationInMinutes = DURATION * 1 minutes;
+        uint256 endTime = block.timestamp + durationInMinutes;
+
+        uint256 TimeAfterEnd = endTime + 1 minutes;
+
+        vm.startPrank(SELLER);
+        contractCollection3.approve(address(marketPlace), 3);
+        marketPlace.createAuction(address(contractCollection3), 3, price);
+        vm.stopPrank();
+
+        vm.startPrank(BUYER);
+        marketPlace.bidOnAuction{ value: highBid }(0);
+        vm.stopPrank();
+
+        vm.startPrank(SELLERTWO);
+        marketPlace.bidOnAuction{ value: HighestBid }(0);
+        vm.stopPrank();
+
+        vm.warp(TimeAfterEnd);
+
+        vm.startPrank(address(2));
+        (bool canExec, bytes memory execPayload) = auctionEndChecker.checker();
+        if (!canExec) {
+            vm.expectEmit(true, true, true, true);
+            emit AuctionEnded(0, SELLERTWO, HighestBid, address(contractCollection3), 3);
+            marketPlace.endAuction(0);
+        } else {
+            (bool success,) = address(marketPlace).call(execPayload);
+            require(success, "Failed to end auction");
+        }
+        vm.stopPrank();
+
+        uint256 sellerFinalBalance = SELLER.balance;
+        uint256 expectedSellerBalance = sellerInitialBalance + 6 ether;
+        assertEq(sellerFinalBalance, expectedSellerBalance);
+
+        address nftOwner = contractCollection3.ownerOf(3);
+        assertEq(nftOwner, SELLERTWO);
     }
 
     function testWithdrawSuccessful() public contractCollection3SellerAndBuyerMints {
@@ -592,6 +738,21 @@ contract MarketPlaceTest is Test {
         vm.stopPrank();
     }
 
+    function testSetNewGelato__CantBeZeroAddress() public {
+        vm.startPrank(address(1));
+        vm.expectRevert(MarketPlace.MarketPlace__CantBeZeroAddress.selector);
+        marketPlace.setNewGelatoDedicatedMsgSender(address(0));
+        vm.stopPrank();
+    }
+
+    function testSetNewGelatoDedicatedMsgSender() public {
+        vm.startPrank(address(1));
+        vm.expectEmit(true, true, true, false);
+        emit NewGelatoDedicatedMsgSender(address(4));
+        marketPlace.setNewGelatoDedicatedMsgSender(address(4));
+        vm.stopPrank();
+    }
+
     function testGetListingDetails() public contractCollection3SellerAndBuyerMints {
         vm.startPrank(SELLER);
         contractCollection3.approve(address(marketPlace), 3);
@@ -611,5 +772,24 @@ contract MarketPlaceTest is Test {
     function test_MarketPlace__InvalidListingId() public {
         vm.expectRevert(MarketPlace.MarketPlace__InvalidListingId.selector);
         marketPlace.getListingDetails(1);
+    }
+
+    function testGetAuction() public contractCollection3SellerAndBuyerMints {
+        vm.startPrank(SELLER);
+        contractCollection3.approve(address(marketPlace), 3);
+        marketPlace.createAuction(address(contractCollection3), 3, price);
+        vm.stopPrank();
+
+        marketPlace.getAuction(0);
+    }
+
+    function testAuctionIdsLength() public contractCollection3SellerAndBuyerMints {
+        vm.startPrank(SELLER);
+        contractCollection3.approve(address(marketPlace), 3);
+        marketPlace.createAuction(address(contractCollection3), 3, price);
+        vm.stopPrank();
+
+        uint256 auctionIdsLength = marketPlace.auctionIdsLength();
+        assertEq(auctionIdsLength, 1);
     }
 }

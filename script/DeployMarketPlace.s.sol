@@ -7,7 +7,7 @@ pragma solidity 0.8.24;
  * @notice A script to deploy the MarketPlace contract with configurations fetched from a HelperConfig contract.
  */
 import { Script, console2 } from "forge-std/Script.sol";
-import { MarketPlace } from "../src/MarketPlace.sol";
+import { MarketPlace } from "../src/marketplace/MarketPlace.sol";
 import { HelperConfig } from "./HelperConfig.s.sol";
 
 contract DeployMarketPlace is Script {

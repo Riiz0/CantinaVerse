@@ -4,7 +4,7 @@ pragma solidity 0.8.24;
 
 import { Test, console2, Vm } from "forge-std/Test.sol";
 import { HelperConfig } from "../../script/HelperConfig.s.sol";
-import { FactoryNFTContract } from "../../src/FactoryNFTContract.sol";
+import { FactoryNFTContract } from "../../src/marketplace/FactoryNFTContract.sol";
 import { DeployFactoryNFTContract } from "../../script/DeployFactoryNFTContract.s.sol";
 
 contract FactoryNFTContractTest is Test {

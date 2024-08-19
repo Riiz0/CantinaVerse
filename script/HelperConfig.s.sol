@@ -80,7 +80,10 @@ contract HelperConfig is Script {
     }
 
     function getSepoliaConfig() public pure returns (NetworkConfig memory) {
-        return NetworkConfig({ initialOwner: address(1), initialGelatoAddress: address(2) });
+        return NetworkConfig({
+            initialOwner: address(0xfe63Ba8189215E5C975e73643b96066B6aD41A45),
+            initialGelatoAddress: address(0x823F9f50f6A6E52CC4073Ff1493D4a8482D8Aba4)
+        });
     }
 
     function getZkSyncConfig() public pure returns (NetworkConfig memory) {

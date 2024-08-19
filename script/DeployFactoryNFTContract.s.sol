@@ -8,7 +8,7 @@ pragma solidity 0.8.24;
  */
 import { Script, console2 } from "forge-std/Script.sol";
 import { HelperConfig } from "./HelperConfig.s.sol";
-import { FactoryNFTContract } from "../src/FactoryNFTContract.sol";
+import { FactoryNFTContract } from "../src/marketplace/FactoryNFTContract.sol";
 
 contract DeployFactoryNFTContract is Script {
     /**
