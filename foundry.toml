@@ -45,20 +45,6 @@ quote_style = "double"
 tab_width = 4
 wrap_comments = true
 
-[etherscan]
-# zksync = no keey needed for zksync
-sepolia = { key = "6DGM59A47Z9UZNCSSR44ASZ5NW6ZDDWMK4" }
-arbitrum = { key = "${API_KEY_ARBISCAN}" }
-avalanche = { key = "${API_KEY_SNOWTRACE}" }
-bnb_smart_chain = { key = "${API_KEY_BSCSCAN}" }
-gnosis_chain = { key = "${API_KEY_GNOSISSCAN}" }
-goerli = { key = "${API_KEY_ETHERSCAN}" }
-mainnet = { key = "${API_KEY_ETHERSCAN}" }
-optimism = { key = "${API_KEY_OPTIMISTIC_ETHERSCAN}" }
-polygon = { key = "${API_KEY_POLYGONSCAN}" }
-mode = { key = "${API_KEY_MODESCAN}" }
-base = { key = "${API_KEY_BASESCAN}" }
-
 [rpc_endpoints]
 # example:
 # zksync = "https://mainnet.era.zksync.io"

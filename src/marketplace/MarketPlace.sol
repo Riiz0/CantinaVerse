@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.24;
 
-import { console2 } from "forge-std/Test.sol";
 import { IERC721 } from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
 import { IERC721Receiver } from "@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol";
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
@@ -64,7 +63,7 @@ contract MarketPlace is Ownable, ReentrancyGuard, IERC721Receiver {
     uint256 private s_auctionIdCounter;
     address private s_GelatoDedicatedMsgSender;
     uint256 private s_fee;
-    uint256 private constant DURATION = 14 days;
+    uint256 private constant DURATION = 10 minutes; // Should be 14 days in production
 
     //////////////
     // Events   //

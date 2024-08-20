@@ -31,7 +31,7 @@ contract MarketPlaceTest is Test {
     uint256 constant STARTING_BALANCE = 100 ether;
     uint256 price = 1 ether;
     uint256 serviceFee = 1 ether;
-    uint256 constant DURATION = 14 days;
+    uint256 constant DURATION = 10 minutes;
 
     event NFTListed(address indexed seller, address indexed nftAddress, uint256 indexed tokenId, uint256 price);
     event NFTDelisted(address indexed seller, address indexed nftAddress, uint256 indexed tokenId);
@@ -556,6 +556,7 @@ contract MarketPlaceTest is Test {
         vm.startPrank(SELLER);
         contractCollection3.approve(address(mockMarketPlace), 3);
         mockMarketPlace.createAuction(address(contractCollection3), 3, price);
+        vm.warp(block.timestamp);
         vm.stopPrank();
 
         vm.startPrank(BUYER);

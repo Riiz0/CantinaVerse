@@ -22,7 +22,7 @@ contract MockMarketPlace is IMarketPlace, IERC721Receiver {
     mapping(uint256 => Auction) private s_auctions;
     uint256 private s_auctionIdCounter;
     address public dedicatedMsgSender;
-    uint256 private constant DURATION = 14 days;
+    uint256 private constant DURATION = 10 minutes;
 
     event AuctionEnded(
         uint256 indexed auctionId,

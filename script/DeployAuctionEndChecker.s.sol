@@ -4,6 +4,7 @@ pragma solidity 0.8.24;
 import { Script, console2 } from "forge-std/Script.sol";
 import { HelperConfig } from "./HelperConfig.s.sol";
 import { AuctionEndChecker } from "../src/marketplace/AuctionEndChecker.sol";
+import { IMarketPlace } from "../src/marketplace/interfaces/IMarketPlace.sol";
 
 contract DeployAuctionEndChecker is Script {
     function run() external returns (AuctionEndChecker) {
@@ -25,12 +26,13 @@ contract DeployAuctionEndChecker is Script {
         }
 
         vm.startBroadcast();
-        //AuctionEndChecker auctionEndChecker = new AuctionEndChecker();
+        IMarketPlace marketPlace = IMarketPlace(0x0292Bb8c5289aA7aa844f4064e87c8D17177Ced9);
+        AuctionEndChecker auctionEndChecker = new AuctionEndChecker(marketPlace);
         vm.stopBroadcast();
 
-        //console2.log("AuctionEndChecker deployed at:", address(auctionEndChecker));
-        //console2.log("Marketplace Address:", address());
+        console2.log("AuctionEndChecker deployed at:", address(auctionEndChecker));
+        console2.log("Marketplace Address:", address(marketPlace));
 
-        //return auctionEndChecker;
+        return auctionEndChecker;
     }
 }
