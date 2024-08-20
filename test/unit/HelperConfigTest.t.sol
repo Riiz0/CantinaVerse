@@ -74,28 +74,4 @@ contract HelperConfigTest is Test {
         config = helperConfig.getModeMainnetConfig();
         assertEq(config.initialOwner, 0xfe63Ba8189215E5C975e73643b96066B6aD41A45);
     }
-
-    function testUnsupportedNetwork() public {
-        vm.chainId(1); // Ethereum mainnet, which is not explicitly supported in your deployment script
-        vm.expectRevert("Unsupported network");
-        this.simulateDeploymentScript();
-    }
-
-    function simulateDeploymentScript() public view {
-        HelperConfig.NetworkConfig memory config;
-
-        if (block.chainid == 31_337) {
-            config = helperConfig.getAnvilConfig();
-        } else if (block.chainid == 11_155_111) {
-            config = helperConfig.getSepoliaConfig();
-        } else if (block.chainid == 8453) {
-            config = helperConfig.getBaseMainnetConfig();
-        } else if (block.chainid == 10) {
-            config = helperConfig.getOpMainnetConfig();
-        } else if (block.chainid == 34_443) {
-            config = helperConfig.getModeMainnetConfig();
-        } else {
-            revert("Unsupported network");
-        }
-    }
 }

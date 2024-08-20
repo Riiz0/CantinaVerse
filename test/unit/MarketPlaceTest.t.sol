@@ -67,7 +67,7 @@ contract MarketPlaceTest is Test {
         contractCollection3 = new MockERC721("Collection 3", "COL3");
         contractCollection4 = new MockERC721("Collection 4", "COL4");
         contractCollection5 = new MockERC721("Collection 5", "COL5");
-        (marketPlace) = deployer.run();
+        marketPlace = deployer.run();
         vm.deal(BUYER, STARTING_BALANCE);
         vm.deal(SELLER, STARTING_BALANCE);
         vm.deal(SELLERTWO, STARTING_BALANCE);
@@ -120,6 +120,42 @@ contract MarketPlaceTest is Test {
         contractCollection3.safeMint(BUYER);
         contractCollection3.safeMint(BUYER);
         _;
+    }
+
+    function testDeployOnAnvil() public {
+        vm.chainId(31_337);
+        assertEq(marketPlace.owner(), config.getAnvilConfig().initialOwner);
+        assertEq(marketPlace.getFee(), config.getAnvilConfig().serviceFee);
+    }
+
+    function testDeployOnSepolia() public {
+        vm.chainId(11_155_111);
+        assertEq(address(0xfe63Ba8189215E5C975e73643b96066B6aD41A45), config.getSepoliaConfig().initialOwner);
+        assertEq(marketPlace.getFee(), config.getSepoliaConfig().serviceFee);
+    }
+
+    function testDeployOnBaseMainnet() public {
+        vm.chainId(8453);
+        assertEq(address(0xfe63Ba8189215E5C975e73643b96066B6aD41A45), config.getBaseMainnetConfig().initialOwner);
+        assertEq(marketPlace.getFee(), config.getBaseMainnetConfig().serviceFee);
+    }
+
+    function testDeployOnOptimismMainnet() public {
+        vm.chainId(10);
+        assertEq(address(0xfe63Ba8189215E5C975e73643b96066B6aD41A45), config.getOpMainnetConfig().initialOwner);
+        assertEq(marketPlace.getFee(), config.getOpMainnetConfig().serviceFee);
+    }
+
+    function testDeployOnModeMainnet() public {
+        vm.chainId(34_443);
+        assertEq(address(0xfe63Ba8189215E5C975e73643b96066B6aD41A45), config.getModeMainnetConfig().initialOwner);
+        assertEq(marketPlace.getFee(), config.getModeMainnetConfig().serviceFee);
+    }
+
+    function testRevertOnUnsupportedNetwork() public {
+        vm.chainId(1); // Ethereum mainnet, which is not supported in your script
+        vm.expectRevert("Unsupported network");
+        deployer.run();
     }
 
     function testConstructorSetsInitialOwnerCorrectly() public {
