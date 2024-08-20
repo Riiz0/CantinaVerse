@@ -7,8 +7,8 @@ pragma solidity 0.8.24;
  * @notice A script to deploy the FactoryNFTContract with configurations fetched from a HelperConfig contract.
  */
 import { Script, console2 } from "forge-std/Script.sol";
-import { HelperConfig } from "../HelperConfig.s.sol";
-import { FactoryNFTContract } from "../../src/marketplace/FactoryNFTContract.sol";
+import { HelperConfig } from "./HelperConfig.s.sol";
+import { FactoryNFTContract } from "../../../src/marketplace/FactoryNFTContract.sol";
 
 contract DeployFactoryNFTContract is Script {
     /**
@@ -19,7 +19,7 @@ contract DeployFactoryNFTContract is Script {
      */
     function run() external returns (FactoryNFTContract) {
         HelperConfig helperConfig = new HelperConfig();
-        HelperConfig.NetworkConfig memory config = helperConfig.getActiveNetworkConfig();
+        HelperConfig.NetworkConfig memory config = helperConfig.getOrCreateAnvilEthConfig();
 
         FactoryNFTContract factory = new FactoryNFTContract(config.initialOwner, 0);
 
