@@ -19,10 +19,30 @@ contract DeployFactoryNFTContract is Script {
      */
     function run() external returns (FactoryNFTContract) {
         HelperConfig helperConfig = new HelperConfig();
-        HelperConfig.NetworkConfig memory config = helperConfig.getOrCreateAnvilEthConfig();
+        HelperConfig.NetworkConfig memory config;
 
-        FactoryNFTContract factory = new FactoryNFTContract(config.initialOwner, 0);
+        if (block.chainid == 31_337) {
+            config = helperConfig.getAnvilConfig();
+        } else if (block.chainid == 11_155_111) {
+            config = helperConfig.getSepoliaConfig();
+        } else if (block.chainid == 8453) {
+            config = helperConfig.getBaseMainnetConfig();
+        } else if (block.chainid == 10) {
+            config = helperConfig.getOpMainnetConfig();
+        } else if (block.chainid == 34_443) {
+            config = helperConfig.getModeMainnetConfig();
+        } else {
+            revert("Unsupported network");
+        }
 
-        return (factory);
+        vm.startBroadcast();
+        FactoryNFTContract factory = new FactoryNFTContract(config.initialOwner, config.serviceFee);
+        vm.stopBroadcast();
+
+        console2.log("FactoryNFTContract deployed at:", address(factory));
+        console2.log("Initial owner:", config.initialOwner);
+        console2.log("Service fee:", config.serviceFee);
+
+        return factory;
     }
 }

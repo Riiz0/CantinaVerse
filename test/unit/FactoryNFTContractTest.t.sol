@@ -33,7 +33,6 @@ contract FactoryNFTContractTest is Test {
 
     function setUp() public {
         config = new HelperConfig();
-
         deployer = new DeployFactoryNFTContract();
         (factory) = deployer.run();
 

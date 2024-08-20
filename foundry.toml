@@ -6,10 +6,10 @@ solc = "0.8.24"
 remappings = ["@openzeppelin/contracts=lib/openzeppelin-contracts/contracts/"]
 
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options
-# fs_permissions = [
-#     { access = "read", path = "./broadcast" },
-#     { access = "read", path = "./reports" },
-# ]
+fs_permissions = [
+    { access = "read", path = "./broadcast" },
+    { access = "read", path = "./reports" },
+]
 
 # When working with private keys avoid .env file and use the following code in the terminal
 # cast wallet import NAME_OF_FILE --interactive
