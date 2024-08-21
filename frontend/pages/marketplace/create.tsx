@@ -1,16 +1,16 @@
 'use client';
 
-import { useState } from 'react';
-import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
+import { useState, useEffect } from 'react';
+import { useWriteContract, useReadContract, useWaitForTransactionReceipt, useAccount } from 'wagmi';
 import { parseEther } from 'viem';
 import { create } from 'ipfs-http-client';
 import axios from 'axios';
 import { NFTStorage } from 'nft.storage';
-import { Footer } from '@/components/Footer';
+import { Footer } from '../../components/pagesFooter';
 import Header from '@/components/nftmarketplace/homepage/marketplaceHeader';
-import { factoryNFTContractABI } from './factoryNFTContractABI';
+import { factoryNFTContractABI } from '../../ABIs/factoryNFTContractABI';
 
-const FACTORY_CONTRACT_ADDRESS = '0x...'; // Your deployed FactoryNFTContract address
+const FACTORY_CONTRACT_ADDRESS = '0xD6aD186C394699F89C0064528a0299C79b62717e';
 
 // IPFS client setup
 const ipfs = create({ host: 'ipfs.infura.io', port: 5001, protocol: 'https' });
@@ -27,12 +27,27 @@ export default function Create() {
   const [ipfsHash, setIpfsHash] = useState('');
   const [pinningService, setPinningService] = useState<PinningService>('none');
   const [pinningApiKey, setPinningApiKey] = useState('');
+  const [contractFee, setContractFee] = useState<bigint | undefined>();
 
   const { writeContract, data: hash, error, isPending } = useWriteContract();
-
+  const { address: connectedAddress } = useAccount();
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
     hash,
   });
+
+  const fee = useReadContract({
+    address: FACTORY_CONTRACT_ADDRESS,
+    abi: factoryNFTContractABI,
+    functionName: 'getFee',
+  });
+
+  useEffect(() => {
+    const fetchContractFee = async () => {
+      const feeValue = fee.data as bigint;
+      setContractFee(feeValue);
+    };
+    fetchContractFee();
+  }, [fee]);
 
   const uploadToPinata = async (file: File, metadata: any) => {
     const formData = new FormData();
@@ -72,7 +87,7 @@ export default function Create() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!file) return;
+    if (!file || !connectedAddress || !contractFee) return;
 
     try {
       let baseURI;
@@ -91,6 +106,9 @@ export default function Create() {
         const metadataAdded = await ipfs.add(metadata);
         baseURI = `https://ipfs.io/ipfs/${metadataAdded.path}`;
         setIpfsHash(metadataAdded.path);
+
+        // Display a disclaimer for users when using the "No Pinning Service (Temporary Storage)" option
+        alert("Important: Your content is temporarily stored on IPFS. To ensure long-term availability, please pin this content using a pinning service or your own IPFS node. Learn more about pinning at https://docs.ipfs.tech/concepts/persistence/.");
       } else if (pinningService === 'pinata') {
         baseURI = await uploadToPinata(file, { name, description: `${name} collection` });
       } else if (pinningService === 'nftstorage') {
@@ -107,11 +125,11 @@ export default function Create() {
           symbol,
           baseURI,
           BigInt(maxSupply),
-          '0x...', // owner address (you might want to get this from the connected wallet)
+          connectedAddress,
           BigInt(royaltyPercentage),
           parseEther(mintPrice),
         ],
-        value: parseEther('0.1'), // Assuming a 0.1 ETH fee, adjust as needed
+        value: contractFee,
       });
     } catch (error) {
       console.error("Error uploading to IPFS or pinning service:", error);
@@ -121,52 +139,73 @@ export default function Create() {
   return (
     <main>
       <Header />
-      <form onSubmit={handleSubmit}>
-        <input type="text" value={name} onChange={(e) => setName(e.target.value)} placeholder="Collection Name" />
-        <input type="text" value={symbol} onChange={(e) => setSymbol(e.target.value)} placeholder="Symbol" />
-        <input type="number" value={maxSupply} onChange={(e) => setMaxSupply(e.target.value)} placeholder="Max Supply" />
-        <input type="number" value={royaltyPercentage} onChange={(e) => setRoyaltyPercentage(e.target.value)} placeholder="Royalty Percentage" />
-        <input type="number" value={mintPrice} onChange={(e) => setMintPrice(e.target.value)} placeholder="Mint Price (ETH)" />
-        <input type="file" onChange={(e) => setFile(e.target.files?.[0] || null)} />
-
-        <select value={pinningService} onChange={(e) => setPinningService(e.target.value as PinningService)}>
-          <option value="none">No Pinning Service (Temporary Storage)</option>
-          <option value="pinata">Pinata</option>
-          <option value="nftstorage">NFT.Storage</option>
-        </select>
-
-        {pinningService !== 'none' && (
-          <input
-            type="text"
-            value={pinningApiKey}
-            onChange={(e) => setPinningApiKey(e.target.value)}
-            placeholder={`${pinningService === 'pinata' ? 'Pinata' : 'NFT.Storage'} API Key`}
-          />
-        )}
-
-        <button type="submit" disabled={isPending || isConfirming}>
-          {isPending ? 'Preparing...' : isConfirming ? 'Confirming...' : 'Create Collection'}
-        </button>
-      </form>
-      {error && <div>Error: {error.message}</div>}
-      {isConfirmed && (
-        <div>
-          <p>Collection created successfully!</p>
-          {pinningService === 'none' && (
-            <>
-              <p>IPFS Hash: {ipfsHash}</p>
-              <p>
-                Important: Your content is temporarily stored on IPFS. To ensure long-term availability,
-                please pin this content using a pinning service or your own IPFS node.
-                Learn more about pinning <a href="https://docs.ipfs.tech/concepts/persistence/" target="_blank" rel="noopener noreferrer">here</a>.
-              </p>
-            </>
-          )}
-          {pinningService !== 'none' && (
-            <p>Your content has been pinned using {pinningService === 'pinata' ? 'Pinata' : 'NFT.Storage'}.</p>
+      <div className="create-container">
+        <div className="create-container-form">
+          <h1 className="create-title">Create NFT Collection</h1>
+          <form onSubmit={handleSubmit} className="create-form">
+            <div className="form-group">
+              <label htmlFor="name" className="form-label">Collection Name</label>
+              <input type="text" id="name" value={name} onChange={(e) => setName(e.target.value)} className="form-input" />
+            </div>
+            <div className="form-group">
+              <label htmlFor="symbol" className="form-label">Symbol</label>
+              <input type="text" id="symbol" value={symbol} onChange={(e) => setSymbol(e.target.value)} className="form-input" />
+            </div>
+            <div className="form-group">
+              <label htmlFor="maxSupply" className="form-label">Max Supply</label>
+              <input type="number" id="maxSupply" value={maxSupply} onChange={(e) => setMaxSupply(e.target.value)} className="form-input" />
+            </div>
+            <div className="form-group">
+              <label htmlFor="royaltyPercentage" className="form-label">Royalty Percentage</label>
+              <input type="number" id="royaltyPercentage" value={royaltyPercentage} onChange={(e) => setRoyaltyPercentage(e.target.value)} className="form-input" />
+            </div>
+            <div className="form-group">
+              <label htmlFor="mintPrice" className="form-label">Mint Price (ETH)</label>
+              <input type="number" id="mintPrice" value={mintPrice} onChange={(e) => setMintPrice(e.target.value)} className="form-input" />
+            </div>
+            <div className="form-group">
+              <label htmlFor="file" className="form-label">Upload Image</label>
+              <input type="file" id="file" onChange={(e) => setFile(e.target.files?.[0] || null)} className="form-input" />
+            </div>
+            <div className="form-group">
+              <label htmlFor="pinningService" className="form-label">Pinning Service</label>
+              <select id="pinningService" value={pinningService} onChange={(e) => setPinningService(e.target.value as PinningService)} className="form-input">
+                <option value="none">No Pinning Service (Temporary Storage)</option>
+                <option value="pinata">Pinata</option>
+                <option value="nftstorage">NFT.Storage</option>
+              </select>
+            </div>
+            {pinningService !== 'none' && (
+              <div className="form-group">
+                <label htmlFor="pinningApiKey" className="form-label">{pinningService === 'pinata' ? 'Pinata' : 'NFT.Storage'} API Key</label>
+                <input type="text" id="pinningApiKey" value={pinningApiKey} onChange={(e) => setPinningApiKey(e.target.value)} className="form-input" />
+              </div>
+            )}
+            <button type="submit" className="submit-btn" disabled={isPending || isConfirming}>
+              {isPending ? 'Preparing...' : isConfirming ? 'Confirming...' : 'Create Collection'}
+            </button>
+          </form>
+          {error && <div className="error-message">Error: {error.message}</div>}
+          {isConfirmed && (
+            <div className="success-message">
+              <p>Collection created successfully!</p>
+              {pinningService === 'none' && (
+                <>
+                  <p>IPFS Hash: {ipfsHash}</p>
+                  <p>
+                    Important: Your content is temporarily stored on IPFS. To ensure long-term availability,
+                    please pin this content using a pinning service or your own IPFS node.
+                    Learn more about pinning <a href="https://docs.ipfs.tech/concepts/persistence/" target="_blank" rel="noopener noreferrer">here</a>.
+                  </p>
+                </>
+              )}
+              {pinningService !== 'none' && (
+                <p>Your content has been pinned using {pinningService === 'pinata' ? 'Pinata' : 'NFT.Storage'}.</p>
+              )}
+            </div>
           )}
         </div>
-      )}
+      </div>
       <Footer />
     </main>
   );

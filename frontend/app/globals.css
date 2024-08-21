@@ -1184,8 +1184,90 @@ body {
 /*-----------------------------------*\
   #CREATE
 \*-----------------------------------*/
+.create-container {
+  max-width: 100%;
+  margin: 100px auto;
+  padding: 40px;
+  background-color: var(--xiketic);
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
 
+.create-container-form {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 40px;
+  background-color: #202020;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
 
+.create-title {
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: #ffffff;
+}
+
+.create-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.form-label {
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 5px;
+  color: #ffffff;
+}
+
+.form-input {
+  padding: 10px;
+  border: 1px solid #333333;
+  border-radius: 4px;
+  background-color: #333333;
+  color: #ffffff;
+  font-size: 16px;
+}
+
+.submit-btn {
+  padding: 12px 24px;
+  background-color: #007bff;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.submit-btn:disabled {
+  background-color: #6c757d;
+  cursor: not-allowed;
+}
+
+.submit-btn:not(:disabled):hover {
+  background-color: #0056b3;
+}
+
+.error-message {
+  color: #dc3545;
+  font-size: 14px;
+  margin-top: 10px;
+}
+
+.success-message {
+  color: #28a745;
+  font-size: 16px;
+  margin-top: 20px;
+}
 
 
 
