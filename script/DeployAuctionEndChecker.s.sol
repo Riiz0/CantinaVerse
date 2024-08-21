@@ -26,7 +26,7 @@ contract DeployAuctionEndChecker is Script {
         }
 
         vm.startBroadcast();
-        IMarketPlace marketPlace = IMarketPlace(0x0292Bb8c5289aA7aa844f4064e87c8D17177Ced9);
+        IMarketPlace marketPlace = IMarketPlace(0x8e402Cb9eAaaCcD6D9D8B821503566a169a851D3);
         AuctionEndChecker auctionEndChecker = new AuctionEndChecker(marketPlace);
         vm.stopBroadcast();
 

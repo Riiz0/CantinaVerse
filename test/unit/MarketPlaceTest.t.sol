@@ -31,7 +31,7 @@ contract MarketPlaceTest is Test {
     uint256 constant STARTING_BALANCE = 100 ether;
     uint256 price = 1 ether;
     uint256 serviceFee = 1 ether;
-    uint256 constant DURATION = 10 minutes;
+    uint256 constant DURATION = 3 days;
 
     event NFTListed(address indexed seller, address indexed nftAddress, uint256 indexed tokenId, uint256 price);
     event NFTDelisted(address indexed seller, address indexed nftAddress, uint256 indexed tokenId);
@@ -445,8 +445,7 @@ contract MarketPlaceTest is Test {
 
     function test_ExpectEmit_CreateAuctionSuccessfulWithEmit() public contractCollection3SellerAndBuyerMints {
         uint256 testStartTime = block.timestamp;
-        uint256 durationInMinutes = DURATION * 60;
-        uint256 endTime = block.timestamp + durationInMinutes;
+        uint256 endTime = testStartTime + DURATION;
 
         vm.startPrank(SELLER);
         contractCollection3.approve(address(marketPlace), 2);
@@ -473,11 +472,9 @@ contract MarketPlaceTest is Test {
 
     function test_MarketPlace__NFTAuctionHasEnded() public contractCollection3SellerAndBuyerMints {
         uint256 testStartTime = block.timestamp;
-        uint256 durationInMinutes = DURATION * 60;
-        uint256 endTime = block.timestamp + durationInMinutes;
+        uint256 endTime = testStartTime + DURATION;
 
-        uint256 daysAfterEnd = DURATION + 1 minutes;
-        uint256 durationInMinutesAfterEnd = daysAfterEnd * 60;
+        uint256 timeAfterEnd = DURATION + 1 minutes;
 
         vm.startPrank(SELLER);
         contractCollection3.approve(address(marketPlace), 2);
@@ -485,7 +482,7 @@ contract MarketPlaceTest is Test {
         emit AuctionCreated(0, testStartTime, endTime, address(contractCollection3), 2, price);
         marketPlace.createAuction(address(contractCollection3), 2, price);
         vm.stopPrank();
-        vm.warp(durationInMinutesAfterEnd);
+        vm.warp(timeAfterEnd);
         vm.startPrank(BUYER);
         vm.expectRevert(MarketPlace.MarketPlace__NFTAuctionHasEnded.selector);
         marketPlace.bidOnAuction{ value: price }(0);
@@ -494,8 +491,7 @@ contract MarketPlaceTest is Test {
 
     function test_MarketPlace__BidIsLessThanHighestBid() public contractCollection3SellerAndBuyerMints {
         uint256 testStartTime = block.timestamp;
-        uint256 durationInMinutes = DURATION * 60;
-        uint256 endTime = block.timestamp + durationInMinutes;
+        uint256 endTime = testStartTime + DURATION;
 
         vm.startPrank(SELLER);
         contractCollection3.approve(address(marketPlace), 2);
@@ -518,11 +514,11 @@ contract MarketPlaceTest is Test {
         uint256 highBid = 5 ether;
         uint256 HighestBid = 6 ether;
         uint256 testStartTime = block.timestamp;
-        uint256 durationInMinutes = DURATION * 60;
+        uint256 durationInMinutes = DURATION;
         uint256 endTime = block.timestamp + durationInMinutes;
 
-        uint256 daysAfterEnd = 2 days;
-        uint256 durationInMinutesAfterEnd = daysAfterEnd * 60;
+        uint256 TimeAfterEnd = 1 minutes;
+        uint256 durationInMinutesAfterEnd = TimeAfterEnd;
 
         vm.startPrank(SELLER);
         contractCollection3.approve(address(marketPlace), 2);

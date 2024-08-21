@@ -63,7 +63,7 @@ contract MarketPlace is Ownable, ReentrancyGuard, IERC721Receiver {
     uint256 private s_auctionIdCounter;
     address private s_GelatoDedicatedMsgSender;
     uint256 private s_fee;
-    uint256 private constant DURATION = 10 minutes; // Should be 14 days in production
+    uint256 private constant DURATION = 3 days;
 
     //////////////
     // Events   //
@@ -181,7 +181,7 @@ contract MarketPlace is Ownable, ReentrancyGuard, IERC721Receiver {
             revert MarketPlace__PriceCannotBeZero();
         }
 
-        uint256 endTime = block.timestamp + (DURATION * 1 minutes);
+        uint256 endTime = block.timestamp + DURATION;
         uint256 newAuctionId = s_auctionIdCounter++;
         s_auctions[newAuctionId] = Auction({
             seller: msg.sender,

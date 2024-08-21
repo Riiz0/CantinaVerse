@@ -11,7 +11,6 @@ contract AuctionEndChecker {
     }
 
     function checker() external view returns (bool canExec, bytes memory execPayload) {
-        uint256 now = block.timestamp;
         for (uint256 i = 0; i < marketPlace.auctionIdsLength(); i++) {
             (
                 , // seller
@@ -23,7 +22,7 @@ contract AuctionEndChecker {
                 , // startTime
                 uint256 endTime
             ) = marketPlace.getAuction(i);
-            if (now >= endTime) {
+            if (block.timestamp >= endTime) {
                 return (true, abi.encodeWithSignature("endAuction(uint256)", i));
             }
         }
