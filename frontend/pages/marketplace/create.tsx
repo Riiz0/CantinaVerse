@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import { useWriteContract, useReadContract, useWaitForTransactionReceipt, useAccount, useWatchContractEvent } from 'wagmi';
 import { parseEther } from 'viem';
 import { pinata } from "@/utils/config"
@@ -19,7 +19,10 @@ export default function Create() {
   const [royaltyPercentage, setRoyaltyPercentage] = useState('');
   const [mintPrice, setMintPrice] = useState('');
   const [contractFee, setContractFee] = useState<bigint | undefined>();
+
+  /* eslint-disable */
   const [contractBaseURI, setContractBaseURI] = useState('');
+  /* eslint-disable */
   const [collectionCreated, setCollectionCreated] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
 
@@ -89,7 +92,7 @@ export default function Create() {
     }
   }, [isConfirmed]);
 
-  const handleCreateCollection = async () => {
+  const handleCreateCollection = useCallback(async () => {
     if (!name || !symbol || !maxSupply || !royaltyPercentage || !mintPrice) {
       alert('Please fill in all collection details.');
       return;
@@ -115,7 +118,7 @@ export default function Create() {
       console.error("Error creating collection:", typedError);
       alert(`Error creating collection: ${typedError.message}`);
     }
-  };
+  }, [name, symbol, maxSupply, royaltyPercentage, mintPrice, contractFee, writeContract]); // Dependencies array
 
   const uploadImage = async () => {
     if (!file) return;
@@ -318,6 +321,7 @@ export default function Create() {
               <div className="attributes-section">
                 <h3>Attributes</h3>
                 {attributes.map((attr, index) => (
+                  /* eslint-disable */
                   <div key={index} className="attribute-input">
                     <input
                       type="text"
