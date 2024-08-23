@@ -58,7 +58,6 @@ contract FactoryNFTContract is Ownable, ReentrancyGuard {
      * owner.
      * @param name Name of the NFT collection.
      * @param symbol Symbol of the NFT collection.
-     * @param baseURI Base URI for the NFT collection's metadata.
      * @param maxSupply Maximum number of NFTs that can be minted in the collection.
      * @param owner Address that will own the created NFT collection.
      * @param royaltyPercentage Royalty percentage for secondary sales.
@@ -68,7 +67,6 @@ contract FactoryNFTContract is Ownable, ReentrancyGuard {
     function createCollection(
         string memory name,
         string memory symbol,
-        string memory baseURI,
         uint256 maxSupply,
         address owner,
         uint96 royaltyPercentage,
@@ -81,8 +79,7 @@ contract FactoryNFTContract is Ownable, ReentrancyGuard {
         if (msg.value != s_fee) {
             revert FactoryNFTContract__InsufficientFunds();
         }
-        NFTContract newCollection =
-            new NFTContract(name, symbol, baseURI, maxSupply, owner, royaltyPercentage, mintPrice);
+        NFTContract newCollection = new NFTContract(name, symbol, maxSupply, msg.sender, royaltyPercentage, mintPrice);
         s_collections.push(address(newCollection));
         emit CollectionCreated(address(newCollection), name, symbol, maxSupply, owner, royaltyPercentage, mintPrice);
     }

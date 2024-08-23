@@ -30,7 +30,7 @@ contract NFTContract is ERC721, ERC2981, ERC721Enumerable, ERC721URIStorage, Own
     // State Variables  //
     //////////////////////
     uint256 private s_nextTokenId;
-    string private s_baseURI;
+    string private s_baseURI = "https://silver-selective-kite-794.mypinata.cloud/ipfs/";
     uint256 private immutable i_maxSupply;
     uint96 private constant MAX_ROYALTY_PERCENTAGE = 3000; // 30% => (30 / 100) * 10000 = 3000
     uint96 private s_royaltyPercentage;
@@ -50,7 +50,6 @@ contract NFTContract is ERC721, ERC2981, ERC721Enumerable, ERC721URIStorage, Own
      *      initial owner, and royalty percentage. Validates the initial royalty percentage against the maximum allowed.
      * @param name Name of the NFT collection.
      * @param symbol Symbol of the NFT collection.
-     * @param baseURI Base URI for token metadata.
      * @param maxSupply Maximum number of tokens that can be minted.
      * @param initialOwner Address of the initial owner, who is also set as the default royalty recipient.
      * @param royaltyPercentage Initial royalty percentage for secondary sales.
@@ -58,7 +57,6 @@ contract NFTContract is ERC721, ERC2981, ERC721Enumerable, ERC721URIStorage, Own
     constructor(
         string memory name,
         string memory symbol,
-        string memory baseURI,
         uint256 maxSupply,
         address initialOwner,
         uint96 royaltyPercentage,
@@ -70,7 +68,6 @@ contract NFTContract is ERC721, ERC2981, ERC721Enumerable, ERC721URIStorage, Own
         if (royaltyPercentage > MAX_ROYALTY_PERCENTAGE) {
             revert NFTContract__MaxRoyaltyPercentageReached();
         }
-        s_baseURI = baseURI;
         i_maxSupply = maxSupply;
         s_royaltyPercentage = royaltyPercentage;
         _setDefaultRoyalty(initialOwner, s_royaltyPercentage);

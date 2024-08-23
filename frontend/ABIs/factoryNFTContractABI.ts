@@ -143,11 +143,6 @@ export const factoryNFTContractABI = [
                 "type": "string"
             },
             {
-                "internalType": "string",
-                "name": "baseURI",
-                "type": "string"
-            },
-            {
                 "internalType": "uint256",
                 "name": "maxSupply",
                 "type": "uint256"

@@ -1,5 +1,5 @@
 Blockscout link to NFT Contract: https://eth-sepolia.blockscout.com/address/0x63C91b914FCaFaAA4D2d588a256eEbD05aA063AD?tab=write_contract
 
-Blockscout link to FactoryNFTContract: https://eth-sepolia.blockscout.com/address/0xD6aD186C394699F89C0064528a0299C79b62717e?tab=contract
+Blockscout link to FactoryNFTContract: https://eth-sepolia.blockscout.com/address/0x669517ea44DE33d9172C52e24Cb0a4889f588986?tab=contract
 Blockscout link to MarketPlace Contract: https://eth-sepolia.blockscout.com/address/0x17CF06244a8b00Ec60B24EAC40B994e543C1c5BD?tab=contract
 Blockscout link to AuctionEndChecker Contract: https://eth-sepolia.blockscout.com/address/0xA0BC7c1CE381E5a2dC1567467603eB49E2B2DeA4?tab=contract

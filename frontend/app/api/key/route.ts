@@ -13,6 +13,7 @@ export async function GET(req: NextRequest, res: NextResponse) {
         endpoints: {
           pinning: {
             pinFileToIPFS: true,
+            pinJSONToIPFS: true,
           },
         },
       },

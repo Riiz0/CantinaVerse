@@ -20,7 +20,7 @@ contract NFTContractTest is Test {
     address OWNER = makeAddr("Owner");
     string name = "MY NFT COLLECTION";
     string symbol = "MYCOL";
-    string baseURI = "ipfs://";
+    string baseURI = "https://silver-selective-kite-794.mypinata.cloud/ipfs/";
     uint256 maxSupply = 10;
     uint96 royaltyPercentage = 2500;
     uint256 INITIAL_STARTING_BALABCE = 100 ether;
@@ -28,8 +28,8 @@ contract NFTContractTest is Test {
     uint256 mintTestPrice = 0.01 ether;
 
     function setUp() public {
-        nftcontract = new NFTContract(name, symbol, baseURI, maxSupply, OWNER, royaltyPercentage, mintPrice);
-        nftcontract2 = new NFTContract(name, symbol, baseURI, maxSupply, OWNER, royaltyPercentage, mintTestPrice);
+        nftcontract = new NFTContract(name, symbol, maxSupply, OWNER, royaltyPercentage, mintPrice);
+        nftcontract2 = new NFTContract(name, symbol, maxSupply, OWNER, royaltyPercentage, mintTestPrice);
         vm.deal(MINTER, INITIAL_STARTING_BALABCE);
     }
 
@@ -58,7 +58,7 @@ contract NFTContractTest is Test {
         vm.expectRevert(NFTContract.NFTContract__MaxRoyaltyPercentageReached.selector);
 
         // Attempt to deploy the contract with the excessive royalty percentage
-        new NFTContract(name, symbol, baseURI, maxSupply, msg.sender, excessiveRoyaltyPercentage, mintPrice);
+        new NFTContract(name, symbol, maxSupply, msg.sender, excessiveRoyaltyPercentage, mintPrice);
     }
 
     function testRevert_InsufficientFunds() public {
