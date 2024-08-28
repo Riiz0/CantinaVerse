@@ -31,6 +31,7 @@ export default function Create() {
   const [imageCid, setImageCid] = useState("");
   const [metadataCid, setMetadataCid] = useState("");
   const [imageUploading, setImageUploading] = useState(false);
+  const [localImageUrl, setLocalImageUrl] = useState<string | null>(null);
   const inputFile = useRef<HTMLInputElement>(null);
 
   // Metadata fields
@@ -143,15 +144,17 @@ export default function Create() {
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const selectedFile = e.target.files[0];
-      if (selectedFile.type.startsWith('')) {
+      if (selectedFile.type.startsWith('image/')) {
         setFile(selectedFile);
+        // Generate a blob URL for the selected file and update the localImageUrl state
+        const imageUrl = URL.createObjectURL(selectedFile);
+        setLocalImageUrl(imageUrl);
       } else {
         alert('Please select an image file.');
         e.target.value = '';
       }
     }
   };
-
   const addAttribute = () => {
     setAttributes([...attributes, { trait_type: '', value: '' }]);
   };
@@ -200,146 +203,213 @@ export default function Create() {
     setCollectionCreated(false);
   };
 
-  if (isNFTCreated) {
-    return (
-      <main>
-        <Header />
-        <div className="create-container">
-          <div className="create-container-form">
-            <h1 className="create-title">NFT Created Successfully</h1>
-            <div className="nft-display">
-              <img
-                src={`https://${process.env.NEXT_PUBLIC_GATEWAY_URL}/ipfs/${imageCid}`}
-                alt="Created NFT"
-                style={{ maxWidth: '300px', margin: '20px 0' }}
-              />
-              <div className="nft-info">
+  return (
+    <main>
+      <Header />
+      <div className="formbold-main-wrapper">
+        <div className="formbold-form-wrapper">
+          <form>
+            <div className="formbold-steps">
+              <ul>
+                <li className={`formbold-step-menu1 ${currentStep === 1 ? 'active' : ''}`}>
+                  <span>1</span>
+                  Collection Details
+                </li>
+                <li className={`formbold-step-menu2 ${currentStep === 2 ? 'active' : ''}`}>
+                  <span>2</span>
+                  Upload Image
+                </li>
+                <li className={`formbold-step-menu3 ${currentStep === 3 ? 'active' : ''}`}>
+                  <span>3</span>
+                  Metadata
+                </li>
+              </ul>
+            </div>
+
+            {currentStep === 1 && (
+              <div className="formbold-form-step-1 active">
+                <div className="formbold-input-flex">
+                  <div>
+                    <label htmlFor="name" className="formbold-form-label">Collection Name</label>
+                    <input
+                      type="text"
+                      id="name"
+                      placeholder="Collection Name"
+                      className="formbold-form-input"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="symbol" className="formbold-form-label">Symbol</label>
+                    <input
+                      type="text"
+                      id="symbol"
+                      placeholder="Symbol"
+                      className="formbold-form-input"
+                      value={symbol}
+                      onChange={(e) => setSymbol(e.target.value)}
+                    />
+                  </div>
+                </div>
+                <div className="formbold-input-flex">
+                  <div>
+                    <label htmlFor="maxSupply" className="formbold-form-label">Max Supply</label>
+                    <input
+                      type="number"
+                      id="maxSupply"
+                      placeholder="Max Supply"
+                      className="formbold-form-input"
+                      value={maxSupply}
+                      onChange={(e) => setMaxSupply(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="royaltyPercentage" className="formbold-form-label">Royalty Percentage</label>
+                    <input
+                      type="number"
+                      id="royaltyPercentage"
+                      placeholder="Royalty Percentage"
+                      className="formbold-form-input"
+                      value={royaltyPercentage}
+                      onChange={(e) => setRoyaltyPercentage(e.target.value)}
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label htmlFor="mintPrice" className="formbold-form-label">Mint Price (in ETH)</label>
+                  <input
+                    type="text"
+                    id="mintPrice"
+                    placeholder="Mint Price (in ETH)"
+                    className="formbold-form-input"
+                    value={mintPrice}
+                    onChange={(e) => setMintPrice(e.target.value)}
+                  />
+                </div>
+              </div>
+            )}
+
+            {currentStep === 2 && (
+              <div className="formbold-form-step-2 active">
+                <div>
+                  <label htmlFor="file" className="formbold-form-label">Upload Image</label>
+                  <input
+                    type="file"
+                    id="file"
+                    accept="image/*"
+                    onChange={handleFileChange}
+                    ref={inputFile}
+                    className="formbold-form-input"
+                  />
+                </div>
+                {/* Display local image preview if available */}
+                {localImageUrl && (
+                  <div className="formbold-image-preview">
+                    <img src={localImageUrl} alt="Selected" />
+                  </div>
+                )}
+                {/* Once imageCid is obtained, display the image from Pinata */}
+                {imageCid && (
+                  <div className="formbold-image-preview">
+                    <img
+                      src={`https://${process.env.NEXT_PUBLIC_GATEWAY_URL}/ipfs/${imageCid}`}
+                      alt="Uploaded NFT"
+                    />
+                  </div>
+                )}
+              </div>
+            )}
+
+            {currentStep === 3 && (
+              <div className="formbold-form-step-3 active">
+                <div>
+                  <label htmlFor="description" className="formbold-form-label">Description</label>
+                  <textarea
+                    id="description"
+                    placeholder="Description"
+                    className="formbold-form-input"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                  ></textarea>
+                </div>
+                <div className="formbold-attributes-section">
+                  <h3 className="formbold-form-label">Attributes</h3>
+                  {attributes.map((attr, index) => (
+                    <div key={index} className="formbold-input-flex">
+                      <input
+                        type="text"
+                        placeholder="Trait Type"
+                        className="formbold-form-input"
+                        value={attr.trait_type}
+                        onChange={(e) => updateAttribute(index, 'trait_type', e.target.value)}
+                      />
+                      <input
+                        type="text"
+                        placeholder="Value"
+                        className="formbold-form-input"
+                        value={attr.value}
+                        onChange={(e) => updateAttribute(index, 'value', e.target.value)}
+                      />
+                    </div>
+                  ))}
+                  <button type="button" className="formbold-btn" onClick={addAttribute}>Add Attribute</button>
+                </div>
+              </div>
+            )}
+
+            <div className="formbold-form-btn-wrapper">
+              {currentStep > 1 && (
+                <button type="button" className="formbold-back-btn" style={{ alignSelf: 'flex-start' }} onClick={() => setCurrentStep(currentStep - 1)}>
+                  Back
+                </button>
+              )}
+              {currentStep < 3 ? (
+                <button type="button" className="formbold-btn" style={{ alignSelf: 'flex-end' }} onClick={() => setCurrentStep(currentStep + 1)}>
+                  Next Step
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <g clipPath="url(#clip0_1675_1807)">
+                      <path d="M10.7814 7.33312L7.20541 3.75712L8.14808 2.81445L13.3334 7.99979L8.14808 13.1851L7.20541 12.2425L10.7814 8.66645H2.66675V7.33312H10.7814Z" fill="white" />
+                    </g>
+                    <defs>
+                      <clipPath id="clip0_1675_1807">
+                        <rect width="16" height="16" fill="white" />
+                      </clipPath>
+                    </defs>
+                  </svg>
+                </button>
+              ) : (
+                <button type="button" className="formbold-btn" style={{ alignSelf: 'flex-end' }} onClick={handleCreateCollection} disabled={isPending || isConfirming}>
+                  {isPending || isConfirming ? "Creating Collection..." : "Create Collection"}
+                </button>
+              )}
+            </div>
+          </form>
+
+          {isNFTCreated && (
+            <div className="formbold-form-confirm">
+              <h2 className="formbold-form-label">NFT Created Successfully</h2>
+              <div className="formbold-image-preview">
+                <img
+                  src={`https://${process.env.NEXT_PUBLIC_GATEWAY_URL}/ipfs/${imageCid}`}
+                  alt="Created NFT"
+                />
+              </div>
+              <div className="formbold-nft-info">
                 <p><strong>Name:</strong> {name}</p>
                 <p><strong>Description:</strong> {description}</p>
                 <p><strong>Image CID:</strong> {imageCid}</p>
                 <p><strong>Metadata CID:</strong> {metadataCid}</p>
               </div>
-            </div>
-            <div className="action-buttons">
-              <button className="create-button" onClick={resetCreationProcess}>Create New Collection</button>
-              <Link href="/explorer">
-                <button className="create-button">Go to Explorer</button>
-              </Link>
-              <Link href="/mint">
-                <button className="create-button">Go to Mint</button>
-              </Link>
-            </div>
-          </div>
-        </div>
-        <Footer />
-      </main>
-    );
-  }
-
-  return (
-    <main>
-      <Header />
-      <div className="create-container">
-        <div className="create-container-form">
-          <h1 className="create-title">Create NFT Collection</h1>
-
-          {/* Progress Indicator */}
-          <div className="progress-indicator">
-            <span className={`step ${currentStep === 1 ? 'active' : ''}`}>Step 1: Fill Collection Details</span>
-            <span className={`step ${currentStep === 2 ? 'active' : ''}`}>Step 2: Upload Image</span>
-            <span className={`step ${currentStep === 3 ? 'active' : ''}`}>Step 3: Input Metadata</span>
-          </div>
-
-          {currentStep === 1 && (
-            <div className="collection-setup-section">
-              <input
-                type="text"
-                placeholder="Collection Name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-              />
-              <input
-                type="text"
-                placeholder="Symbol"
-                value={symbol}
-                onChange={(e) => setSymbol(e.target.value)}
-              />
-              <input
-                type="number"
-                placeholder="Max Supply"
-                value={maxSupply}
-                onChange={(e) => setMaxSupply(e.target.value)}
-              />
-              <input
-                type="number"
-                placeholder="Royalty Percentage"
-                value={royaltyPercentage}
-                onChange={(e) => setRoyaltyPercentage(e.target.value)}
-              />
-              <input
-                type="text"
-                placeholder="Mint Price (in ETH)"
-                value={mintPrice}
-                onChange={(e) => setMintPrice(e.target.value)}
-              />
-              <button className="create-button" onClick={handleCreateCollection} disabled={isPending || isConfirming}>
-                {isPending || isConfirming ? "Creating Collection..." : "Create Collection"}
-              </button>
-              {isConfirmed && <p>Collection created successfully!</p>}
-              {error && <p>Error: {error.message}</p>}
-            </div>
-          )}
-
-          {currentStep === 2 && (
-            <div className="image-upload-section">
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleFileChange}
-                ref={inputFile}
-              />
-              <button className="create-button" onClick={uploadImage} disabled={imageUploading || !file}>
-                {imageUploading ? "Uploading..." : "Upload Image"}
-              </button>
-              {imageCid && (
-                <img
-                  src={`https://${process.env.NEXT_PUBLIC_GATEWAY_URL}/ipfs/${imageCid}`}
-                  alt="Uploaded NFT"
-                  style={{ maxWidth: '200px', marginTop: '10px' }}
-                />
-              )}
-            </div>
-          )}
-
-          {currentStep === 3 && (
-            <div className="metadata-section">
-              <textarea
-                placeholder="Description"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-              />
-              <div className="attributes-section">
-                <h3>Attributes</h3>
-                {attributes.map((attr, index) => (
-                  /* eslint-disable */
-                  <div key={index} className="attribute-input">
-                    <input
-                      type="text"
-                      placeholder="Trait Type"
-                      value={attr.trait_type}
-                      onChange={(e) => updateAttribute(index, 'trait_type', e.target.value)}
-                    />
-                    <input
-                      type="text"
-                      placeholder="Value"
-                      value={attr.value}
-                      onChange={(e) => updateAttribute(index, 'value', e.target.value)}
-                    />
-                  </div>
-                ))}
-                <button className="create-button" onClick={addAttribute}>Add Attribute</button>
+              <div className="formbold-form-btn-wrapper">
+                <button className="formbold-btn" onClick={resetCreationProcess}>Create New Collection</button>
+                <Link href="/explorer">
+                  <button className="formbold-btn">Go to Explorer</button>
+                </Link>
+                <Link href="/mint">
+                  <button className="formbold-btn">Go to Mint</button>
+                </Link>
               </div>
-              <button className="create-button" onClick={uploadMetadata}>Finalize NFT Creation</button>
             </div>
           )}
         </div>
