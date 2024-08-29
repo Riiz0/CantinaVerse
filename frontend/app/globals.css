@@ -12,13 +12,13 @@
    --eerie-black-1: hsl(252, 11%, 9%);
    --eerie-black-2: hsl(0, 0%, 13%);
    --raisin-black: hsl(249, 9%, 15%);
-   --deep-teal: hsl(46, 60%, 52%);
-   --light-teal: hsl(46, 60%, 52%);
+   --deep-teal: #D05F4E;
+   --light-teal: #D05F4E;
    --gainsboro: hsl(0, 0%, 88%);
    --cultured: hsl(0, 0%, 98%);
    --white_20: hsla(217, 15%, 70%, 0.3);
    --xiketic: hsl(0, 0%, 0%);
-   --complementary-teal: hsl(180, 65%, 30%); /* New */
+   --complementary-teal: #D05F4E;
    --white: hsl(0, 0%, 100%);
    --black: hsl(0, 0%, 0%);
 

@@ -12,37 +12,25 @@ import Link from 'next/link';
 const FACTORY_CONTRACT_ADDRESS = '0x669517ea44DE33d9172C52e24Cb0a4889f588986';
 
 export default function Create() {
-  // Collection details
   const [name, setName] = useState('');
   const [symbol, setSymbol] = useState('');
   const [maxSupply, setMaxSupply] = useState('');
   const [royaltyPercentage, setRoyaltyPercentage] = useState('');
   const [mintPrice, setMintPrice] = useState('');
   const [contractFee, setContractFee] = useState<bigint | undefined>();
-
-  /* eslint-disable */
-  const [contractBaseURI, setContractBaseURI] = useState('');
-  /* eslint-disable */
-  const [collectionCreated, setCollectionCreated] = useState(false);
-  const [currentStep, setCurrentStep] = useState(1);
-
-  // Image and metadata
   const [file, setFile] = useState<File | null>(null);
-  const [imageCid, setImageCid] = useState("");
-  const [metadataCid, setMetadataCid] = useState("");
-  const [imageUploading, setImageUploading] = useState(false);
-  const [localImageUrl, setLocalImageUrl] = useState<string | null>(null);
-  const inputFile = useRef<HTMLInputElement>(null);
-
-  // Metadata fields
   const [description, setDescription] = useState('');
   const [attributes, setAttributes] = useState<{ trait_type: string; value: string }[]>([]);
-
-  // New state for completed NFT view
+  const [currentStep, setCurrentStep] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
   const [isNFTCreated, setIsNFTCreated] = useState(false);
+  const [localImageUrl, setLocalImageUrl] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const { writeContract, data: hash, error, isPending } = useWriteContract();
+  const inputFile = useRef<HTMLInputElement>(null);
+
   const { address: connectedAddress } = useAccount();
+  const { writeContract, data: hash, error: contractError, isPending } = useWriteContract();
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
     hash,
   });
@@ -53,20 +41,13 @@ export default function Create() {
     functionName: 'getFee',
   });
 
-  const baseURI = useReadContract({
-    address: FACTORY_CONTRACT_ADDRESS,
-    abi: factoryNFTContractABI,
-    functionName: 'getBaseURI',
-  });
-
   useWatchContractEvent({
     address: FACTORY_CONTRACT_ADDRESS,
     abi: factoryNFTContractABI,
     eventName: 'CollectionCreated',
     onLogs(logs) {
       console.log('New logs!', logs)
-      setCollectionCreated(true);
-      setCurrentStep(2);
+      setIsNFTCreated(true);
     },
   })
 
@@ -79,27 +60,71 @@ export default function Create() {
   }, [fee]);
 
   useEffect(() => {
-    const fetchBaseURI = async () => {
-      const baseURIValue = baseURI.data as string;
-      setContractBaseURI(baseURIValue);
-    };
-    fetchBaseURI();
-  }, [baseURI]);
+    if (contractError) {
+      setError(`Contract interaction failed: ${contractError.message}`);
+      setIsLoading(false);
+    }
+  }, [contractError]);
 
   useEffect(() => {
     if (isConfirmed) {
-      setCollectionCreated(true);
-      setCurrentStep(2);
+      setIsNFTCreated(true);
+      setIsLoading(false);
     }
   }, [isConfirmed]);
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const selectedFile = e.target.files[0];
+      if (selectedFile.type.startsWith('')) {
+        setFile(selectedFile);
+        const imageUrl = URL.createObjectURL(selectedFile);
+        setLocalImageUrl(imageUrl);
+      } else {
+        setError('Please select an image file.');
+        e.target.value = '';
+      }
+    }
+  };
+
+  const uploadImage = async () => {
+    if (!file) {
+      setError('Please select an image file.');
+      return null;
+    }
+    setIsLoading(true);
+    try {
+      const keyRequest = await fetch("/api/key", { method: "GET" });
+      const keyData = await keyRequest.json();
+      const upload = await pinata.upload
+        .file(file)
+        .key(keyData.JWT);
+
+      return upload.IpfsHash;
+    } catch (e) {
+      console.error(e);
+      setError("Trouble uploading file");
+      return null;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handleCreateCollection = useCallback(async () => {
-    if (!name || !symbol || !maxSupply || !royaltyPercentage || !mintPrice) {
-      alert('Please fill in all collection details.');
+    if (!name || !symbol || !maxSupply || !royaltyPercentage || !mintPrice || !file || !description) {
+      setError('Please fill in all required fields and select an image.');
       return;
     }
 
+    setIsLoading(true);
+    setError(null);
+
     try {
+      const uploadedImageCid = await uploadImage();
+      if (!uploadedImageCid) {
+        throw new Error("Image upload failed");
+      }
+
       writeContract({
         address: FACTORY_CONTRACT_ADDRESS,
         abi: factoryNFTContractABI,
@@ -110,51 +135,18 @@ export default function Create() {
           BigInt(maxSupply),
           connectedAddress,
           BigInt(royaltyPercentage),
-          parseEther(mintPrice),
+          parseEther(mintPrice)
         ],
         value: contractFee,
       });
     } catch (error) {
       const typedError = error as Error;
       console.error("Error creating collection:", typedError);
-      alert(`Error creating collection: ${typedError.message}`);
+      setError(`Error creating collection: ${typedError.message}`);
+      setIsLoading(false);
     }
-  }, [name, symbol, maxSupply, royaltyPercentage, mintPrice, contractFee, writeContract]); // Dependencies array
+  }, [name, symbol, maxSupply, royaltyPercentage, mintPrice, file, description, contractFee, writeContract, connectedAddress]);
 
-  const uploadImage = async () => {
-    if (!file) return;
-    setImageUploading(true);
-    try {
-      const keyRequest = await fetch("/api/key", { method: "GET" });
-      const keyData = await keyRequest.json();
-      const upload = await pinata.upload
-        .file(file)
-        .key(keyData.JWT);
-
-      setImageCid(`${upload.IpfsHash}`);
-      setCurrentStep(3);
-    } catch (e) {
-      console.error(e);
-      alert("Trouble uploading file");
-    } finally {
-      setImageUploading(false);
-    }
-  };
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const selectedFile = e.target.files[0];
-      if (selectedFile.type.startsWith('image/')) {
-        setFile(selectedFile);
-        // Generate a blob URL for the selected file and update the localImageUrl state
-        const imageUrl = URL.createObjectURL(selectedFile);
-        setLocalImageUrl(imageUrl);
-      } else {
-        alert('Please select an image file.');
-        e.target.value = '';
-      }
-    }
-  };
   const addAttribute = () => {
     setAttributes([...attributes, { trait_type: '', value: '' }]);
   };
@@ -165,28 +157,6 @@ export default function Create() {
     setAttributes(newAttributes);
   };
 
-  const uploadMetadata = async () => {
-    try {
-      const metadata = {
-        name,
-        description,
-        image: `https://${process.env.NEXT_PUBLIC_GATEWAY_URL}/ipfs/${imageCid}`,
-        attributes
-      };
-      const keyRequest = await fetch("/api/key", { method: "GET" });
-      const keyData = await keyRequest.json();
-      const upload = await pinata.upload
-        .json(metadata)
-        .key(keyData.JWT);
-      setIsNFTCreated(true);
-      setMetadataCid(upload.IpfsHash);
-      return `${upload.IpfsHash}`;
-    } catch (e) {
-      console.error(e);
-      alert("Trouble uploading metadata");
-    }
-  };
-
   const resetCreationProcess = () => {
     setName('');
     setSymbol('');
@@ -194,13 +164,13 @@ export default function Create() {
     setRoyaltyPercentage('');
     setMintPrice('');
     setFile(null);
-    setImageCid('');
-    setMetadataCid('');
     setDescription('');
     setAttributes([]);
     setCurrentStep(1);
     setIsNFTCreated(false);
-    setCollectionCreated(false);
+    setLocalImageUrl(null);
+    setError(null);
+    setIsLoading(false);
   };
 
   return (
@@ -208,7 +178,7 @@ export default function Create() {
       <Header />
       <div className="formbold-main-wrapper">
         <div className="formbold-form-wrapper">
-          <form>
+          <form onSubmit={(e) => e.preventDefault()}>
             <div className="formbold-steps">
               <ul>
                 <li className={`formbold-step-menu1 ${currentStep === 1 ? 'active' : ''}`}>
@@ -217,11 +187,11 @@ export default function Create() {
                 </li>
                 <li className={`formbold-step-menu2 ${currentStep === 2 ? 'active' : ''}`}>
                   <span>2</span>
-                  Upload Image
+                  Upload Image & Metadata
                 </li>
                 <li className={`formbold-step-menu3 ${currentStep === 3 ? 'active' : ''}`}>
                   <span>3</span>
-                  Metadata
+                  Review & Create
                 </li>
               </ul>
             </div>
@@ -238,6 +208,7 @@ export default function Create() {
                       className="formbold-form-input"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
+                      required
                     />
                   </div>
                   <div>
@@ -249,6 +220,7 @@ export default function Create() {
                       className="formbold-form-input"
                       value={symbol}
                       onChange={(e) => setSymbol(e.target.value)}
+                      required
                     />
                   </div>
                 </div>
@@ -262,6 +234,7 @@ export default function Create() {
                       className="formbold-form-input"
                       value={maxSupply}
                       onChange={(e) => setMaxSupply(e.target.value)}
+                      required
                     />
                   </div>
                   <div>
@@ -273,6 +246,7 @@ export default function Create() {
                       className="formbold-form-input"
                       value={royaltyPercentage}
                       onChange={(e) => setRoyaltyPercentage(e.target.value)}
+                      required
                     />
                   </div>
                 </div>
@@ -285,6 +259,7 @@ export default function Create() {
                     className="formbold-form-input"
                     value={mintPrice}
                     onChange={(e) => setMintPrice(e.target.value)}
+                    required
                   />
                 </div>
               </div>
@@ -297,32 +272,18 @@ export default function Create() {
                   <input
                     type="file"
                     id="file"
-                    accept="image/*"
+                    accept=""
                     onChange={handleFileChange}
                     ref={inputFile}
                     className="formbold-form-input"
+                    required
                   />
                 </div>
-                {/* Display local image preview if available */}
                 {localImageUrl && (
                   <div className="formbold-image-preview">
                     <img src={localImageUrl} alt="Selected" />
                   </div>
                 )}
-                {/* Once imageCid is obtained, display the image from Pinata */}
-                {imageCid && (
-                  <div className="formbold-image-preview">
-                    <img
-                      src={`https://${process.env.NEXT_PUBLIC_GATEWAY_URL}/ipfs/${imageCid}`}
-                      alt="Uploaded NFT"
-                    />
-                  </div>
-                )}
-              </div>
-            )}
-
-            {currentStep === 3 && (
-              <div className="formbold-form-step-3 active">
                 <div>
                   <label htmlFor="description" className="formbold-form-label">Description</label>
                   <textarea
@@ -331,10 +292,11 @@ export default function Create() {
                     className="formbold-form-input"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
+                    required
                   ></textarea>
                 </div>
                 <div className="formbold-attributes-section">
-                  <h3 className="formbold-form-label">Attributes</h3>
+                  <h3 className="formbold-form-label">Attributes (Optional)</h3>
                   {attributes.map((attr, index) => (
                     <div key={index} className="formbold-input-flex">
                       <input
@@ -358,60 +320,75 @@ export default function Create() {
               </div>
             )}
 
+            {currentStep === 3 && (
+              <div className="formbold-form-step-3 active">
+                <h2>Review Your Collection</h2>
+                <p><strong>Name:</strong> {name}</p>
+                <p><strong>Symbol:</strong> {symbol}</p>
+                <p><strong>Max Supply:</strong> {maxSupply}</p>
+                <p><strong>Royalty Percentage:</strong> {royaltyPercentage}%</p>
+                <p><strong>Mint Price:</strong> {mintPrice} ETH</p>
+                <p><strong>Description:</strong> {description}</p>
+                {localImageUrl && (
+                  <div className="formbold-image-preview">
+                    <img src={localImageUrl} alt="Collection Image" />
+                  </div>
+                )}
+                <h3>Attributes:</h3>
+                <ul>
+                  {attributes.map((attr, index) => (
+                    <li key={index}>{attr.trait_type}: {attr.value}</li>
+                  ))}
+                </ul>
+                <p><strong>Contract Fee:</strong> {contractFee ? parseFloat(contractFee.toString()) / 1e18 : 'Loading...'} ETH</p>
+                {error && <p className="error-message">{error}</p>}
+                <button
+                  type="button"
+                  className="formbold-btn"
+                  onClick={handleCreateCollection}
+                  disabled={isLoading || isPending || isConfirming}
+                >
+                  {isLoading || isPending || isConfirming ? 'Processing...' : 'Create Collection'}
+                </button>
+              </div>
+            )}
+
+            {isNFTCreated && (
+              <div className="formbold-success-message">
+                <h2>NFT Collection Created Successfully!</h2>
+                <p>Your NFT collection has been created and is now live on the blockchain.</p>
+                <Link href="/marketplace" className="formbold-btn">
+                  Go to Marketplace
+                </Link>
+                <button type="button" className="formbold-btn" onClick={resetCreationProcess}>
+                  Create Another Collection
+                </button>
+              </div>
+            )}
+
             <div className="formbold-form-btn-wrapper">
-              {currentStep > 1 && (
-                <button type="button" className="formbold-back-btn" style={{ alignSelf: 'flex-start' }} onClick={() => setCurrentStep(currentStep - 1)}>
+              {currentStep > 1 && !isNFTCreated && (
+                <button
+                  type="button"
+                  className="formbold-back-btn"
+                  onClick={() => setCurrentStep(currentStep - 1)}
+                  disabled={isLoading || isPending || isConfirming}
+                >
                   Back
                 </button>
               )}
-              {currentStep < 3 ? (
-                <button type="button" className="formbold-btn" style={{ alignSelf: 'flex-end' }} onClick={() => setCurrentStep(currentStep + 1)}>
-                  Next Step
-                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <g clipPath="url(#clip0_1675_1807)">
-                      <path d="M10.7814 7.33312L7.20541 3.75712L8.14808 2.81445L13.3334 7.99979L8.14808 13.1851L7.20541 12.2425L10.7814 8.66645H2.66675V7.33312H10.7814Z" fill="white" />
-                    </g>
-                    <defs>
-                      <clipPath id="clip0_1675_1807">
-                        <rect width="16" height="16" fill="white" />
-                      </clipPath>
-                    </defs>
-                  </svg>
-                </button>
-              ) : (
-                <button type="button" className="formbold-btn" style={{ alignSelf: 'flex-end' }} onClick={handleCreateCollection} disabled={isPending || isConfirming}>
-                  {isPending || isConfirming ? "Creating Collection..." : "Create Collection"}
+              {currentStep < 3 && !isNFTCreated && (
+                <button
+                  type="button"
+                  className="formbold-btn"
+                  onClick={() => setCurrentStep(currentStep + 1)}
+                  disabled={isLoading || isPending || isConfirming}
+                >
+                  Next
                 </button>
               )}
             </div>
           </form>
-
-          {isNFTCreated && (
-            <div className="formbold-form-confirm">
-              <h2 className="formbold-form-label">NFT Created Successfully</h2>
-              <div className="formbold-image-preview">
-                <img
-                  src={`https://${process.env.NEXT_PUBLIC_GATEWAY_URL}/ipfs/${imageCid}`}
-                  alt="Created NFT"
-                />
-              </div>
-              <div className="formbold-nft-info">
-                <p><strong>Name:</strong> {name}</p>
-                <p><strong>Description:</strong> {description}</p>
-                <p><strong>Image CID:</strong> {imageCid}</p>
-                <p><strong>Metadata CID:</strong> {metadataCid}</p>
-              </div>
-              <div className="formbold-form-btn-wrapper">
-                <button className="formbold-btn" onClick={resetCreationProcess}>Create New Collection</button>
-                <Link href="/explorer">
-                  <button className="formbold-btn">Go to Explorer</button>
-                </Link>
-                <Link href="/mint">
-                  <button className="formbold-btn">Go to Mint</button>
-                </Link>
-              </div>
-            </div>
-          )}
         </div>
       </div>
       <Footer />
