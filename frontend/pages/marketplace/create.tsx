@@ -76,7 +76,7 @@ export default function Create() {
     }
   }, [isConfirmed]);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const selectedFile = e.target.files[0];
       if (selectedFile.type.startsWith('')) {
@@ -88,7 +88,7 @@ export default function Create() {
         e.target.value = '';
       }
     }
-  };
+  }, [setFile, setLocalImageUrl, setError]);
 
   const uploadImage = async () => {
     if (!file) {
@@ -204,17 +204,19 @@ export default function Create() {
     }
   };
 
-  const addAttribute = () => {
-    setAttributes([...attributes, { trait_type: '', value: '' }]);
-  };
+  const addAttribute = useCallback(() => {
+    setAttributes(prev => [...prev, { trait_type: '', value: '' }]);
+  }, []);
 
-  const updateAttribute = (index: number, field: 'trait_type' | 'value', value: string) => {
-    const newAttributes = [...attributes];
-    newAttributes[index][field] = value;
-    setAttributes(newAttributes);
-  };
+  const updateAttribute = useCallback((index: number, field: 'trait_type' | 'value', value: string) => {
+    setAttributes(prev => {
+      const newAttributes = [...prev];
+      newAttributes[index][field] = value;
+      return newAttributes;
+    });
+  }, []);
 
-  const resetCreationProcess = () => {
+  const resetCreationProcess = useCallback(() => {
     setName('');
     setSymbol('');
     setMaxSupply('');
@@ -223,14 +225,14 @@ export default function Create() {
     setFile(null);
     setDescription('');
     setAttributes([]);
-    setStep(1); // Reset the step to 1
+    setStep(1);
     setIsNFTCreated(false);
     setLocalImageUrl(null);
     setError(null);
     setIsLoading(false);
-    setImageCid(null); // Reset image CID
-    setMetadataCid(null); // Reset metadata CID
-  };
+    setImageCid(null);
+    setMetadataCid(null);
+  }, []);
 
   return (
     <main>
