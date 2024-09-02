@@ -111,11 +111,21 @@ export default function Create() {
     }
   };
 
+  function sanitizeFilename(filename: string): string {
+    return filename.replace(/[^a-z0-9\._-]/gi, '').replace(/\.{2,}/g, '.').replace(/\.+/g, '.').replace(/\/+/g, '/').substring(0, 255);
+  }
+
   const uploadMetadata = async () => {
     if (!imageCid || !description) {
       setError('Image must be uploaded first.');
       return null;
     }
+    // Extract filename from the image CID
+    const imageFilename = imageCid.split('/').pop() || 'default.json';
+
+    // Sanitize the filename
+    const sanitizedFilename = sanitizeFilename(imageFilename);
+
     const metadata = {
       name: name,
       description,
@@ -127,8 +137,10 @@ export default function Create() {
       const keyRequest = await fetch("/api/key", { method: "GET" });
       const keyData = await keyRequest.json();
       const upload = await pinata.upload.json(metadata).key(keyData.JWT);
-      setMetadataCid(upload.IpfsHash);
-      return upload.IpfsHash;
+
+      // Set the metadata CID using the sanitized filename
+      setMetadataCid(`${sanitizedFilename}-${upload.IpfsHash}`);
+      return `${sanitizedFilename}-${upload.IpfsHash}`;
     } catch (e) {
       console.error(e);
       setError("Trouble uploading metadata");
