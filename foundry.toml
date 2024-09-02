@@ -50,5 +50,6 @@ wrap_comments = true
 # zksync = "https://mainnet.era.zksync.io"
 sepolia = "https://eth-sepolia.g.alchemy.com/v2/N-xInl4-MvlVwtClZjoMxNqFyiAP4PcZ"
 
-
+[etherscan]
+sepolia = { key = "XK1YC9BH1K44AQ5AKTFJPXMEITQRW64KH8" }
 # See more config options https://github.com/foundry-rs/foundry/blob/master/crates/config/README.md#all-options

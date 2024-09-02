@@ -123,11 +123,6 @@ contract NFTContract is ERC721, ERC2981, ERC721Enumerable, ERC721URIStorage, Own
         emit RoyaltyInfoUpdated(contractOwner, newRoyaltyPercentage);
     }
 
-    /**
-     * @notice Sets the base URI for all NFT metadata to `baseURI`.
-     * @dev Only callable by the contract owner. Updates `s_baseURI` with the new base URI.
-     * @param baseURI The new base URI to be set for all token metadata.
-     */
     function setBaseURI(string memory baseURI) external onlyOwner {
         s_baseURI = baseURI;
     }
@@ -161,6 +156,23 @@ contract NFTContract is ERC721, ERC2981, ERC721Enumerable, ERC721URIStorage, Own
 
     function getMintPrice() external view returns (uint256) {
         return s_mintPrice;
+    }
+
+    function _startsWith(string memory _base, string memory _value) internal pure returns (bool) {
+        bytes memory baseBytes = bytes(_base);
+        bytes memory valueBytes = bytes(_value);
+
+        if (baseBytes.length < valueBytes.length) {
+            return false;
+        }
+
+        for (uint256 i = 0; i < valueBytes.length; i++) {
+            if (baseBytes[i] != valueBytes[i]) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     ////////////////////////////////////////////////////////////
@@ -210,7 +222,19 @@ contract NFTContract is ERC721, ERC2981, ERC721Enumerable, ERC721URIStorage, Own
      * @return string memory The URI for the token's metadata.
      */
     function tokenURI(uint256 tokenId) public view override(ERC721, ERC721URIStorage) returns (string memory) {
-        return super.tokenURI(tokenId);
+        string memory baseURI = _baseURI();
+        string memory _tokenURI = ERC721URIStorage.tokenURI(tokenId);
+
+        if (bytes(baseURI).length == 0) {
+            return _tokenURI;
+        }
+
+        // Check if _tokenURI already starts with the baseURI
+        if (bytes(_tokenURI).length > 0 && _startsWith(_tokenURI, baseURI)) {
+            return _tokenURI;
+        }
+
+        return string(abi.encodePacked(baseURI, _tokenURI));
     }
 
     /**
@@ -219,9 +243,7 @@ contract NFTContract is ERC721, ERC2981, ERC721Enumerable, ERC721URIStorage, Own
      * @param interfaceId The ID of the interface to check support for.
      * @return bool Whether the contract supports the specified interface.
      */
-    function supportsInterface(
-        bytes4 interfaceId
-    )
+    function supportsInterface(bytes4 interfaceId)
         public
         view
         override(ERC721, ERC2981, ERC721Enumerable, ERC721URIStorage)
