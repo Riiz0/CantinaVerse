@@ -6,6 +6,8 @@ const nextConfig = {
     return config;
   },
   output: 'standalone',
+  // Add this line
+  trailingSlash: false,
 };
 
 export default nextConfig;
