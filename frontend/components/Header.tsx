@@ -8,8 +8,13 @@ export default function Header() {
             <div className="logo-and-title">
                 <Link href="/" passHref>
                     <div style={{ display: 'flex', alignItems: 'center' }}>
-                        <Image src="/assets/CantinaVerse_Transparent.svg" width={68} height={48} alt="NFTC Logo" />
-                        <span className="navbar-title">CantinaVerse</span>
+                        <Image
+                            src="/assets/logo_title.svg"
+                            width={275}
+                            height={275}
+                            alt="NFTC Logo"
+                            layout="intrinsic"
+                        />
                     </div>
                 </Link>
             </div>
@@ -20,7 +25,6 @@ export default function Header() {
                 <li><Link href="/governance">DAO</Link></li>
                 <li><Link href="/aboutus">About Us</Link></li>
             </ul>
-            <div className="hidden-element"></div>
         </nav>
     );
-};
+}

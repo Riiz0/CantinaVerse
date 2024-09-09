@@ -21,43 +21,59 @@ contract HelperConfig is Script {
     /*//////////////////////////////////////////////////////////////
                                 CONFIGS
     //////////////////////////////////////////////////////////////*/
-    function getEthMainnetConfig() public pure returns (NetworkConfig memory) {
+    function getEthMainnetConfig() public view returns (NetworkConfig memory) {
         NetworkConfig memory EthMainnetConfig = NetworkConfig({
-            initialOwner: 0xfe63Ba8189215E5C975e73643b96066B6aD41A45,
+            initialOwner: msg.sender,
             GelatoDedicatedMsgSender: 0x823F9f50f6A6E52CC4073Ff1493D4a8482D8Aba4,
             serviceFee: 0
         });
         return EthMainnetConfig;
     }
 
-    function getSepoliaConfig() public pure returns (NetworkConfig memory) {
+    function getSepoliaConfig() public view returns (NetworkConfig memory) {
         NetworkConfig memory SepoliaConfig = NetworkConfig({
-            initialOwner: 0xfe63Ba8189215E5C975e73643b96066B6aD41A45,
+            initialOwner: msg.sender,
             GelatoDedicatedMsgSender: 0x823F9f50f6A6E52CC4073Ff1493D4a8482D8Aba4,
             serviceFee: 0
         });
         return SepoliaConfig;
     }
 
-    function getModeMainnetConfig() public pure returns (NetworkConfig memory) {
+    function getModeMainnetConfig() public view returns (NetworkConfig memory) {
         return NetworkConfig({
-            initialOwner: 0xfe63Ba8189215E5C975e73643b96066B6aD41A45,
+            initialOwner: msg.sender,
             GelatoDedicatedMsgSender: 0x823F9f50f6A6E52CC4073Ff1493D4a8482D8Aba4,
             serviceFee: 0
         });
     }
 
-    function getOpMainnetConfig() public pure returns (NetworkConfig memory) {
+    function getOpMainnetConfig() public view returns (NetworkConfig memory) {
         return NetworkConfig({
-            initialOwner: 0xfe63Ba8189215E5C975e73643b96066B6aD41A45,
+            initialOwner: msg.sender,
             GelatoDedicatedMsgSender: 0x823F9f50f6A6E52CC4073Ff1493D4a8482D8Aba4,
             serviceFee: 0
         });
     }
 
-    function getBaseMainnetConfig() public pure returns (NetworkConfig memory) {
+    function getOPSepoliaConfig() public view returns (NetworkConfig memory) {
         return NetworkConfig({
-            initialOwner: 0xfe63Ba8189215E5C975e73643b96066B6aD41A45,
+            initialOwner: msg.sender,
+            GelatoDedicatedMsgSender: 0x823F9f50f6A6E52CC4073Ff1493D4a8482D8Aba4,
+            serviceFee: 0
+        });
+    }
+
+    function getBaseMainnetConfig() public view returns (NetworkConfig memory) {
+        return NetworkConfig({
+            initialOwner: msg.sender,
+            GelatoDedicatedMsgSender: 0x823F9f50f6A6E52CC4073Ff1493D4a8482D8Aba4,
+            serviceFee: 0
+        });
+    }
+
+    function getBaseSepoliaConfig() public view returns (NetworkConfig memory) {
+        return NetworkConfig({
+            initialOwner: msg.sender,
             GelatoDedicatedMsgSender: 0x823F9f50f6A6E52CC4073Ff1493D4a8482D8Aba4,
             serviceFee: 0
         });

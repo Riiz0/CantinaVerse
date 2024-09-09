@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { useWriteContract, useReadContract, useWaitForTransactionReceipt, useAccount, useWatchContractEvent } from 'wagmi';
+import { useWriteContract, useReadContract, useWaitForTransactionReceipt, useAccount, useWatchContractEvent, useChainId } from 'wagmi';
 import { parseEther } from 'viem';
 import { pinata } from "@/utils/config"
 import { Footer } from '../../components/pagesFooter';
@@ -9,7 +9,14 @@ import Header from '@/components/nftmarketplace/homepage/marketplaceHeader';
 import { factoryNFTContractABI } from '../../ABIs/factoryNFTContractABI';
 import Link from 'next/link';
 
-const FACTORY_CONTRACT_ADDRESS = '0xAEdF68cA921Fe00f09A9b358A613C60B76C88285';
+type EthereumAddress = `0x${string}`;
+
+const contractAddresses: Record<number, EthereumAddress> = {
+  5: '0xAEdF68cA921Fe00f09A9b358A613C60B76C88285',  // Sepolia Testnet
+  84532: '0xA999DC0749657e77AC3216d8fA6bE16874F8e50c', // Base Testnet
+  11155420: '0xd19fD90fd1e0E0E4399D341DeaeFE18DE5565BFD', // OP Testnet
+  // Add other network contract addresses here
+};
 
 export default function Create() {
   const [name, setName] = useState('');
@@ -33,26 +40,27 @@ export default function Create() {
   const inputFile = useRef<HTMLInputElement>(null);
 
   const { address: connectedAddress } = useAccount();
+  const chainId = useChainId();
   const { writeContract, data: hash, error: contractError, isPending } = useWriteContract();
   const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
     hash,
   });
+  let FACTORY_CONTRACT_ADDRESS = contractAddresses[chainId as keyof typeof contractAddresses] as `0x${string}`;
 
   const fee = useReadContract({
-    address: FACTORY_CONTRACT_ADDRESS,
+    address: FACTORY_CONTRACT_ADDRESS as `0x${string}`,
     abi: factoryNFTContractABI,
     functionName: 'getFee',
   });
 
   useWatchContractEvent({
-    address: FACTORY_CONTRACT_ADDRESS,
+    address: FACTORY_CONTRACT_ADDRESS as `0x${string}`,
     abi: factoryNFTContractABI,
     eventName: 'CollectionCreated',
     onLogs(logs) {
-      console.log('New logs!', logs)
-      setIsNFTCreated(true);
-    },
-  })
+      console.log('New logs!', logs);
+    }
+  });
 
   useEffect(() => {
     const fetchContractFee = async () => {

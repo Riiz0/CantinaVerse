@@ -15,7 +15,7 @@ export function Footer() {
           <div className="footer-brand">
 
             <a href="#" className="logo">
-              <Image src="/assets/CantinaVerse_Transparent.svg" width="68" height="48" alt="NFTC Logo" />
+              <Image src="/assets/logo.svg" width="68" height="48" alt="NFTC Logo" />
             </a>
 
             <p className="footer-text">

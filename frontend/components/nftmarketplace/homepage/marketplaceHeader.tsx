@@ -20,9 +20,8 @@ export default function Header() {
         <Link href="/">
           <div className="logo-wrapper">
             <div className="logo">
-              <Image src="/assets/CantinaVerse_Transparent.svg" width={68} height={48} alt="NFTC Logo" />
+              <Image src="/assets/logo_title.svg" width={275} height={275} alt="NFTC Logo" />
             </div>
-            <span className="logo-text">CantinaVerse</span> {/* Add your text here */}
           </div>
         </Link>
 
