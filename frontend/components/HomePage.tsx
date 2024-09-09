@@ -84,7 +84,7 @@ export default function HomePage() {
               <p className="ecosystem-header-name">NFT Marketplace</p>
               <p className="eco-additional-info">A robust platform for buying, selling, create, mint and auctioning NFTs, facilitating seamless connections between artists and collectors.</p>
               <p className="eco-tell-me-more">
-                <Link href="/nftmarketplace">
+                <Link href="/marketplace">
                   <span className="eco-tell-me-more-content">Go there <TiArrowForwardOutline aria-hidden="true" /></span>
                 </Link>
               </p>
