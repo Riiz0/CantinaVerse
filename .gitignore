@@ -9,7 +9,6 @@ out/
 
 # Docs
 docs/
-vercel.json
 
 # Dotenv file
 .env
