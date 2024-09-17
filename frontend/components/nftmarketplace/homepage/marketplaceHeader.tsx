@@ -15,8 +15,6 @@ export default function Header() {
       <div className="container">
 
         <div className="overlay" data-overlay></div>
-
-        {/* Wrap both the logo and the text in a single Link */}
         <Link href="/">
           <div className="logo-wrapper">
             <div className="logo">

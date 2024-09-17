@@ -277,40 +277,53 @@ body {
 
 .homepage-navbar {
   display: flex;
-  align-items: center; /* Center items vertically */
-  padding: 25px 42px;
+  align-items: center;
+  justify-content: space-between;
   background-color: var(--navbar-bg-color);
   color: var(--text-color);
   font-family: var(--ff-poppins), sans-serif;
   width: 100%;
-  position: sticky;
-  z-index: 1030;
-  top: 0;
-  height: 100px; /* Set a consistent navbar height */
+  padding: 0 150px; /* Adds padding to the left and right sides of the navbar */
+  box-sizing: border-box; /* Ensures padding does not affect the width */
+  height: 100px; /* Adjust height as needed */
 }
 
-.homepage-navbar ul {
+.logo-container {
+  display: flex;
+  align-items: center;
+}
+
+.logo-and-title img {
+  height: 100%; /* Adjust logo size if needed */
+}
+
+.navbar-links-container {
+  flex: 1; /* Takes up remaining space to center navbar links */
+  display: flex;
+  justify-content: center; /* Centers navbar links */
+  width: 100%;
+}
+
+.navbar-links {
+  padding-top: 30px;
+  font-size: 25px;
   display: flex;
   gap: 40px;
   list-style-type: none; 
+  padding-right: 290px; /* Remove default padding */
 }
 
-.homepage-navbar ul li {
+.navbar-links li {
   cursor: pointer;
 }
 
-.homepage-navbar a {
+.navbar-links a {
   text-decoration: none; 
   color: inherit; 
 }
 
-.homepage-navbar a:hover {
+.navbar-links a:hover {
   opacity: 0.8; 
-}
-
-.homepage-navbar .logo {
-  height: 40px;
-  filter: brightness(70%); 
 }
 
 .homepage-top-container {
@@ -318,33 +331,6 @@ body {
   padding: 130px;
   text-align: center;
   color: var(--text-color);
-}
-
-.hidden-element {
-  flex: 1; 
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding-left: 75px;
-}
-
-.logo-and-title {
-  display: flex;
-  align-items: center; /* Vertically center the logo and title text */
-  gap: 10px;
-  padding-left: 75px;
-  height: 100px; /* Match the navbar height */
-}
-
-.navbar-links {
-  font-size: 25px;
-  display: flex;
-  justify-content: center;
-  align-items: center; /* Vertically center the navbar links */
-  list-style-type: none;
-  height: 100%; /* Ensure the links stretch and center */
-  padding-left: 190px;
-  padding-top: 25px;
 }
 
 .mission-statement, .mission-description {
@@ -709,7 +695,7 @@ body {
   color: var(--white);
   font-weight: var(--fw-600);
   transition: var(--transition-1);
-  margin-top: 18.5px;
+  margin-top: 23.5px;
 }
 
 .navbar-link:is(:hover, :focus) { color: var(--han-purple); }
@@ -1002,26 +988,34 @@ body {
   background-color: hsla(0, 0%, 100%, 0.05);
 }
 
-.newsletter-form { position: relative; }
+.newsletter-form {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%; /* Ensure the form takes full width */
+}
 
 .newsletter-input {
   background-color: var(--eerie-black-2);
   color: var(--gainsboro);
   font-size: var(--fs-5);
   padding: 12px 20px;
-  padding-inline-end: 80px;
   border-radius: var(--radius-4);
   outline: none;
   transition: var(--transition-1);
+  flex: 1; /* Allows the input to grow and take available space */
+  min-width: 250px; /* Ensure it has a minimum width */
 }
 
 .newsletter-input:focus { box-shadow: 0 0 1px 4px hsl(0, 0%, 40%); }
 
 .newsletter-btn {
   background-image: var(--gradient-1);
-  position: absolute;
+  position:absolute;
+  display: flex;
+  align-items: center;
   top: 0;
-  right: 0;
+  right: -47.5px;
   bottom: 0;
   padding-inline: 25px;
   border-radius: 50px 4px 4px 50px;
@@ -1341,6 +1335,114 @@ body {
     margin: 5px 0;
   }
 }
+
+
+/*-----------------------------------*\
+  #Explore Page
+\*-----------------------------------*/
+.exploreSection {
+  margin-top: 100px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 50px 0;
+}
+
+.exploreDiv {
+  width: 95%;
+  background: #1A1A1A; /* Dark grey background */
+  padding: 40px;
+  border-radius: 15px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.exploreTitle {
+  color: #E0E0E0; /* Light grey text */
+  font-size: 2rem;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.searchWrapper {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 30px;
+  padding: 0 500px;
+  align-items: center;
+  justify-content: center;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 15px 20px;
+  border-radius: 8px;
+  border: 1px solid #DDE3EC;
+  background: #1A1A1A; /* Dark grey input background */
+  color: #E0E0E0; /* Light grey text */
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.searchInput:focus {
+  border-color: #D05F4E; /* Bright blue border on focus */
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+}
+
+.searchButton {
+  padding: 15px 20px;
+  border: 1px solid #D05F4E; /* Green button border */
+  background-color: transparent;
+  color: #D05F4E; /* Green button text */
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.searchButton:hover {
+  background-color: #D05F4E; /* Bright blue on hover */
+  color: white;
+}
+
+.collectionsTitle {
+  color: #E0E0E0; /* Light grey text */
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.collectionsList {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.collectionItem {
+  background: #1A1A1A; /* Dark grey background */
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.collectionLink {
+  color: #D05F4E; /* Green link text */
+  text-decoration: none;
+}
+
+.collectionLink:hover {
+  text-decoration: underline;
+}
+
+.noCollections {
+  color: #E0E0E0; /* Light grey text */
+  text-align: center;
+  font-size: 1.2rem;
+}
+
+
 
 /*-----------------------------------*\
   #BACK TO TOP

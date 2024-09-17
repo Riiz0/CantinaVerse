@@ -5,9 +5,9 @@ import Link from 'next/link';
 export default function Header() {
     return (
         <nav className="homepage-navbar">
-            <div className="logo-and-title">
+            <div className="logo-container">
                 <Link href="/" passHref>
-                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                    <div className="logo-and-title">
                         <Image
                             src="/assets/logo_title.svg"
                             width={275}
@@ -18,13 +18,15 @@ export default function Header() {
                     </div>
                 </Link>
             </div>
-            <ul className="navbar-links">
-                <li><Link href="/marketplace">Marketplace</Link></li>
-                <li><Link href="/tokencreation">Token Creation</Link></li>
-                <li><Link href="/casinogames">Gaming</Link></li>
-                <li><Link href="/governance">DAO</Link></li>
-                <li><Link href="/aboutus">About Us</Link></li>
-            </ul>
+            <div className="navbar-links-container">
+                <ul className="navbar-links">
+                    <li><Link href="/marketplace">Marketplace</Link></li>
+                    <li><Link href="/tokencreation">Token Creation</Link></li>
+                    <li><Link href="/casinogames">Gaming</Link></li>
+                    <li><Link href="/governance">DAO</Link></li>
+                    <li><Link href="/aboutus">About Us</Link></li>
+                </ul>
+            </div>
         </nav>
     );
 }

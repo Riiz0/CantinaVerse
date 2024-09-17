@@ -92,7 +92,7 @@ export function Footer() {
           <div className="footer-list">
             <p className="footer-list-title">Subscribe To Us</p>
             <form action="" className="newsletter-form">
-              <input type="email" name="email" required className="newsletter-input" />
+              <input type="email" name="email" placeholder="info@yourmail.com" required className="newsletter-input" />
               <button type="submit" className="newsletter-btn" aria-label="Submit">
                 <IoPaperPlaneOutline />
               </button>
