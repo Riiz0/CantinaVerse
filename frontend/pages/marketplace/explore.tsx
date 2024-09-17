@@ -30,6 +30,18 @@ const Explore = () => {
         functionName: 'getCollections',
     });
 
+    const { data: userCollections } = useReadContract({
+        address: FACTORY_CONTRACT_ADDRESS,
+        abi: factoryNFTContractABI,
+        functionName: 'getUserCollections',
+    });
+
+    const { data: collectionDetails } = useReadContract({
+        address: FACTORY_CONTRACT_ADDRESS,
+        abi: factoryNFTContractABI,
+        functionName: 'getCollectionDetails',
+    });
+
     // Update collections state when fetched
     useEffect(() => {
         if (nftCollections) {
@@ -70,20 +82,11 @@ const Explore = () => {
                         <button onClick={handleSearch} className="searchButton" >Search</button>
                     </div>
 
-                    <h2>Collections</h2>
-                    <div className="collections-list">
-                        {filteredCollections.length > 0 ? (
-                            filteredCollections.map((collection, index) => (
-                                <div key={index} className="collection-item">
-                                </div>
-                            ))
-                        ) : (
-                            <p>No collections found</p>
-                        )}
-                    </div>
+                    <h2 className="collectionsTitle">NFT Gallery</h2>
+                    <p className="noCollections">No NFTs found</p>
                 </div>
             </section>
-        </main>
+        </main >
     );
 };
 
