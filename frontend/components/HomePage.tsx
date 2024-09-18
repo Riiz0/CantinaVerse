@@ -35,7 +35,7 @@ export default function HomePage() {
         <div className="homepage-top-container">
           <p className="mission-statement">Our Mission</p>
           <h1 className="main-heading">Building an ecosystem for all</h1>
-          <p className="mission-description">Empowering creators, gamers, and investors with unparalleled opportunities for expression, engagement, and financial empowerment...</p>
+          <p className="mission-description">Empowering creators, gamers, and crypto enthusiasts with unparalleled opportunities for expression, engagement, and financial empowerment...</p>
           <Link href="/aboutus">
             <button className="join-us-btn">Learn More <TiArrowForwardOutline aria-hidden="true" /></button>
           </Link>
@@ -92,7 +92,7 @@ export default function HomePage() {
             <div className="diagonal-container-3" data-aos="fade-up">
               <img src="/assets/6.svg" alt="Diagonal Image 3" className="container-image" />
               <p className="ecosystem-header-name">Casino Gaming</p>
-              <p className="eco-additional-info">A variety of casino games, ensuring a fair and transparent gaming experience through partnerships with trusted networks like Gelato.</p>
+              <p className="eco-additional-info">A variety of casino games, ensuring a fair and transparent gaming experience with trusted oracle networks like Gelato.</p>
               <p className="eco-tell-me-more">
                 <Link href="/casinogames">
                   <span className="eco-tell-me-more-content">Go there <TiArrowForwardOutline aria-hidden="true" /></span>
