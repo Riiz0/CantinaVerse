@@ -10,19 +10,19 @@ import { TiArrowUpOutline } from "react-icons/ti";
 
 
 export default function MainSection() {
-    return (
-      <main>
-        <article>
-          <HeroContainer />
-          <Explorer />
-          <RecentListings />
-          <RecentAuctions />
-          <Instructions />
-          <Footer />
-          <a href="#top" className="back-to-top" aria-label="Back to Top" data-back-top-btn>
+  return (
+    <main>
+      <article>
+        <HeroContainer />
+        <Explorer />
+        <RecentListings />
+        <RecentAuctions />
+        <Instructions />
+        <Footer />
+        <a href="#top" className="back-to-top" aria-label="Back to Top" data-back-top-btn>
           <TiArrowUpOutline />
-          </a>
-        </article>
-      </main>
-    );
-  }
+        </a>
+      </article>
+    </main>
+  );
+}
