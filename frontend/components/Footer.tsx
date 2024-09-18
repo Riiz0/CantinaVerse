@@ -19,7 +19,7 @@ export function Footer() {
             </a>
 
             <p className="footer-text">
-              Our mission is to empower creators, gamers, and investors with unparalleled opportunities for expression, engagement, and financial empowerment.
+              Our mission is to empower creators, gamers, and crypto enthusiasts with unparalleled opportunities for expression, engagement, and financial empowerment.
             </p>
 
             <ul className="social-list">
