@@ -18,7 +18,7 @@ export function HeroContainer() {
         <div className="btn-group">
           <button className="btn">
             <IoRocketOutline aria-hidden="true" />
-            <Link href="/explore">Explore</Link>
+            <Link href="/marketplace/explore">Explore</Link>
           </button>
           <button className="btn">
             <IoCreateOutline aria-hidden="true" />

@@ -30,10 +30,10 @@
       "static/chunks/main.js",
       "static/chunks/pages/marketplace.js"
     ],
-    "/marketplace/create": [
+    "/marketplace/explore": [
       "static/chunks/webpack.js",
       "static/chunks/main.js",
-      "static/chunks/pages/marketplace/create.js"
+      "static/chunks/pages/marketplace/explore.js"
     ]
   },
   "ampFirstPages": []

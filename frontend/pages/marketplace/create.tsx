@@ -48,18 +48,19 @@ export default function Create() {
   let FACTORY_CONTRACT_ADDRESS = contractAddresses[chainId as keyof typeof contractAddresses] as `0x${string}`;
 
   const fee = useReadContract({
-    address: FACTORY_CONTRACT_ADDRESS as `0x${string}`,
+    address: FACTORY_CONTRACT_ADDRESS,
     abi: factoryNFTContractABI,
     functionName: 'getFee',
   });
 
   useWatchContractEvent({
-    address: FACTORY_CONTRACT_ADDRESS as `0x${string}`,
+    address: FACTORY_CONTRACT_ADDRESS,
     abi: factoryNFTContractABI,
     eventName: 'CollectionCreated',
     onLogs(logs) {
       console.log('New logs!', logs);
-    }
+      setIsNFTCreated(true);
+    },
   });
 
   useEffect(() => {
@@ -447,9 +448,11 @@ export default function Create() {
             {isNFTCreated && (
               <div className="formbold-success-message">
                 <h2>NFT Collection Created Successfully!</h2>
-                <p>Your NFT collection has been created and is now live on the blockchain.</p>
-                <Link href="/marketplace" className="formbold-btn">
-                  Go to Marketplace
+                <Link href="/mint" className="formbold-btn">
+                  Go to Mint Page
+                </Link>
+                <Link href="/explore" className="formbold-btn">
+                  Go to Explore Page
                 </Link>
                 <button type="button" className="formbold-btn" onClick={resetCreationProcess}>
                   Create Another Collection
