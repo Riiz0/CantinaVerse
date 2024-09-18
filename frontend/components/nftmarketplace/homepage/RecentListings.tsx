@@ -3,138 +3,138 @@
 import Image from 'next/image';
 
 export function RecentListings() {
-    return (
-      <section className="section top-seller" id="top-seller">
-        <div className="container">
+  return (
+    <section className="section top-seller" id="top-seller">
+      <div className="container">
 
-          <p className="section-subtitle">Listings</p>
+        <p className="section-subtitle">Listings</p>
 
-          <h2 className="h2 section-title">Top Listings</h2>
+        <h2 className="h2 section-title">Top Listings</h2>
 
-          <ul className="grid-list">
+        <ul className="grid-list">
 
-            <li>
-              <div className="card top-seller-card">
+          <li>
+            <div className="card top-seller-card">
 
-                <figure className="card-avatar">
-                  <a href="#">
-                    <Image src="/assets/avatar-1.jpg" width="64" height="64" loading="lazy" alt="Richard" />
-                  </a>
-                </figure>
+              <figure className="card-avatar">
+                <a href="#">
+                  <Image src="/assets/avatar-1.jpg" width="64" height="64" loading="lazy" alt="Richard" />
+                </a>
+              </figure>
 
-                <div>
-                  <h3 className="card-title">
-                    <a href="#">@Richard</a>
-                  </h3>
+              <div>
+                <h3 className="card-title">
+                  <a href="#">@Richard</a>
+                </h3>
 
-                  <data value="1.5">1.5 BNB</data>
-                </div>
-
+                <data value="1.5">1.5 BNB</data>
               </div>
-            </li>
 
-            <li>
-              <div className="card top-seller-card">
+            </div>
+          </li>
 
-                <figure className="card-avatar">
-                  <a href="#">
-                    <Image src="/assets/avatar-2.jpg" width="64" height="64" loading="lazy" alt="John Deo" />
-                  </a>
-                </figure>
+          <li>
+            <div className="card top-seller-card">
 
-                <div>
-                  <h3 className="card-title">
-                    <a href="#">@JohnDeo</a>
-                  </h3>
+              <figure className="card-avatar">
+                <a href="#">
+                  <Image src="/assets/avatar-2.jpg" width="64" height="64" loading="lazy" alt="John Deo" />
+                </a>
+              </figure>
 
-                  <data value="2.3">2.3 BNB</data>
-                </div>
+              <div>
+                <h3 className="card-title">
+                  <a href="#">@JohnDeo</a>
+                </h3>
 
+                <data value="2.3">2.3 BNB</data>
               </div>
-            </li>
 
-            <li>
-              <div className="card top-seller-card">
+            </div>
+          </li>
 
-                <figure className="card-avatar">
-                  <a href="#">
-                    <Image src="/assets/avatar-3.jpg" width="64" height="64" loading="lazy" alt="Junaid" />
-                  </a>
-                </figure>
+          <li>
+            <div className="card top-seller-card">
 
-                <div>
-                  <h3 className="card-title">
-                    <a href="#">@Junaid</a>
-                  </h3>
+              <figure className="card-avatar">
+                <a href="#">
+                  <Image src="/assets/avatar-3.jpg" width="64" height="64" loading="lazy" alt="Junaid" />
+                </a>
+              </figure>
 
-                  <data value="2.5">2.5 BNB</data>
-                </div>
+              <div>
+                <h3 className="card-title">
+                  <a href="#">@Junaid</a>
+                </h3>
 
+                <data value="2.5">2.5 BNB</data>
               </div>
-            </li>
 
-            <li>
-              <div className="card top-seller-card">
+            </div>
+          </li>
 
-                <figure className="card-avatar">
-                  <a href="#">
-                    <Image src="/assets/avatar-4.jpg" width="64" height="64" loading="lazy" alt="Yasmin" />
-                  </a>
-                </figure>
+          <li>
+            <div className="card top-seller-card">
 
-                <div>
-                  <h3 className="card-title">
-                    <a href="#">@Yasmin</a>
-                  </h3>
+              <figure className="card-avatar">
+                <a href="#">
+                  <Image src="/assets/avatar-4.jpg" width="64" height="64" loading="lazy" alt="Yasmin" />
+                </a>
+              </figure>
 
-                  <data value="1.9">1.9 BNB</data>
-                </div>
+              <div>
+                <h3 className="card-title">
+                  <a href="#">@Yasmin</a>
+                </h3>
 
+                <data value="1.9">1.9 BNB</data>
               </div>
-            </li>
 
-            <li>
-              <div className="card top-seller-card">
+            </div>
+          </li>
 
-                <figure className="card-avatar">
-                  <a href="#">
-                    <Image src="/assets/avatar-5.jpg" width="64" height="64" loading="lazy" alt="Arham H" />
-                  </a>
-                </figure>
+          <li>
+            <div className="card top-seller-card">
 
-                <div>
-                  <h3 className="card-title">
-                    <a href="#">@ArhamH</a>
-                  </h3>
+              <figure className="card-avatar">
+                <a href="#">
+                  <Image src="/assets/avatar-5.jpg" width="64" height="64" loading="lazy" alt="Arham H" />
+                </a>
+              </figure>
 
-                  <data value="3.2">3.2 BNB</data>
-                </div>
+              <div>
+                <h3 className="card-title">
+                  <a href="#">@ArhamH</a>
+                </h3>
 
+                <data value="3.2">3.2 BNB</data>
               </div>
-            </li>
 
-            <li>
-              <div className="card top-seller-card">
+            </div>
+          </li>
 
-                <figure className="card-avatar">
-                  <a href="#">
-                    <Image src="/assets/avatar-6.jpg" width="64" height="64" loading="lazy" alt="Sara" />
-                  </a>
-                </figure>
+          <li>
+            <div className="card top-seller-card">
 
-                <div>
-                  <h3 className="card-title">
-                    <a href="#">@Sara</a>
-                  </h3>
+              <figure className="card-avatar">
+                <a href="#">
+                  <Image src="/assets/avatar-6.jpg" width="64" height="64" loading="lazy" alt="Sara" />
+                </a>
+              </figure>
 
-                  <data value="4.7">4.7 BNB</data>
-                </div>
+              <div>
+                <h3 className="card-title">
+                  <a href="#">@Sara</a>
+                </h3>
 
+                <data value="4.7">4.7 BNB</data>
               </div>
-            </li>
 
-          </ul>
-        </div>
-      </section>
-    );
-  }
+            </div>
+          </li>
+
+        </ul>
+      </div>
+    </section>
+  );
+}

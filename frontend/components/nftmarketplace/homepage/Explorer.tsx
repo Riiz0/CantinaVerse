@@ -80,7 +80,7 @@ export function Explorer() {
               </div>
 
               <button className="btn">
-              <IoBagAddOutline aria-hidden="true" />
+                <IoBagAddOutline aria-hidden="true" />
                 <span>Place a Bid</span>
               </button>
 
