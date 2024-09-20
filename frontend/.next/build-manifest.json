@@ -25,15 +25,15 @@
       "static/chunks/main.js",
       "static/chunks/pages/_error.js"
     ],
-    "/aboutus": [
+    "/marketplace/create": [
       "static/chunks/webpack.js",
       "static/chunks/main.js",
-      "static/chunks/pages/aboutus.js"
+      "static/chunks/pages/marketplace/create.js"
     ],
-    "/marketplace": [
+    "/marketplace/explore": [
       "static/chunks/webpack.js",
       "static/chunks/main.js",
-      "static/chunks/pages/marketplace.js"
+      "static/chunks/pages/marketplace/explore.js"
     ]
   },
   "ampFirstPages": []

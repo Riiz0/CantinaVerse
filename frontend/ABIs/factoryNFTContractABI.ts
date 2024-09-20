@@ -169,6 +169,50 @@ export const factoryNFTContractABI = [
         "type": "function"
     },
     {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "collectionAddress",
+                "type": "address"
+            }
+        ],
+        "name": "getCollectionDetails",
+        "outputs": [
+            {
+                "internalType": "string",
+                "name": "name",
+                "type": "string"
+            },
+            {
+                "internalType": "string",
+                "name": "symbol",
+                "type": "string"
+            },
+            {
+                "internalType": "uint256",
+                "name": "maxSupply",
+                "type": "uint256"
+            },
+            {
+                "internalType": "address",
+                "name": "owner",
+                "type": "address"
+            },
+            {
+                "internalType": "uint96",
+                "name": "royaltyPercentage",
+                "type": "uint96"
+            },
+            {
+                "internalType": "uint256",
+                "name": "mintPrice",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
         "inputs": [],
         "name": "getCollections",
         "outputs": [

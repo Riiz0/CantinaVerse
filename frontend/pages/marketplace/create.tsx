@@ -13,7 +13,7 @@ type EthereumAddress = `0x${string}`;
 
 const contractAddresses: Record<number, EthereumAddress> = {
   5: '0xAEdF68cA921Fe00f09A9b358A613C60B76C88285',  // Sepolia Testnet
-  84532: '0xA999DC0749657e77AC3216d8fA6bE16874F8e50c', // Base Testnet
+  84532: '0x346BffBd42D024D64455210Bd67Dd9d0dd9D0294', // Base Testnet
   11155420: '0xd19fD90fd1e0E0E4399D341DeaeFE18DE5565BFD', // OP Testnet
   // Add other network contract addresses here
 };
@@ -448,11 +448,8 @@ export default function Create() {
             {isNFTCreated && (
               <div className="formbold-success-message">
                 <h2>NFT Collection Created Successfully!</h2>
-                <Link href="/mint" className="formbold-btn">
-                  Go to Mint Page
-                </Link>
-                <Link href="/explore" className="formbold-btn">
-                  Go to Explore Page
+                <Link href="/marketplace/mint" className="formbold-btn">
+                  Mint your NFT to see it in the Explore Page
                 </Link>
                 <button type="button" className="formbold-btn" onClick={resetCreationProcess}>
                   Create Another Collection

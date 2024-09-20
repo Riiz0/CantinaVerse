@@ -117,6 +117,29 @@ contract FactoryNFTContract is Ownable, ReentrancyGuard {
         return s_collections;
     }
 
+    function getCollectionDetails(address collectionAddress)
+        external
+        view
+        returns (
+            string memory name,
+            string memory symbol,
+            uint256 maxSupply,
+            address owner,
+            uint96 royaltyPercentage,
+            uint256 mintPrice
+        )
+    {
+        NFTContract collection = NFTContract(collectionAddress);
+        return (
+            collection.name(),
+            collection.symbol(),
+            collection.getMaxSupply(),
+            collection.owner(),
+            collection.getRoyaltyPercentage(),
+            collection.getMintPrice()
+        );
+    }
+
     /**
      * @notice Returns the current fee for creating a new NFT collection.
      * @dev Provides a view function to see the current fee required to create a new NFT collection.
