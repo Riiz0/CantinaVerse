@@ -25,10 +25,10 @@
       "static/chunks/main.js",
       "static/chunks/pages/_error.js"
     ],
-    "/marketplace/mint": [
+    "/marketplace": [
       "static/chunks/webpack.js",
       "static/chunks/main.js",
-      "static/chunks/pages/marketplace/mint.js"
+      "static/chunks/pages/marketplace.js"
     ]
   },
   "ampFirstPages": []
