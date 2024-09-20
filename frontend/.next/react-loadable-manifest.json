@@ -437,12 +437,6 @@
       "static/chunks/node_modules_walletconnect_modal-ui_dist_index_js.js"
     ]
   },
-  "node_modules/pinata/dist/index.mjs -> is-ipfs": {
-    "id": "node_modules/pinata/dist/index.mjs -> is-ipfs",
-    "files": [
-      "static/chunks/node_modules_is-ipfs_dist_src_index_js.js"
-    ]
-  },
   "node_modules/viem/_esm/actions/public/call.js -> ../../utils/ccip.js": {
     "id": "node_modules/viem/_esm/actions/public/call.js -> ../../utils/ccip.js",
     "files": [

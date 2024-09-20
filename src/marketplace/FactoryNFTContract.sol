@@ -93,6 +93,12 @@ contract FactoryNFTContract is Ownable, ReentrancyGuard {
         s_fee = _fee;
     }
 
+    /**
+     * @param recipient The address of the recipient.
+     * @param amount The amount to be withdrawn.
+     * @dev Withdraws the specified amount from the contract. Can only be called by the contract owner.
+     * @notice Withdraws the specified amount from the contract.
+     */
     function withdraw(address payable recipient, uint256 amount) external onlyOwner {
         if (recipient == address(0)) {
             revert FactoryNFTContract__CantBeZeroAddress();
@@ -117,6 +123,16 @@ contract FactoryNFTContract is Ownable, ReentrancyGuard {
         return s_collections;
     }
 
+    /**
+     * @param collectionAddress The address of the NFT collection.
+     * @notice Returns the details of the specified NFT collection.
+     * @return name The name of the NFT collection.
+     * @return symbol The symbol of the NFT collection.
+     * @return maxSupply The maximum number of NFTs that can be minted in the collection.
+     * @return owner The owner of the NFT collection.
+     * @return royaltyPercentage The royalty percentage for secondary sales.
+     * @return mintPrice The price for minting an NFT in the collection.
+     */
     function getCollectionDetails(address collectionAddress)
         external
         view
@@ -138,6 +154,14 @@ contract FactoryNFTContract is Ownable, ReentrancyGuard {
             collection.getRoyaltyPercentage(),
             collection.getMintPrice()
         );
+    }
+
+    /**
+     * @notice Returns the number of created NFT collections.
+     * @return The number of created NFT collections.
+     */
+    function getCollectionCount() external view returns (uint256) {
+        return s_collections.length;
     }
 
     /**
