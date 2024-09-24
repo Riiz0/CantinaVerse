@@ -448,8 +448,8 @@ export default function Create() {
             {isNFTCreated && (
               <div className="formbold-success-message">
                 <h2>NFT Collection Created Successfully!</h2>
-                <Link href="/marketplace/mint" className="formbold-btn">
-                  Mint your NFT to see it in the Explore Page
+                <Link href="/marketplace/explore" className="formbold-btn">
+                  Check out the Collection in the Explore Page!
                 </Link>
                 <button type="button" className="formbold-btn" onClick={resetCreationProcess}>
                   Create Another Collection
