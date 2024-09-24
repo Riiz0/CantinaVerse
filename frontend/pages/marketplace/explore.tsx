@@ -1,161 +1,83 @@
-'use client';
-
-import { useState, useEffect } from 'react';
-import { useReadContract, useAccount, useChainId } from 'wagmi';
+import { useState, useEffect, useCallback } from 'react';
+import { useWriteContract, useWaitForTransactionReceipt, useReadContract, useAccount, useChainId } from 'wagmi';
 import { factoryNFTContractABI } from '../../ABIs/factoryNFTContractABI';
+import { nftContractABI } from '../../ABIs/nftContractABI';
 import Header from '@/components/nftmarketplace/homepage/marketplaceHeader';
 import Link from 'next/link';
 import { Footer } from '../../components/pagesFooter';
-import Image from 'next/image';
 import { Button } from 'semantic-ui-react';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@radix-ui/react-dialog';
+import { ToastContainer } from 'react-toastify';
 
 type EthereumAddress = `0x${string}`;
 
-interface Collection {
+interface NFTCollection {
     address: string;
     name: string;
     symbol: string;
-    maxSupply: bigint;
+    maxSupply: number;
     owner: string;
-    royaltyPercentage: bigint;
-    mintPrice: bigint;
-    imageUrl: string;
+    royaltyPercentage: number;
+    mintPrice: number;
 }
 
 const contractAddresses: Record<number, EthereumAddress> = {
     5: '0xAEdF68cA921Fe00f09A9b358A613C60B76C88285',  // Sepolia Testnet
-    84532: '0x346BffBd42D024D64455210Bd67Dd9d0dd9D0294', // Base Testnet
+    84532: '0x879772088438A0e181448A945D350Eb8A93B5449', // Base Testnet
     11155420: '0xd19fD90fd1e0E0E4399D341DeaeFE18DE5565BFD', // OP Testnet
     // Add other network contract addresses here
 };
 
-type ABIOutput = {
-    name: string;
-    symbol: string;
-    maxSupply: bigint;
-    owner: string;
-    royaltyPercentage: bigint;
-    mintPrice: bigint;
-    imageUrl: string;
-};
-
-const TEMPORARY_IMAGE_URL = '/path/to/your/temporary/image.png';
-
 export default function Explore() {
-    const [collections, setCollections] = useState<Collection[]>([]);
+    const [collections, setCollections] = useState([] as { address: string; name: string; owner: string; symbol: string; mintPrice: number; maxSupply: number; royaltyPercentage: number; imageUrl: string; tempImageUrl: string }[]);
+    const [selectedCollection, setSelectedCollection] = useState<{ address: string; name: string; owner: string; symbol: string; mintPrice: number; maxSupply: number; royaltyPercentage: number; imageUrl: string; tempImageUrl: string } | null>(null);
+    const [filteredCollections, setFilteredCollections] = useState<{ address: string; name: string; owner: string; symbol: string; mintPrice: number; maxSupply: number; royaltyPercentage: number; imageUrl: string; tempImageUrl: string }[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
-    const [filteredCollections, setFilteredCollections] = useState<Collection[]>([]);
-    const [selectedCollection, setSelectedCollection] = useState<Collection | null>(null);
-    const [isMinting, setIsMinting] = useState(false);
-    const { address: connectedAddress } = useAccount();
     const chainId = useChainId();
-    const FACTORY_CONTRACT_ADDRESS = contractAddresses[chainId as keyof typeof contractAddresses] as `0x${string}`;
+    const FACTORY_CONTRACT_ADDRESS = contractAddresses[chainId as keyof typeof contractAddresses];
+    const TEMPORARY_IMAGE_URL = 'https://silver-selective-kite-794.mypinata.cloud/ipfs/QmNQq33D3Y1LhftVkHbVJZziuFLQuNLvFmSExwtEcKXcJx';
 
-    const { data: collectionAddresses } = useReadContract({
+    // Fetch all collections from the contract
+    const { data: collectionsData } = useReadContract({
         address: FACTORY_CONTRACT_ADDRESS,
         abi: factoryNFTContractABI,
-        functionName: 'getCollections',
-    });
+        functionName: 'getAllCollections',
+    }) as { data: NFTCollection[] | undefined };
 
-    const fetchTokenURI = async (collectionAddress: string) => {
-        try {
-            const result = await useReadContract({
-                address: collectionAddress as `0x${string}`,
-                abi: factoryNFTContractABI,
-                functionName: 'tokenURI',
-                args: [BigInt(0)],  // tokenId 0
-            });
-
-            if (typeof result === 'string') {
-                const response = await fetch(result);
-                const metadata = await response.json();
-                return metadata.image;
-            }
-        } catch (error) {
-            console.error(`Error fetching tokenURI for collection ${collectionAddress}:`, error);
+    useEffect(() => {
+        if (collectionsData) {
+            const parsedCollections = collectionsData.map((collection: NFTCollection) => ({
+                address: collection.address,
+                name: collection.name,
+                symbol: collection.symbol,
+                maxSupply: Number(collection.maxSupply), // Convert BigInt to number if necessary
+                owner: collection.owner,
+                royaltyPercentage: Number(collection.royaltyPercentage),
+                mintPrice: Number(collection.mintPrice),
+                imageUrl: TEMPORARY_IMAGE_URL,  // You can add logic to handle the image URL
+                tempImageUrl: TEMPORARY_IMAGE_URL,
+            }));
+            setCollections(parsedCollections);
         }
-        return TEMPORARY_IMAGE_URL;
-    };
+    }, [collectionsData]);
 
-    useEffect(() => {
-        const fetchCollectionDetails = async () => {
-            if (collectionAddresses && Array.isArray(collectionAddresses)) {
-                const detailsPromises = collectionAddresses.map(async (address) => {
-                    try {
-                        const result = await useReadContract({
-                            address: FACTORY_CONTRACT_ADDRESS,
-                            abi: factoryNFTContractABI,
-                            functionName: 'getCollectionDetails',
-                            args: [address],
-                        });
-
-                        // Check if result is an array and has at least 6 elements
-                        if (Array.isArray(result) && result.length >= 6) {
-                            return {
-                                address,
-                                name: result[0] as ABIOutput['name'],
-                                symbol: result[1] as ABIOutput['symbol'],
-                                maxSupply: BigInt(result[2]) as bigint,
-                                owner: result[3] as ABIOutput['owner'],
-                                royaltyPercentage: BigInt(result[4]) as bigint,
-                                mintPrice: BigInt(result[5]) as bigint,
-                            };
-                        }
-                        throw new Error('Invalid result structure');
-                    } catch (error) {
-                        console.error(`Error fetching collection details for ${address}:`, error);
-                        return null;
-                    }
-                });
-
-                const fetchedCollections = (await Promise.all(detailsPromises)).filter((c): c is Collection => c !== null);
-                setCollections(fetchedCollections);
-                setFilteredCollections(fetchedCollections);
-            }
-        };
-
-        fetchCollectionDetails();
-    }, [collectionAddresses, FACTORY_CONTRACT_ADDRESS]);
-
-    useEffect(() => {
-        const filtered = collections.filter(
-            (collection) =>
-                collection.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                collection.symbol.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                collection.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                collection.owner.toLowerCase().includes(searchTerm.toLowerCase())
+    const handleSearch = useCallback(() => {
+        const lowercasedTerm = searchTerm.toLowerCase();
+        const filtered = collections.filter((collection) =>
+            (collection.name && collection.name.toLowerCase().includes(lowercasedTerm)) ||
+            (collection.symbol && collection.symbol.toLowerCase().includes(lowercasedTerm)) ||
+            (collection.owner && collection.owner.toLowerCase().includes(lowercasedTerm)) ||
+            (collection.address && collection.address.toLowerCase().includes(lowercasedTerm))
         );
         setFilteredCollections(filtered);
     }, [searchTerm, collections]);
 
-    const handleCollectionClick = (collection: Collection) => {
+    useEffect(() => {
+        handleSearch();
+    }, [searchTerm, collections, handleSearch]);
+
+    const handleCollectionClick = (collection: { address: string; name: string; owner: string; symbol: string; mintPrice: number; maxSupply: number; royaltyPercentage: number; imageUrl: string; tempImageUrl: string }) => {
         setSelectedCollection(collection);
-    };
-
-    const handleMint = async () => {
-        if (!selectedCollection || !connectedAddress) return;
-
-        setIsMinting(true);
-        try {
-            // Generate a unique token URI (you might want to implement a more sophisticated method)
-            const tokenURI = `${selectedCollection.name}-${Date.now()}`;
-
-            await writeContractAsync({
-                address: selectedCollection.address as `0x${string}`,
-                abi: nftContractABI,
-                functionName: 'safeMint',
-                args: [connectedAddress, tokenURI],
-                value: selectedCollection.mintPrice
-            });
-
-            toast.success('NFT minted successfully!');
-        } catch (error) {
-            console.error('Minting error:', error);
-            toast.error('Failed to mint NFT. Please try again.');
-        } finally {
-            setIsMinting(false);
-        }
     };
 
     return (
@@ -176,10 +98,10 @@ export default function Explore() {
                     </div>
                     {filteredCollections.length > 0 ? (
                         <div className="grid-list">
-                            {filteredCollections.map((collection) => (
-                                <div key={collection.address} className="card" onClick={() => handleCollectionClick(collection)}>
+                            {filteredCollections.map((collection, index) => (
+                                <div key={`${collection.address}-${index}`} className="card" onClick={() => handleCollectionClick(collection)}>
                                     <figure className="card-banner">
-                                        <Image
+                                        <img
                                             src={collection.imageUrl || TEMPORARY_IMAGE_URL}
                                             alt={collection.name}
                                             width={300}
@@ -200,11 +122,12 @@ export default function Explore() {
                 </div>
             </div>
             <Footer />
+
             <Dialog open={!!selectedCollection} onOpenChange={() => setSelectedCollection(null)}>
                 <DialogContent>
                     <DialogTitle>{selectedCollection?.name}</DialogTitle>
                     <DialogDescription>
-                        <Image
+                        <img
                             src={selectedCollection?.imageUrl || TEMPORARY_IMAGE_URL}
                             alt={selectedCollection?.name || "Collection"}
                             width={300}
@@ -218,17 +141,21 @@ export default function Explore() {
                         <p>Royalty: {selectedCollection?.royaltyPercentage.toString()}%</p>
                         <p>Mint Price: {selectedCollection?.mintPrice.toString()} wei</p>
                         <div className="button-group">
-                            <Button asChild>
-                                <Link href={`/mint/${selectedCollection?.address}`}>Go to Mint Page</Link>
+                            <Button>
+                                <Link href={`/mint/${selectedCollection?.address}`}>
+                                    Go to Mint Page
+                                </Link>
                             </Button>
-                            <Button asChild>
-                                <a href={`https://blockscout.com/address/${selectedCollection?.address}`} target="_blank" rel="noopener noreferrer">View on Blockscout</a>
+                            <Button>
+                                <a href={`https://blockscout.com/address/${selectedCollection?.address}`} target="_blank" rel="noopener noreferrer">
+                                    View on Blockscout
+                                </a>
                             </Button>
                         </div>
                     </DialogDescription>
                 </DialogContent>
             </Dialog>
+            <ToastContainer />
         </main>
     );
 }
-

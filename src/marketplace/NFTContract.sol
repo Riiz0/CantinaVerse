@@ -123,8 +123,41 @@ contract NFTContract is ERC721, ERC2981, ERC721Enumerable, ERC721URIStorage, Own
         emit RoyaltyInfoUpdated(contractOwner, newRoyaltyPercentage);
     }
 
+    /**
+     *
+     * @param baseURI The new base URI for the NFT metadata.
+     * @dev Only callable by the contract owner.
+     * @notice Updates the base URI for the NFT metadata.
+     */
     function setBaseURI(string memory baseURI) external onlyOwner {
         s_baseURI = baseURI;
+    }
+
+    //////////////////////////////////////
+    // Internal/Private Functions       //
+    //////////////////////////////////////
+    /**
+     * @param _base The base string to be checked.
+     * @param _value The value string to be checked.
+     * @dev Returns true if _base starts with _value.
+     * @return bool True if _base starts with _value.
+     * @notice This function is used to check if a string starts with another string.
+     */
+    function _startsWith(string memory _base, string memory _value) internal pure returns (bool) {
+        bytes memory baseBytes = bytes(_base);
+        bytes memory valueBytes = bytes(_value);
+
+        if (baseBytes.length < valueBytes.length) {
+            return false;
+        }
+
+        for (uint256 i = 0; i < valueBytes.length; i++) {
+            if (baseBytes[i] != valueBytes[i]) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     //////////////////////////////////////
@@ -154,25 +187,13 @@ contract NFTContract is ERC721, ERC2981, ERC721Enumerable, ERC721URIStorage, Own
         return s_baseURI;
     }
 
+    /**
+     * @notice Returns the mint price for the NFT contract.
+     * @return uint256 The mint price for the NFT.
+     * @dev Only callable by the contract owner.
+     */
     function getMintPrice() external view returns (uint256) {
         return s_mintPrice;
-    }
-
-    function _startsWith(string memory _base, string memory _value) internal pure returns (bool) {
-        bytes memory baseBytes = bytes(_base);
-        bytes memory valueBytes = bytes(_value);
-
-        if (baseBytes.length < valueBytes.length) {
-            return false;
-        }
-
-        for (uint256 i = 0; i < valueBytes.length; i++) {
-            if (baseBytes[i] != valueBytes[i]) {
-                return false;
-            }
-        }
-
-        return true;
     }
 
     ////////////////////////////////////////////////////////////
