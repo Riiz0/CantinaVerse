@@ -85,7 +85,7 @@ contract FactoryNFTContractTest is Test {
     function testSuccessfulCreateCollection() public {
         vm.prank(OWNER);
         factory.createCollection(name, symbol, maxSupply, OWNER, royaltyPercentage, mintPrice);
-        assertEq(factory.getCollections().length, 1);
+        assertEq(factory.getAllCollections().length, 1);
     }
 
     function test_FactoryNFTContract__InsufficientFunds() public {
@@ -112,7 +112,7 @@ contract FactoryNFTContractTest is Test {
         factory.createCollection{ value: testPrice }(name, symbol, maxSupply, OWNER, royaltyPercentage, mintPrice);
         vm.stopPrank();
 
-        assertEq(factory.getCollections().length, 1);
+        assertEq(factory.getAllCollections().length, 1);
 
         vm.startPrank(address(1));
         factory.withdraw(PERSONAL, testPrice);
@@ -153,15 +153,6 @@ contract FactoryNFTContractTest is Test {
         vm.expectRevert(FactoryNFTContract.FactoryNFTContract__CantBeZeroAmount.selector);
         factory.withdraw(PERSONAL, 0);
         vm.stopPrank();
-    }
-
-    function testGetCollections() public {
-        vm.prank(OWNER);
-        factory.createCollection(name, symbol, maxSupply, OWNER, royaltyPercentage, mintPrice);
-        address expectedAddress = factory.getCollections()[0];
-        address[] memory collections = factory.getCollections();
-        assertEq(collections.length, 1, "Should have exactly one collection");
-        assertEq(expectedAddress, factory.getCollections()[0]);
     }
 
     function testSetFee() public {

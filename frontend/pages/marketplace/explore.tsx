@@ -22,7 +22,7 @@ interface NFTCollection {
 
 const contractAddresses: Record<number, EthereumAddress> = {
     5: '0xAEdF68cA921Fe00f09A9b358A613C60B76C88285',  // Sepolia Testnet
-    84532: '0x879772088438A0e181448A945D350Eb8A93B5449', // Base Testnet
+    84532: '0x407A99d44aE3AB58075BB2efd8Af7d174AFAe8cA', // Base Testnet
     11155420: '0xd19fD90fd1e0E0E4399D341DeaeFE18DE5565BFD', // OP Testnet
     // Add other network contract addresses here
 };

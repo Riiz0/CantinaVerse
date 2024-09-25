@@ -180,6 +180,11 @@ export const factoryNFTContractABI = [
             {
                 "components": [
                     {
+                        "internalType": "address",
+                        "name": "collectionAddress",
+                        "type": "address"
+                    },
+                    {
                         "internalType": "string",
                         "name": "name",
                         "type": "string"
@@ -230,6 +235,11 @@ export const factoryNFTContractABI = [
         "outputs": [
             {
                 "components": [
+                    {
+                        "internalType": "address",
+                        "name": "collectionAddress",
+                        "type": "address"
+                    },
                     {
                         "internalType": "string",
                         "name": "name",
