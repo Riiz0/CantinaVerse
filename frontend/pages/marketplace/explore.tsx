@@ -1,13 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useWriteContract, useWaitForTransactionReceipt, useReadContract, useAccount, useChainId } from 'wagmi';
+import { useReadContract, useChainId } from 'wagmi';
 import { factoryNFTContractABI } from '../../ABIs/factoryNFTContractABI';
-import { nftContractABI } from '../../ABIs/nftContractABI';
 import Header from '@/components/nftmarketplace/homepage/marketplaceHeader';
 import Link from 'next/link';
 import { Footer } from '../../components/pagesFooter';
 import { Button } from 'semantic-ui-react';
-import { Dialog, DialogContent, DialogTitle, DialogDescription } from '@radix-ui/react-dialog';
-import { ToastContainer } from 'react-toastify';
 
 type EthereumAddress = `0x${string}`;
 
@@ -19,6 +16,8 @@ interface NFTCollection {
     owner: string;
     royaltyPercentage: number;
     mintPrice: number;
+    imageUrl: string;
+    tempImageUrl: string;
 }
 
 const contractAddresses: Record<number, EthereumAddress> = {
@@ -28,14 +27,48 @@ const contractAddresses: Record<number, EthereumAddress> = {
     // Add other network contract addresses here
 };
 
+const TEMPORARY_IMAGE_URL = 'https://silver-selective-kite-794.mypinata.cloud/ipfs/QmNQq33D3Y1LhftVkHbVJZziuFLQuNLvFmSExwtEcKXcJx';
+
+interface CustomModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    collection: NFTCollection | null;
+}
+
+const CustomModal: React.FC<CustomModalProps> = ({ isOpen, onClose, collection }) => {
+    if (!isOpen || !collection) return null;
+
+    return (
+        <div className="modal-overlay" onClick={onClose}>
+            <div className="modal-content" onClick={e => e.stopPropagation()}>
+                <h2>{collection.name}</h2>
+                <img src={collection.imageUrl || TEMPORARY_IMAGE_URL} alt={collection.name} className="modal-image" />
+                <div className="modal-details">
+                    <p><span>Symbol:</span> <span>{collection.symbol}</span></p>
+                    <p><span>Contract:</span> <span>{collection.address}</span></p>
+                    <p><span>Owner:</span> <span>{collection.owner}</span></p>
+                    <p><span>Max Supply:</span> <span>{collection.maxSupply.toString()}</span></p>
+                    <p><span>Royalty:</span> <span>{collection.royaltyPercentage.toString()}%</span></p>
+                    <p><span>Mint Price:</span> <span>{collection.mintPrice.toString()} ETH</span></p>
+                </div>
+                <div className="button-group">
+                    <button className="mint-button" onClick={() => alert(`Minting ${collection.name}`)}>
+                        Mint NFT
+                    </button>
+                    <button className="close-button" onClick={onClose}>Close</button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
 export default function Explore() {
-    const [collections, setCollections] = useState([] as { address: string; name: string; owner: string; symbol: string; mintPrice: number; maxSupply: number; royaltyPercentage: number; imageUrl: string; tempImageUrl: string }[]);
-    const [selectedCollection, setSelectedCollection] = useState<{ address: string; name: string; owner: string; symbol: string; mintPrice: number; maxSupply: number; royaltyPercentage: number; imageUrl: string; tempImageUrl: string } | null>(null);
-    const [filteredCollections, setFilteredCollections] = useState<{ address: string; name: string; owner: string; symbol: string; mintPrice: number; maxSupply: number; royaltyPercentage: number; imageUrl: string; tempImageUrl: string }[]>([]);
+    const [collections, setCollections] = useState<NFTCollection[]>([]);
+    const [selectedCollection, setSelectedCollection] = useState<NFTCollection | null>(null);
+    const [filteredCollections, setFilteredCollections] = useState<NFTCollection[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
     const chainId = useChainId();
     const FACTORY_CONTRACT_ADDRESS = contractAddresses[chainId as keyof typeof contractAddresses];
-    const TEMPORARY_IMAGE_URL = 'https://silver-selective-kite-794.mypinata.cloud/ipfs/QmNQq33D3Y1LhftVkHbVJZziuFLQuNLvFmSExwtEcKXcJx';
 
     // Fetch all collections from the contract
     const { data: collectionsData } = useReadContract({
@@ -47,14 +80,11 @@ export default function Explore() {
     useEffect(() => {
         if (collectionsData) {
             const parsedCollections = collectionsData.map((collection: NFTCollection) => ({
-                address: collection.address,
-                name: collection.name,
-                symbol: collection.symbol,
-                maxSupply: Number(collection.maxSupply), // Convert BigInt to number if necessary
-                owner: collection.owner,
+                ...collection,
+                maxSupply: Number(collection.maxSupply),
                 royaltyPercentage: Number(collection.royaltyPercentage),
                 mintPrice: Number(collection.mintPrice),
-                imageUrl: TEMPORARY_IMAGE_URL,  // You can add logic to handle the image URL
+                imageUrl: TEMPORARY_IMAGE_URL,
                 tempImageUrl: TEMPORARY_IMAGE_URL,
             }));
             setCollections(parsedCollections);
@@ -76,7 +106,7 @@ export default function Explore() {
         handleSearch();
     }, [searchTerm, collections, handleSearch]);
 
-    const handleCollectionClick = (collection: { address: string; name: string; owner: string; symbol: string; mintPrice: number; maxSupply: number; royaltyPercentage: number; imageUrl: string; tempImageUrl: string }) => {
+    const handleCollectionClick = (collection: NFTCollection) => {
         setSelectedCollection(collection);
     };
 
@@ -99,63 +129,45 @@ export default function Explore() {
                     {filteredCollections.length > 0 ? (
                         <div className="grid-list">
                             {filteredCollections.map((collection, index) => (
-                                <div key={`${collection.address}-${index}`} className="card" onClick={() => handleCollectionClick(collection)}>
+                                <div key={`${collection.address}-${index}`}
+                                    className="card-explore"
+                                    onClick={() => handleCollectionClick(collection)}>
                                     <figure className="card-banner">
                                         <img
+                                            className="img-cover"
+                                            width="600" height="600"
+                                            loading="lazy"
                                             src={collection.imageUrl || TEMPORARY_IMAGE_URL}
                                             alt={collection.name}
-                                            width={300}
-                                            height={300}
-                                            className="img-cover"
                                         />
                                     </figure>
                                     <div className="card-content">
-                                        <h2 className="card-title">{collection.name}</h2>
-                                        <p>Symbol: {collection.symbol}</p>
+                                        <h2 className="h3 card-title margin-top">{collection.name}</h2>
+                                        <div className="wrapper">
+                                            <div className="wrapper-item gray-text-card-content">
+                                                Symbol: <span className="white-text-user-wallet">{collection.symbol}</span>
+                                            </div>
+                                            <div className="wrapper-item price-line">
+                                                <span className="white-text-user-wallet">{collection.mintPrice} ETH</span>
+                                                <span className="white-text-user-wallet">{collection.royaltyPercentage}%</span>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             ))}
                         </div>
                     ) : (
-                        <p className="noCollections">No collections found.</p>
+                        <div className="noCollections">No collections found.</div>
                     )}
                 </div>
             </div>
             <Footer />
 
-            <Dialog open={!!selectedCollection} onOpenChange={() => setSelectedCollection(null)}>
-                <DialogContent>
-                    <DialogTitle>{selectedCollection?.name}</DialogTitle>
-                    <DialogDescription>
-                        <img
-                            src={selectedCollection?.imageUrl || TEMPORARY_IMAGE_URL}
-                            alt={selectedCollection?.name || "Collection"}
-                            width={300}
-                            height={300}
-                            className="img-cover"
-                        />
-                        <p>Symbol: {selectedCollection?.symbol}</p>
-                        <p>Contract: {selectedCollection?.address}</p>
-                        <p>Owner: {selectedCollection?.owner}</p>
-                        <p>Max Supply: {selectedCollection?.maxSupply.toString()}</p>
-                        <p>Royalty: {selectedCollection?.royaltyPercentage.toString()}%</p>
-                        <p>Mint Price: {selectedCollection?.mintPrice.toString()} wei</p>
-                        <div className="button-group">
-                            <Button>
-                                <Link href={`/mint/${selectedCollection?.address}`}>
-                                    Go to Mint Page
-                                </Link>
-                            </Button>
-                            <Button>
-                                <a href={`https://blockscout.com/address/${selectedCollection?.address}`} target="_blank" rel="noopener noreferrer">
-                                    View on Blockscout
-                                </a>
-                            </Button>
-                        </div>
-                    </DialogDescription>
-                </DialogContent>
-            </Dialog>
-            <ToastContainer />
+            <CustomModal
+                isOpen={!!selectedCollection}
+                onClose={() => setSelectedCollection(null)}
+                collection={selectedCollection}
+            />
         </main>
     );
 }

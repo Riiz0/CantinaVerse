@@ -190,7 +190,6 @@ contract NFTContract is ERC721, ERC2981, ERC721Enumerable, ERC721URIStorage, Own
     /**
      * @notice Returns the mint price for the NFT contract.
      * @return uint256 The mint price for the NFT.
-     * @dev Only callable by the contract owner.
      */
     function getMintPrice() external view returns (uint256) {
         return s_mintPrice;

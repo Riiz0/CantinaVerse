@@ -24,6 +24,7 @@ contract FactoryNFTContract is Ownable, ReentrancyGuard {
     // State Variables  //
     //////////////////////
     struct NFTCollection {
+        address collectionAddress;
         string name;
         string symbol;
         uint256 maxSupply;
@@ -94,6 +95,7 @@ contract FactoryNFTContract is Ownable, ReentrancyGuard {
         s_collections.push(address(newCollection));
         s_collectionsDetails.push(
             NFTCollection({
+                collectionAddress: address(newCollection),
                 name: name,
                 symbol: symbol,
                 maxSupply: maxSupply,
