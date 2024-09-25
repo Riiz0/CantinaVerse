@@ -9,7 +9,7 @@ import { Button } from 'semantic-ui-react';
 type EthereumAddress = `0x${string}`;
 
 interface NFTCollection {
-    address: string;
+    collectionAddress: string;
     name: string;
     symbol: string;
     maxSupply: number;
@@ -23,7 +23,7 @@ interface NFTCollection {
 const contractAddresses: Record<number, EthereumAddress> = {
     5: '0xAEdF68cA921Fe00f09A9b358A613C60B76C88285',  // Sepolia Testnet
     84532: '0x407A99d44aE3AB58075BB2efd8Af7d174AFAe8cA', // Base Testnet
-    11155420: '0xd19fD90fd1e0E0E4399D341DeaeFE18DE5565BFD', // OP Testnet
+    11155420: '0xf802c833FE8864EAF41c512D66B7C56f5B85d710', // OP Testnet
     // Add other network contract addresses here
 };
 
@@ -45,7 +45,7 @@ const CustomModal: React.FC<CustomModalProps> = ({ isOpen, onClose, collection }
                 <img src={collection.imageUrl || TEMPORARY_IMAGE_URL} alt={collection.name} className="modal-image" />
                 <div className="modal-details">
                     <p><span>Symbol:</span> <span>{collection.symbol}</span></p>
-                    <p><span>Contract:</span> <span>{collection.address}</span></p>
+                    <p><span>Contract:</span> <span>{collection.collectionAddress}</span></p>
                     <p><span>Owner:</span> <span>{collection.owner}</span></p>
                     <p><span>Max Supply:</span> <span>{collection.maxSupply.toString()}</span></p>
                     <p><span>Royalty:</span> <span>{collection.royaltyPercentage.toString()}%</span></p>
@@ -80,8 +80,11 @@ export default function Explore() {
     useEffect(() => {
         if (collectionsData) {
             const parsedCollections = collectionsData.map((collection: NFTCollection) => ({
-                ...collection,
+                collectionAddress: collection.collectionAddress,
+                name: collection.name,
+                symbol: collection.symbol,
                 maxSupply: Number(collection.maxSupply),
+                owner: collection.owner,
                 royaltyPercentage: Number(collection.royaltyPercentage),
                 mintPrice: Number(collection.mintPrice),
                 imageUrl: TEMPORARY_IMAGE_URL,
@@ -97,7 +100,7 @@ export default function Explore() {
             (collection.name && collection.name.toLowerCase().includes(lowercasedTerm)) ||
             (collection.symbol && collection.symbol.toLowerCase().includes(lowercasedTerm)) ||
             (collection.owner && collection.owner.toLowerCase().includes(lowercasedTerm)) ||
-            (collection.address && collection.address.toLowerCase().includes(lowercasedTerm))
+            (collection.collectionAddress && collection.collectionAddress.toLowerCase().includes(lowercasedTerm))
         );
         setFilteredCollections(filtered);
     }, [searchTerm, collections]);
@@ -129,7 +132,7 @@ export default function Explore() {
                     {filteredCollections.length > 0 ? (
                         <div className="grid-list">
                             {filteredCollections.map((collection, index) => (
-                                <div key={`${collection.address}-${index}`}
+                                <div key={`${collection.collectionAddress}-${index}`}
                                     className="card-explore"
                                     onClick={() => handleCollectionClick(collection)}>
                                     <figure className="card-banner">

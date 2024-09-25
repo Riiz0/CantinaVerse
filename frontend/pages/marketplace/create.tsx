@@ -14,7 +14,7 @@ type EthereumAddress = `0x${string}`;
 const contractAddresses: Record<number, EthereumAddress> = {
   5: '0xAEdF68cA921Fe00f09A9b358A613C60B76C88285',  // Sepolia Testnet
   84532: '0x407A99d44aE3AB58075BB2efd8Af7d174AFAe8cA', // Base Testnet
-  11155420: '0xd19fD90fd1e0E0E4399D341DeaeFE18DE5565BFD', // OP Testnet
+  11155420: '0xf802c833FE8864EAF41c512D66B7C56f5B85d710', // OP Testnet
   // Add other network contract addresses here
 };
 

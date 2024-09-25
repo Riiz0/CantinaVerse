@@ -446,8 +446,8 @@
   "node_modules/viem/_esm/actions/public/call.js -> ../../utils/ccip.js": {
     "id": "node_modules/viem/_esm/actions/public/call.js -> ../../utils/ccip.js",
     "files": [
-      "static/chunks/node_modules_viem__esm_utils_ccip_js.js",
-      "static/chunks/_app-pages-browser_node_modules_viem__esm_utils_ccip_js.js"
+      "static/chunks/_app-pages-browser_node_modules_viem__esm_utils_ccip_js.js",
+      "static/chunks/node_modules_viem__esm_utils_ccip_js.js"
     ]
   },
   "node_modules/viem/_esm/utils/rpc/webSocket.js -> isows": {
