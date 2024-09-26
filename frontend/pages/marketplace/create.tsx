@@ -13,7 +13,7 @@ type EthereumAddress = `0x${string}`;
 
 const contractAddresses: Record<number, EthereumAddress> = {
   5: '0xAEdF68cA921Fe00f09A9b358A613C60B76C88285',  // Sepolia Testnet
-  84532: '0x407A99d44aE3AB58075BB2efd8Af7d174AFAe8cA', // Base Testnet
+  84532: '0x156b0e52cE557A0E489944f46Bd849BBD81345E5', // Base Testnet
   11155420: '0xf802c833FE8864EAF41c512D66B7C56f5B85d710', // OP Testnet
   // Add other network contract addresses here
 };
@@ -120,20 +120,11 @@ export default function Create() {
     }
   };
 
-  function sanitizeFilename(filename: string): string {
-    return filename.replace(/[^a-z0-9\._-]/gi, '').replace(/\.{2,}/g, '.').replace(/\.+/g, '.').replace(/\/+/g, '/').substring(0, 255);
-  }
-
   const uploadMetadata = async () => {
     if (!imageCid || !description) {
       setError('Image must be uploaded first.');
       return null;
     }
-    // Extract filename from the image CID
-    const imageFilename = imageCid.split('/').pop() || 'default.json';
-
-    // Sanitize the filename
-    const sanitizedFilename = sanitizeFilename(imageFilename);
 
     const metadata = {
       name: name,
@@ -148,8 +139,8 @@ export default function Create() {
       const upload = await pinata.upload.json(metadata).key(keyData.JWT);
 
       // Set the metadata CID using the sanitized filename
-      setMetadataCid(`${sanitizedFilename}-${upload.IpfsHash}`);
-      return `${sanitizedFilename}-${upload.IpfsHash}`;
+      setMetadataCid(upload.IpfsHash);
+      return upload.IpfsHash;
     } catch (e) {
       console.error(e);
       setError("Trouble uploading metadata");
@@ -177,7 +168,8 @@ export default function Create() {
           BigInt(maxSupply),
           connectedAddress,
           BigInt(royaltyPercentage),
-          parseEther(mintPrice)
+          parseEther(mintPrice),
+          metadataCid
         ],
         value: contractFee,
       });

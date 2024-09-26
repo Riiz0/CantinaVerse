@@ -31,6 +31,7 @@ contract FactoryNFTContract is Ownable, ReentrancyGuard {
         address owner;
         uint96 royaltyPercentage;
         uint256 mintPrice;
+        string metadataURI;
     }
 
     NFTCollection[] private s_collectionsDetails; // Stores details of all created NFT collections.
@@ -47,7 +48,8 @@ contract FactoryNFTContract is Ownable, ReentrancyGuard {
         uint256 maxSupply,
         address owner,
         uint96 royaltyPercentage,
-        uint256 mintPrice
+        uint256 mintPrice,
+        string metadataURI
     );
 
     //////////////////
@@ -82,7 +84,8 @@ contract FactoryNFTContract is Ownable, ReentrancyGuard {
         uint256 maxSupply,
         address owner,
         uint96 royaltyPercentage,
-        uint256 mintPrice
+        uint256 mintPrice,
+        string memory metadataURI
     )
         external
         payable
@@ -91,7 +94,8 @@ contract FactoryNFTContract is Ownable, ReentrancyGuard {
         if (msg.value != s_fee) {
             revert FactoryNFTContract__InsufficientFunds();
         }
-        NFTContract newCollection = new NFTContract(name, symbol, maxSupply, msg.sender, royaltyPercentage, mintPrice);
+        NFTContract newCollection =
+            new NFTContract(name, symbol, maxSupply, msg.sender, royaltyPercentage, mintPrice, metadataURI);
         s_collections.push(address(newCollection));
         s_collectionsDetails.push(
             NFTCollection({
@@ -101,10 +105,13 @@ contract FactoryNFTContract is Ownable, ReentrancyGuard {
                 maxSupply: maxSupply,
                 owner: msg.sender, // The address that deployed the collection
                 royaltyPercentage: royaltyPercentage,
-                mintPrice: mintPrice
+                mintPrice: mintPrice,
+                metadataURI: metadataURI
             })
         );
-        emit CollectionCreated(address(newCollection), name, symbol, maxSupply, owner, royaltyPercentage, mintPrice);
+        emit CollectionCreated(
+            address(newCollection), name, symbol, maxSupply, owner, royaltyPercentage, mintPrice, metadataURI
+        );
     }
 
     /**

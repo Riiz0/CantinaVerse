@@ -446,8 +446,8 @@
   "node_modules/viem/_esm/actions/public/call.js -> ../../utils/ccip.js": {
     "id": "node_modules/viem/_esm/actions/public/call.js -> ../../utils/ccip.js",
     "files": [
-      "static/chunks/_app-pages-browser_node_modules_viem__esm_utils_ccip_js.js",
-      "static/chunks/node_modules_viem__esm_utils_ccip_js.js"
+      "static/chunks/node_modules_viem__esm_utils_ccip_js.js",
+      "static/chunks/_app-pages-browser_node_modules_viem__esm_utils_ccip_js.js"
     ]
   },
   "node_modules/viem/_esm/utils/rpc/webSocket.js -> isows": {
@@ -457,5 +457,17 @@
   "node_modules/viem/_esm/utils/signature/recoverPublicKey.js -> @noble/curves/secp256k1": {
     "id": "node_modules/viem/_esm/utils/signature/recoverPublicKey.js -> @noble/curves/secp256k1",
     "files": []
+  },
+  "pages/marketplace.tsx -> ../components/nftmarketplace/homepage/MainSection": {
+    "id": "pages/marketplace.tsx -> ../components/nftmarketplace/homepage/MainSection",
+    "files": [
+      "static/chunks/components_nftmarketplace_homepage_MainSection_tsx.js"
+    ]
+  },
+  "pages/marketplace.tsx -> ../components/nftmarketplace/homepage/marketplaceHeader": {
+    "id": "pages/marketplace.tsx -> ../components/nftmarketplace/homepage/marketplaceHeader",
+    "files": [
+      "static/chunks/components_nftmarketplace_homepage_marketplaceHeader_tsx.js"
+    ]
   }
 }

@@ -111,6 +111,12 @@ export const factoryNFTContractABI = [
                 "internalType": "uint256",
                 "name": "mintPrice",
                 "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "string",
+                "name": "metadataURI",
+                "type": "string"
             }
         ],
         "name": "CollectionCreated",
@@ -166,6 +172,11 @@ export const factoryNFTContractABI = [
                 "internalType": "uint256",
                 "name": "mintPrice",
                 "type": "uint256"
+            },
+            {
+                "internalType": "string",
+                "name": "metadataURI",
+                "type": "string"
             }
         ],
         "name": "createCollection",
@@ -213,6 +224,11 @@ export const factoryNFTContractABI = [
                         "internalType": "uint256",
                         "name": "mintPrice",
                         "type": "uint256"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "metadataURI",
+                        "type": "string"
                     }
                 ],
                 "internalType": "struct FactoryNFTContract.NFTCollection[]",
@@ -269,6 +285,11 @@ export const factoryNFTContractABI = [
                         "internalType": "uint256",
                         "name": "mintPrice",
                         "type": "uint256"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "metadataURI",
+                        "type": "string"
                     }
                 ],
                 "internalType": "struct FactoryNFTContract.NFTCollection",

@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useReadContract, useChainId } from 'wagmi';
+import { useReadContract, useWriteContract, useWaitForTransactionReceipt, useAccount, useChainId } from 'wagmi';
 import { factoryNFTContractABI } from '../../ABIs/factoryNFTContractABI';
+import { nftContractABI } from '@/ABIs/nftContractABI';
 import Header from '@/components/nftmarketplace/homepage/marketplaceHeader';
-import Link from 'next/link';
 import { Footer } from '../../components/pagesFooter';
-import { Button } from 'semantic-ui-react';
+import { parseEther } from 'viem';
 
 type EthereumAddress = `0x${string}`;
 
@@ -18,11 +18,12 @@ interface NFTCollection {
     mintPrice: number;
     imageUrl: string;
     tempImageUrl: string;
+    metadataURI: string;
 }
 
 const contractAddresses: Record<number, EthereumAddress> = {
     5: '0xAEdF68cA921Fe00f09A9b358A613C60B76C88285',  // Sepolia Testnet
-    84532: '0x407A99d44aE3AB58075BB2efd8Af7d174AFAe8cA', // Base Testnet
+    84532: '0x156b0e52cE557A0E489944f46Bd849BBD81345E5', // Base Testnet
     11155420: '0xf802c833FE8864EAF41c512D66B7C56f5B85d710', // OP Testnet
     // Add other network contract addresses here
 };
@@ -33,9 +34,10 @@ interface CustomModalProps {
     isOpen: boolean;
     onClose: () => void;
     collection: NFTCollection | null;
+    onMint: (collection: NFTCollection) => void;
 }
 
-const CustomModal: React.FC<CustomModalProps> = ({ isOpen, onClose, collection }) => {
+const CustomModal: React.FC<CustomModalProps> = ({ isOpen, onClose, collection, onMint }) => {
     if (!isOpen || !collection) return null;
 
     return (
@@ -52,7 +54,7 @@ const CustomModal: React.FC<CustomModalProps> = ({ isOpen, onClose, collection }
                     <p><span>Mint Price:</span> <span>{collection.mintPrice.toString()} ETH</span></p>
                 </div>
                 <div className="button-group">
-                    <button className="mint-button" onClick={() => alert(`Minting ${collection.name}`)}>
+                    <button className="mint-button" onClick={() => onMint(collection)}>
                         Mint NFT
                     </button>
                     <button className="close-button" onClick={onClose}>Close</button>
@@ -68,7 +70,21 @@ export default function Explore() {
     const [filteredCollections, setFilteredCollections] = useState<NFTCollection[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
     const chainId = useChainId();
+    const { address } = useAccount();
+    const { writeContract, data: mintTxData } = useWriteContract();
+    const { isLoading: isMintLoading, isSuccess: isMintSuccess } = useWaitForTransactionReceipt({
+        hash: mintTxData,
+    });
     const FACTORY_CONTRACT_ADDRESS = contractAddresses[chainId as keyof typeof contractAddresses];
+
+    const fetchBaseURI = async (collectionAddress: string) => {
+        const baseURI = useReadContract({
+            address: collectionAddress as `0x${string}`,
+            abi: nftContractABI,
+            functionName: 'getBaseURI',
+        });
+        return baseURI;
+    };
 
     // Fetch all collections from the contract
     const { data: collectionsData } = useReadContract({
@@ -89,6 +105,7 @@ export default function Explore() {
                 mintPrice: Number(collection.mintPrice),
                 imageUrl: TEMPORARY_IMAGE_URL,
                 tempImageUrl: TEMPORARY_IMAGE_URL,
+                metadataURI: collection.metadataURI,
             }));
             setCollections(parsedCollections);
         }
@@ -112,6 +129,32 @@ export default function Explore() {
     const handleCollectionClick = (collection: NFTCollection) => {
         setSelectedCollection(collection);
     };
+
+    const handleMint = useCallback((collection: NFTCollection) => {
+        if (!address) {
+            alert("Please connect your wallet to mint an NFT.");
+            return;
+        }
+
+        // Ensure you pass the correct URI for the NFT
+        const metadataURI = collection.metadataURI || TEMPORARY_IMAGE_URL;
+
+        writeContract({
+            address: collection.collectionAddress as `0x${string}`,
+            abi: nftContractABI,
+            functionName: 'safeMint',
+            args: [address, metadataURI],  // Pass in the correct 'to' address and metadata URI
+            value: parseEther(collection.mintPrice.toString()),  // Send the required mint price in ETH
+        });
+    }, [address, writeContract]);
+
+
+    useEffect(() => {
+        if (isMintSuccess) {
+            alert("NFT minted successfully!");
+            setSelectedCollection(null);
+        }
+    }, [isMintSuccess]);
 
     return (
         <main>
@@ -170,7 +213,10 @@ export default function Explore() {
                 isOpen={!!selectedCollection}
                 onClose={() => setSelectedCollection(null)}
                 collection={selectedCollection}
+                onMint={handleMint}
             />
+
+            {isMintLoading && <div className="loading-overlay">Minting in progress...</div>}
         </main>
     );
 }

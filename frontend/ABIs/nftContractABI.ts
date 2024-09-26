@@ -30,6 +30,11 @@ export const nftContractABI = [
                 "internalType": "uint256",
                 "name": "mintPrice",
                 "type": "uint256"
+            },
+            {
+                "internalType": "string",
+                "name": "metadataURI",
+                "type": "string"
             }
         ],
         "stateMutability": "nonpayable",
