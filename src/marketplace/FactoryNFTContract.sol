@@ -18,10 +18,23 @@ contract FactoryNFTContract is Ownable, ReentrancyGuard {
     error FactoryNFTContract__CantBeZeroAddress();
     error FactoryNFTContract__CantBeZeroAmount();
     error FactoryNFTContract__TransferFailed();
+    error FactoryNFTContract__IndexOutOfBounds();
 
     //////////////////////
     // State Variables  //
     //////////////////////
+    struct NFTCollection {
+        address collectionAddress;
+        string name;
+        string symbol;
+        uint256 maxSupply;
+        address owner;
+        uint96 royaltyPercentage;
+        uint256 mintPrice;
+        string metadataURI;
+    }
+
+    NFTCollection[] private s_collectionsDetails; // Stores details of all created NFT collections.
     address[] private s_collections; // Stores addresses of all created NFT collections.
     uint256 private s_fee; // Fee required to create a new NFT collection.
 
@@ -35,7 +48,8 @@ contract FactoryNFTContract is Ownable, ReentrancyGuard {
         uint256 maxSupply,
         address owner,
         uint96 royaltyPercentage,
-        uint256 mintPrice
+        uint256 mintPrice,
+        string metadataURI
     );
 
     //////////////////
@@ -70,7 +84,8 @@ contract FactoryNFTContract is Ownable, ReentrancyGuard {
         uint256 maxSupply,
         address owner,
         uint96 royaltyPercentage,
-        uint256 mintPrice
+        uint256 mintPrice,
+        string memory metadataURI
     )
         external
         payable
@@ -79,9 +94,24 @@ contract FactoryNFTContract is Ownable, ReentrancyGuard {
         if (msg.value != s_fee) {
             revert FactoryNFTContract__InsufficientFunds();
         }
-        NFTContract newCollection = new NFTContract(name, symbol, maxSupply, msg.sender, royaltyPercentage, mintPrice);
+        NFTContract newCollection =
+            new NFTContract(name, symbol, maxSupply, msg.sender, royaltyPercentage, mintPrice, metadataURI);
         s_collections.push(address(newCollection));
-        emit CollectionCreated(address(newCollection), name, symbol, maxSupply, owner, royaltyPercentage, mintPrice);
+        s_collectionsDetails.push(
+            NFTCollection({
+                collectionAddress: address(newCollection),
+                name: name,
+                symbol: symbol,
+                maxSupply: maxSupply,
+                owner: msg.sender, // The address that deployed the collection
+                royaltyPercentage: royaltyPercentage,
+                mintPrice: mintPrice,
+                metadataURI: metadataURI
+            })
+        );
+        emit CollectionCreated(
+            address(newCollection), name, symbol, maxSupply, owner, royaltyPercentage, mintPrice, metadataURI
+        );
     }
 
     /**
@@ -115,53 +145,25 @@ contract FactoryNFTContract is Ownable, ReentrancyGuard {
     // Public/External View Functions   //
     //////////////////////////////////////
     /**
-     * @notice Returns the addresses of all created NFT collections.
-     * @dev Provides a view function to list all NFT collection addresses stored in the contract.
-     * @return An array of addresses representing the NFT collections created through this contract.
+     * @notice Returns the details of all created NFT collections.
+     * @dev Provides a view function to see the details of all created NFT collections.
+     * @return The details of all created NFT collections.
      */
-    function getCollections() external view returns (address[] memory) {
-        return s_collections;
+    function getAllCollections() external view returns (NFTCollection[] memory) {
+        return s_collectionsDetails;
     }
 
     /**
-     * @param collectionAddress The address of the NFT collection.
+     * @param index The index of the NFT collection.
      * @notice Returns the details of the specified NFT collection.
-     * @return name The name of the NFT collection.
-     * @return symbol The symbol of the NFT collection.
-     * @return maxSupply The maximum number of NFTs that can be minted in the collection.
-     * @return owner The owner of the NFT collection.
-     * @return royaltyPercentage The royalty percentage for secondary sales.
-     * @return mintPrice The price for minting an NFT in the collection.
+     * @dev Provides a view function to see the details of the specified NFT collection.
+     * @return The details of the specified NFT collection.
      */
-    function getCollectionDetails(address collectionAddress)
-        external
-        view
-        returns (
-            string memory name,
-            string memory symbol,
-            uint256 maxSupply,
-            address owner,
-            uint96 royaltyPercentage,
-            uint256 mintPrice
-        )
-    {
-        NFTContract collection = NFTContract(collectionAddress);
-        return (
-            collection.name(),
-            collection.symbol(),
-            collection.getMaxSupply(),
-            collection.owner(),
-            collection.getRoyaltyPercentage(),
-            collection.getMintPrice()
-        );
-    }
-
-    /**
-     * @notice Returns the number of created NFT collections.
-     * @return The number of created NFT collections.
-     */
-    function getCollectionCount() external view returns (uint256) {
-        return s_collections.length;
+    function getCollectionDetails(uint256 index) external view returns (NFTCollection memory) {
+        if (index >= s_collectionsDetails.length) {
+            revert FactoryNFTContract__IndexOutOfBounds();
+        }
+        return s_collectionsDetails[index];
     }
 
     /**

@@ -31,6 +31,7 @@ contract NFTContract is ERC721, ERC2981, ERC721Enumerable, ERC721URIStorage, Own
     //////////////////////
     uint256 private s_nextTokenId;
     string private s_baseURI = "https://silver-selective-kite-794.mypinata.cloud/ipfs/";
+    string private s_metadataURI;
     uint256 private immutable i_maxSupply;
     uint96 private constant MAX_ROYALTY_PERCENTAGE = 3000; // 30% => (30 / 100) * 10000 = 3000
     uint96 private s_royaltyPercentage;
@@ -53,6 +54,8 @@ contract NFTContract is ERC721, ERC2981, ERC721Enumerable, ERC721URIStorage, Own
      * @param maxSupply Maximum number of tokens that can be minted.
      * @param initialOwner Address of the initial owner, who is also set as the default royalty recipient.
      * @param royaltyPercentage Initial royalty percentage for secondary sales.
+     * @param mintPrice Price for minting an NFT.
+     * @param metadataURI URI for the NFT metadata.
      */
     constructor(
         string memory name,
@@ -60,7 +63,8 @@ contract NFTContract is ERC721, ERC2981, ERC721Enumerable, ERC721URIStorage, Own
         uint256 maxSupply,
         address initialOwner,
         uint96 royaltyPercentage,
-        uint256 mintPrice
+        uint256 mintPrice,
+        string memory metadataURI
     )
         ERC721(name, symbol)
         Ownable(initialOwner)
@@ -72,6 +76,7 @@ contract NFTContract is ERC721, ERC2981, ERC721Enumerable, ERC721URIStorage, Own
         s_royaltyPercentage = royaltyPercentage;
         _setDefaultRoyalty(initialOwner, s_royaltyPercentage);
         s_mintPrice = mintPrice;
+        s_metadataURI = metadataURI;
     }
 
     /////////////////////////////////
@@ -123,8 +128,41 @@ contract NFTContract is ERC721, ERC2981, ERC721Enumerable, ERC721URIStorage, Own
         emit RoyaltyInfoUpdated(contractOwner, newRoyaltyPercentage);
     }
 
+    /**
+     *
+     * @param baseURI The new base URI for the NFT metadata.
+     * @dev Only callable by the contract owner.
+     * @notice Updates the base URI for the NFT metadata.
+     */
     function setBaseURI(string memory baseURI) external onlyOwner {
         s_baseURI = baseURI;
+    }
+
+    //////////////////////////////////////
+    // Internal/Private Functions       //
+    //////////////////////////////////////
+    /**
+     * @param _base The base string to be checked.
+     * @param _value The value string to be checked.
+     * @dev Returns true if _base starts with _value.
+     * @return bool True if _base starts with _value.
+     * @notice This function is used to check if a string starts with another string.
+     */
+    function _startsWith(string memory _base, string memory _value) internal pure returns (bool) {
+        bytes memory baseBytes = bytes(_base);
+        bytes memory valueBytes = bytes(_value);
+
+        if (baseBytes.length < valueBytes.length) {
+            return false;
+        }
+
+        for (uint256 i = 0; i < valueBytes.length; i++) {
+            if (baseBytes[i] != valueBytes[i]) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     //////////////////////////////////////
@@ -154,25 +192,12 @@ contract NFTContract is ERC721, ERC2981, ERC721Enumerable, ERC721URIStorage, Own
         return s_baseURI;
     }
 
+    /**
+     * @notice Returns the mint price for the NFT contract.
+     * @return uint256 The mint price for the NFT.
+     */
     function getMintPrice() external view returns (uint256) {
         return s_mintPrice;
-    }
-
-    function _startsWith(string memory _base, string memory _value) internal pure returns (bool) {
-        bytes memory baseBytes = bytes(_base);
-        bytes memory valueBytes = bytes(_value);
-
-        if (baseBytes.length < valueBytes.length) {
-            return false;
-        }
-
-        for (uint256 i = 0; i < valueBytes.length; i++) {
-            if (baseBytes[i] != valueBytes[i]) {
-                return false;
-            }
-        }
-
-        return true;
     }
 
     ////////////////////////////////////////////////////////////

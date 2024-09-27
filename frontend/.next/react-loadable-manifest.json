@@ -451,17 +451,5 @@
   "node_modules/viem/_esm/utils/signature/recoverPublicKey.js -> @noble/curves/secp256k1": {
     "id": "node_modules/viem/_esm/utils/signature/recoverPublicKey.js -> @noble/curves/secp256k1",
     "files": []
-  },
-  "pages/marketplace.tsx -> ../components/nftmarketplace/homepage/MainSection": {
-    "id": "pages/marketplace.tsx -> ../components/nftmarketplace/homepage/MainSection",
-    "files": [
-      "static/chunks/components_nftmarketplace_homepage_MainSection_tsx.js"
-    ]
-  },
-  "pages/marketplace.tsx -> ../components/nftmarketplace/homepage/marketplaceHeader": {
-    "id": "pages/marketplace.tsx -> ../components/nftmarketplace/homepage/marketplaceHeader",
-    "files": [
-      "static/chunks/components_nftmarketplace_homepage_marketplaceHeader_tsx.js"
-    ]
   }
 }

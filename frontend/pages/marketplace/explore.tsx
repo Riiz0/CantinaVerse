@@ -1,135 +1,204 @@
-'use client';
-
-import { useState, useEffect } from 'react';
-import { useReadContract, useAccount, useChainId } from 'wagmi';
+import { useState, useEffect, useCallback } from 'react';
+import { useReadContract, useWriteContract, useWaitForTransactionReceipt, useAccount, useChainId } from 'wagmi';
 import { factoryNFTContractABI } from '../../ABIs/factoryNFTContractABI';
+import { nftContractABI } from '@/ABIs/nftContractABI';
 import Header from '@/components/nftmarketplace/homepage/marketplaceHeader';
-import Link from 'next/link';
 import { Footer } from '../../components/pagesFooter';
-import Image from 'next/image';
+import { parseEther } from 'viem';
 
 type EthereumAddress = `0x${string}`;
 
-interface Collection {
-    address: string;
+interface NFTCollection {
+    collectionAddress: string;
     name: string;
     symbol: string;
-    maxSupply: bigint;
+    maxSupply: number;
     owner: string;
-    royaltyPercentage: bigint;
-    mintPrice: bigint;
+    royaltyPercentage: number;
+    mintPrice: number;
+    imageUrl: string;
+    metadataURI: string;
 }
 
 const contractAddresses: Record<number, EthereumAddress> = {
     5: '0xAEdF68cA921Fe00f09A9b358A613C60B76C88285',  // Sepolia Testnet
-    84532: '0x346BffBd42D024D64455210Bd67Dd9d0dd9D0294', // Base Testnet
-    11155420: '0xd19fD90fd1e0E0E4399D341DeaeFE18DE5565BFD', // OP Testnet
+    84532: '0x156b0e52cE557A0E489944f46Bd849BBD81345E5', // Base Testnet
+    11155420: '0xf802c833FE8864EAF41c512D66B7C56f5B85d710', // OP Testnet
     // Add other network contract addresses here
 };
 
-type ABIOutput = {
-    name: string;
-    symbol: string;
-    maxSupply: bigint;
-    owner: string;
-    royaltyPercentage: bigint;
-    mintPrice: bigint;
-    imageUrl: string;
+const TEMPORARY_IMAGE_URL = 'https://silver-selective-kite-794.mypinata.cloud/ipfs/QmNQq33D3Y1LhftVkHbVJZziuFLQuNLvFmSExwtEcKXcJx';
+
+interface CustomModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    collection: NFTCollection | null;
+    onMint: (collection: NFTCollection) => void;
+}
+
+const CustomModal: React.FC<CustomModalProps> = ({ isOpen, onClose, collection, onMint }) => {
+    if (!isOpen || !collection) return null;
+
+    return (
+        <div className="modal-overlay" onClick={onClose}>
+            <div className="modal-content" onClick={e => e.stopPropagation()}>
+                <h2>{collection.name}</h2>
+                <img src={collection.imageUrl || TEMPORARY_IMAGE_URL} alt={collection.name} className="modal-image" />
+                <div className="modal-details">
+                    <p><span>Symbol:</span> <span>{collection.symbol}</span></p>
+                    <p><span>Contract:</span> <span>{collection.collectionAddress}</span></p>
+                    <p><span>Owner:</span> <span>{collection.owner}</span></p>
+                    <p><span>Max Supply:</span> <span>{collection.maxSupply.toString()}</span></p>
+                    <p><span>Royalty:</span> <span>{collection.royaltyPercentage.toString()}%</span></p>
+                    <p><span>Mint Price:</span> <span>{collection.mintPrice.toString()} ETH</span></p>
+                </div>
+                <div className="button-group">
+                    <button className="mint-button" onClick={() => onMint(collection)}>
+                        Mint NFT
+                    </button>
+                    <button className="close-button" onClick={onClose}>Close</button>
+                </div>
+            </div>
+        </div>
+    );
 };
 
-const TEMPORARY_IMAGE_URL = '/path/to/your/temporary/image.png';
-
 export default function Explore() {
-    const [collections, setCollections] = useState<Collection[]>([]);
+    const [collections, setCollections] = useState<NFTCollection[]>([]);
+    const [selectedCollection, setSelectedCollection] = useState<NFTCollection | null>(null);
+    const [filteredCollections, setFilteredCollections] = useState<NFTCollection[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
-    const [filteredCollections, setFilteredCollections] = useState<Collection[]>([]);
-    const { address: connectedAddress } = useAccount();
     const chainId = useChainId();
-    const FACTORY_CONTRACT_ADDRESS = contractAddresses[chainId as keyof typeof contractAddresses] as `0x${string}`;
+    const { address } = useAccount();
+    const { writeContract } = useWriteContract();
+    const [txHash, setTxHash] = useState<`0x${string}` | undefined>(undefined);
+    const { data: receipt, isLoading: isMintLoading, isSuccess: isMintSuccess } = useWaitForTransactionReceipt({
+        hash: txHash,
+    });
+    const FACTORY_CONTRACT_ADDRESS = contractAddresses[chainId as keyof typeof contractAddresses];
 
-    const { data: collectionAddresses } = useReadContract({
+    const { data: collectionsData } = useReadContract({
         address: FACTORY_CONTRACT_ADDRESS,
         abi: factoryNFTContractABI,
-        functionName: 'getCollections',
-    });
+        functionName: 'getAllCollections',
+    }) as { data: NFTCollection[] | undefined };
 
-    const fetchTokenURI = async (collectionAddress: string) => {
-        try {
-            const result = await useReadContract({
-                address: collectionAddress as `0x${string}`,
-                abi: factoryNFTContractABI,
-                functionName: 'tokenURI',
-                args: [BigInt(0)],  // tokenId 0
-            });
-
-            if (typeof result === 'string') {
-                const response = await fetch(result);
-                const metadata = await response.json();
-                return metadata.image;
-            }
-        } catch (error) {
-            console.error(`Error fetching tokenURI for collection ${collectionAddress}:`, error);
-        }
-        return TEMPORARY_IMAGE_URL;
-    };
-
-    useEffect(() => {
-        const fetchCollectionDetails = async () => {
-            if (collectionAddresses && Array.isArray(collectionAddresses)) {
-                const detailsPromises = collectionAddresses.map(async (address) => {
-                    try {
-                        const result = await useReadContract({
-                            address: FACTORY_CONTRACT_ADDRESS,
-                            abi: factoryNFTContractABI,
-                            functionName: 'getCollectionDetails',
-                            args: [address],
-                        });
-
-                        // Check if result is an array and has at least 6 elements
-                        if (Array.isArray(result) && result.length >= 6) {
-                            return {
-                                address,
-                                name: result[0] as ABIOutput['name'],
-                                symbol: result[1] as ABIOutput['symbol'],
-                                maxSupply: BigInt(result[2]) as bigint,
-                                owner: result[3] as ABIOutput['owner'],
-                                royaltyPercentage: BigInt(result[4]) as bigint,
-                                mintPrice: BigInt(result[5]) as bigint,
-                            };
-                        }
-                        throw new Error('Invalid result structure');
-                    } catch (error) {
-                        console.error(`Error fetching collection details for ${address}:`, error);
-                        return null;
-                    }
-                });
-
-                const fetchedCollections = (await Promise.all(detailsPromises)).filter((c): c is Collection => c !== null);
-                setCollections(fetchedCollections);
-                setFilteredCollections(fetchedCollections);
-            }
-        };
-
-        fetchCollectionDetails();
-    }, [collectionAddresses, FACTORY_CONTRACT_ADDRESS]);
-
-    useEffect(() => {
-        const filtered = collections.filter(
-            (collection) =>
-                collection.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                collection.symbol.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                collection.address.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                collection.owner.toLowerCase().includes(searchTerm.toLowerCase())
+    const handleSearch = useCallback(() => {
+        const lowercasedTerm = searchTerm.toLowerCase();
+        const filtered = collections.filter((collection) =>
+            (collection.name && collection.name.toLowerCase().includes(lowercasedTerm)) ||
+            (collection.symbol && collection.symbol.toLowerCase().includes(lowercasedTerm)) ||
+            (collection.owner && collection.owner.toLowerCase().includes(lowercasedTerm)) ||
+            (collection.collectionAddress && collection.collectionAddress.toLowerCase().includes(lowercasedTerm))
         );
         setFilteredCollections(filtered);
     }, [searchTerm, collections]);
+
+    useEffect(() => {
+        handleSearch();
+    }, [searchTerm, collections, handleSearch]);
+
+    const handleCollectionClick = (collection: NFTCollection) => {
+        setSelectedCollection(collection);
+    };
+
+    const fetchMetadata = useCallback(async (tokenURI: string) => {
+        try {
+            const response = await fetch(tokenURI);
+            const metadata = await response.json();
+            console.log('Fetched metadata:', metadata); // Log fetched metadata
+            return metadata.image; // Ensure this is the correct field
+        } catch (error) {
+            console.error("Failed to fetch metadata:", error);
+            return TEMPORARY_IMAGE_URL; // Fallback image
+        }
+    }, []);
+    const updateCollectionImage = useCallback((collectionAddress: string, imageUrl: string) => {
+        setCollections(prevCollections =>
+            prevCollections.map(c =>
+                c.collectionAddress === collectionAddress ? { ...c, imageUrl } : c
+            )
+        );
+    }, []);
+
+    useEffect(() => {
+        const fetchAndSetCollections = async () => {
+            if (collectionsData) {
+                const parsedCollections = collectionsData.map((collection) => ({
+                    collectionAddress: collection.collectionAddress,
+                    name: collection.name,
+                    symbol: collection.symbol,
+                    maxSupply: Number(collection.maxSupply),
+                    owner: collection.owner,
+                    royaltyPercentage: Number(collection.royaltyPercentage),
+                    mintPrice: Number(collection.mintPrice),
+                    imageUrl: collection.imageUrl,
+                    metadataURI: collection.metadataURI,
+                }));
+
+                setCollections(parsedCollections); // Set collections first
+
+                // Fetch token URIs for each collection and update images
+                for (const collection of parsedCollections) {
+                    try {
+                        const tokenURI = useReadContract({
+                            address: collection.collectionAddress as `0x${string}`,
+                            abi: nftContractABI,
+                            functionName: 'tokenURI',
+                            args: [0], // Use a valid token ID
+                        });
+
+                        if (tokenURI) {
+                            const imageUrl = await fetchMetadata(tokenURI as unknown as string);
+                            updateCollectionImage(collection.collectionAddress, imageUrl);
+                        }
+                    } catch (error) {
+                        console.error('Failed to fetch tokenURI for collection:', collection.collectionAddress, error);
+                    }
+                }
+            }
+        };
+
+        fetchAndSetCollections().catch(error => {
+            console.error("Failed to fetch collections:", error);
+        });
+    }, [collectionsData, fetchMetadata, updateCollectionImage]);
+
+    const handleMint = useCallback(async (collection: NFTCollection) => {
+        if (!address) {
+            alert("Please connect your wallet to mint an NFT.");
+            return;
+        }
+
+        try {
+            writeContract({
+                address: collection.collectionAddress as `0x${string}`,
+                abi: nftContractABI,
+                functionName: 'safeMint',
+                args: [address, collection.metadataURI],
+                value: parseEther(collection.mintPrice.toString()),
+            });
+        } catch (error) {
+            console.error("Error minting NFT:", error);
+            alert("Error minting NFT. Please try again.");
+        }
+    }, [address, writeContract]);
+
+    useEffect(() => {
+        if (isMintSuccess && selectedCollection) {
+            console.log('Mint success, updating image for:', selectedCollection); // Log selectedCollection
+            updateCollectionImage(selectedCollection.collectionAddress, selectedCollection.imageUrl);
+            alert("NFT minted successfully!");
+            setSelectedCollection(null);
+        }
+    }, [isMintSuccess, selectedCollection, updateCollectionImage]);
 
     return (
         <main>
             <Header />
             <div className="exploreSection">
                 <div className="exploreDiv">
-                    <h1 className="exploreTitle">Explore NFT Collections</h1>
+                    <h1 className="collectionsTitle">Explore NFT Collections</h1>
                     <div className="searchWrapper">
                         <input
                             type="text"
@@ -141,28 +210,50 @@ export default function Explore() {
                         <button className="searchButton">Search</button>
                     </div>
                     {filteredCollections.length > 0 ? (
-                        <div className="collectionsList">
-                            {filteredCollections.map((collection) => (
-                                <Link href={`/collection/${collection.address}`} key={collection.address}>
-                                    <div className="collectionItem">
-                                        <h2>{collection.name}</h2>
-                                        <p>Symbol: {collection.symbol}</p>
-                                        <p>Contract Address: {collection.address.slice(0, 6)}...{collection.address.slice(-4)}</p>
-                                        <p>Owner: {collection.owner.slice(0, 6)}...{collection.owner.slice(-4)}</p>
-                                        <p>Max Supply: {collection.maxSupply.toString()}</p>
-                                        <p>Royalty: {collection.royaltyPercentage.toString()}%</p>
-                                        <p>Mint Price: {collection.mintPrice.toString()} wei</p>
+                        <div className="grid-list">
+                            {filteredCollections.map((collection, index) => (
+                                <div key={`${collection.collectionAddress}-${index}`}
+                                    className="card-explore"
+                                    onClick={() => handleCollectionClick(collection)}>
+                                    <figure className="card-banner">
+                                        <img
+                                            className="img-cover"
+                                            width="600" height="600"
+                                            loading="lazy"
+                                            src={collection.imageUrl || TEMPORARY_IMAGE_URL}
+                                            alt={collection.name}
+                                        />
+                                    </figure>
+                                    <div className="card-content">
+                                        <h2 className="h3 card-title margin-top">{collection.name}</h2>
+                                        <div className="wrapper">
+                                            <div className="wrapper-item gray-text-card-content">
+                                                Symbol: <span className="white-text-user-wallet">{collection.symbol}</span>
+                                            </div>
+                                            <div className="wrapper-item price-line">
+                                                <span className="white-text-user-wallet">{collection.mintPrice} ETH</span>
+                                                <span className="white-text-user-wallet">{collection.royaltyPercentage}%</span>
+                                            </div>
+                                        </div>
                                     </div>
-                                </Link>
+                                </div>
                             ))}
                         </div>
                     ) : (
-                        <p className="noCollections">No collections found.</p>
+                        <div className="noCollections">No collections found.</div>
                     )}
                 </div>
             </div>
             <Footer />
+
+            <CustomModal
+                isOpen={!!selectedCollection}
+                onClose={() => setSelectedCollection(null)}
+                collection={selectedCollection}
+                onMint={handleMint}
+            />
+
+            {isMintLoading && <div className="loading-overlay">Minting in progress...</div>}
         </main>
     );
 }
-

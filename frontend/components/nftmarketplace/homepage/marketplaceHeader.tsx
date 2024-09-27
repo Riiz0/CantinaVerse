@@ -43,12 +43,8 @@ export default function Header() {
             <li>
               <Link href="/marketplace/create"><div className="navbar-link" data-navlink>Create</div></Link>
             </li>
-
             <li>
-              <Link href="/marketplace/mint"><div className="navbar-link" data-navlink>Mint</div></Link>
-            </li>
-            <li>
-              <Link href="/marketplace/trade"><div className="navbar-link" data-navlink>Trade</div></Link>
+              <Link href="/marketplace/trade"><div className="navbar-link" data-navlink>List</div></Link>
             </li>
 
             <li>

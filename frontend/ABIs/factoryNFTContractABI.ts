@@ -27,6 +27,11 @@ export const factoryNFTContractABI = [
     },
     {
         "inputs": [],
+        "name": "FactoryNFTContract__IndexOutOfBounds",
+        "type": "error"
+    },
+    {
+        "inputs": [],
         "name": "FactoryNFTContract__InsufficientFunds",
         "type": "error"
     },
@@ -106,6 +111,12 @@ export const factoryNFTContractABI = [
                 "internalType": "uint256",
                 "name": "mintPrice",
                 "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "string",
+                "name": "metadataURI",
+                "type": "string"
             }
         ],
         "name": "CollectionCreated",
@@ -161,6 +172,11 @@ export const factoryNFTContractABI = [
                 "internalType": "uint256",
                 "name": "mintPrice",
                 "type": "uint256"
+            },
+            {
+                "internalType": "string",
+                "name": "metadataURI",
+                "type": "string"
             }
         ],
         "name": "createCollection",
@@ -169,57 +185,116 @@ export const factoryNFTContractABI = [
         "type": "function"
     },
     {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "collectionAddress",
-                "type": "address"
-            }
-        ],
-        "name": "getCollectionDetails",
+        "inputs": [],
+        "name": "getAllCollections",
         "outputs": [
             {
-                "internalType": "string",
-                "name": "name",
-                "type": "string"
-            },
-            {
-                "internalType": "string",
-                "name": "symbol",
-                "type": "string"
-            },
-            {
-                "internalType": "uint256",
-                "name": "maxSupply",
-                "type": "uint256"
-            },
-            {
-                "internalType": "address",
-                "name": "owner",
-                "type": "address"
-            },
-            {
-                "internalType": "uint96",
-                "name": "royaltyPercentage",
-                "type": "uint96"
-            },
-            {
-                "internalType": "uint256",
-                "name": "mintPrice",
-                "type": "uint256"
+                "components": [
+                    {
+                        "internalType": "address",
+                        "name": "collectionAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "name",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "symbol",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "maxSupply",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "owner",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint96",
+                        "name": "royaltyPercentage",
+                        "type": "uint96"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "mintPrice",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "metadataURI",
+                        "type": "string"
+                    }
+                ],
+                "internalType": "struct FactoryNFTContract.NFTCollection[]",
+                "name": "",
+                "type": "tuple[]"
             }
         ],
         "stateMutability": "view",
         "type": "function"
     },
     {
-        "inputs": [],
-        "name": "getCollections",
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "index",
+                "type": "uint256"
+            }
+        ],
+        "name": "getCollectionDetails",
         "outputs": [
             {
-                "internalType": "address[]",
+                "components": [
+                    {
+                        "internalType": "address",
+                        "name": "collectionAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "name",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "symbol",
+                        "type": "string"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "maxSupply",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "owner",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint96",
+                        "name": "royaltyPercentage",
+                        "type": "uint96"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "mintPrice",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "string",
+                        "name": "metadataURI",
+                        "type": "string"
+                    }
+                ],
+                "internalType": "struct FactoryNFTContract.NFTCollection",
                 "name": "",
-                "type": "address[]"
+                "type": "tuple"
             }
         ],
         "stateMutability": "view",
