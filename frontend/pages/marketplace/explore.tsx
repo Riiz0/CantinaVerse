@@ -17,7 +17,6 @@ interface NFTCollection {
     royaltyPercentage: number;
     mintPrice: number;
     imageUrl: string;
-    tempImageUrl: string;
     metadataURI: string;
 }
 
@@ -71,45 +70,18 @@ export default function Explore() {
     const [searchTerm, setSearchTerm] = useState('');
     const chainId = useChainId();
     const { address } = useAccount();
-    const { writeContract, data: mintTxData } = useWriteContract();
-    const { isLoading: isMintLoading, isSuccess: isMintSuccess } = useWaitForTransactionReceipt({
-        hash: mintTxData,
+    const { writeContract } = useWriteContract();
+    const [txHash, setTxHash] = useState<`0x${string}` | undefined>(undefined);
+    const { data: receipt, isLoading: isMintLoading, isSuccess: isMintSuccess } = useWaitForTransactionReceipt({
+        hash: txHash,
     });
     const FACTORY_CONTRACT_ADDRESS = contractAddresses[chainId as keyof typeof contractAddresses];
 
-    const fetchBaseURI = async (collectionAddress: string) => {
-        const baseURI = useReadContract({
-            address: collectionAddress as `0x${string}`,
-            abi: nftContractABI,
-            functionName: 'getBaseURI',
-        });
-        return baseURI;
-    };
-
-    // Fetch all collections from the contract
     const { data: collectionsData } = useReadContract({
         address: FACTORY_CONTRACT_ADDRESS,
         abi: factoryNFTContractABI,
         functionName: 'getAllCollections',
     }) as { data: NFTCollection[] | undefined };
-
-    useEffect(() => {
-        if (collectionsData) {
-            const parsedCollections = collectionsData.map((collection: NFTCollection) => ({
-                collectionAddress: collection.collectionAddress,
-                name: collection.name,
-                symbol: collection.symbol,
-                maxSupply: Number(collection.maxSupply),
-                owner: collection.owner,
-                royaltyPercentage: Number(collection.royaltyPercentage),
-                mintPrice: Number(collection.mintPrice),
-                imageUrl: TEMPORARY_IMAGE_URL,
-                tempImageUrl: TEMPORARY_IMAGE_URL,
-                metadataURI: collection.metadataURI,
-            }));
-            setCollections(parsedCollections);
-        }
-    }, [collectionsData]);
 
     const handleSearch = useCallback(() => {
         const lowercasedTerm = searchTerm.toLowerCase();
@@ -130,31 +102,96 @@ export default function Explore() {
         setSelectedCollection(collection);
     };
 
-    const handleMint = useCallback((collection: NFTCollection) => {
+    const fetchMetadata = useCallback(async (tokenURI: string) => {
+        try {
+            const response = await fetch(tokenURI);
+            const metadata = await response.json();
+            console.log('Fetched metadata:', metadata); // Log fetched metadata
+            return metadata.image; // Ensure this is the correct field
+        } catch (error) {
+            console.error("Failed to fetch metadata:", error);
+            return TEMPORARY_IMAGE_URL; // Fallback image
+        }
+    }, []);
+    const updateCollectionImage = useCallback((collectionAddress: string, imageUrl: string) => {
+        setCollections(prevCollections =>
+            prevCollections.map(c =>
+                c.collectionAddress === collectionAddress ? { ...c, imageUrl } : c
+            )
+        );
+    }, []);
+
+    useEffect(() => {
+        const fetchAndSetCollections = async () => {
+            if (collectionsData) {
+                const parsedCollections = collectionsData.map((collection) => ({
+                    collectionAddress: collection.collectionAddress,
+                    name: collection.name,
+                    symbol: collection.symbol,
+                    maxSupply: Number(collection.maxSupply),
+                    owner: collection.owner,
+                    royaltyPercentage: Number(collection.royaltyPercentage),
+                    mintPrice: Number(collection.mintPrice),
+                    imageUrl: collection.imageUrl,
+                    metadataURI: collection.metadataURI,
+                }));
+
+                setCollections(parsedCollections); // Set collections first
+
+                // Fetch token URIs for each collection and update images
+                for (const collection of parsedCollections) {
+                    try {
+                        const tokenURI = useReadContract({
+                            address: collection.collectionAddress as `0x${string}`,
+                            abi: nftContractABI,
+                            functionName: 'tokenURI',
+                            args: [0], // Use a valid token ID
+                        });
+
+                        if (tokenURI) {
+                            const imageUrl = await fetchMetadata(tokenURI as unknown as string);
+                            updateCollectionImage(collection.collectionAddress, imageUrl);
+                        }
+                    } catch (error) {
+                        console.error('Failed to fetch tokenURI for collection:', collection.collectionAddress, error);
+                    }
+                }
+            }
+        };
+
+        fetchAndSetCollections().catch(error => {
+            console.error("Failed to fetch collections:", error);
+        });
+    }, [collectionsData, fetchMetadata, updateCollectionImage]);
+
+    const handleMint = useCallback(async (collection: NFTCollection) => {
         if (!address) {
             alert("Please connect your wallet to mint an NFT.");
             return;
         }
 
-        // Ensure you pass the correct URI for the NFT
-        const metadataURI = collection.metadataURI || TEMPORARY_IMAGE_URL;
-
-        writeContract({
-            address: collection.collectionAddress as `0x${string}`,
-            abi: nftContractABI,
-            functionName: 'safeMint',
-            args: [address, metadataURI],  // Pass in the correct 'to' address and metadata URI
-            value: parseEther(collection.mintPrice.toString()),  // Send the required mint price in ETH
-        });
+        try {
+            writeContract({
+                address: collection.collectionAddress as `0x${string}`,
+                abi: nftContractABI,
+                functionName: 'safeMint',
+                args: [address, collection.metadataURI],
+                value: parseEther(collection.mintPrice.toString()),
+            });
+        } catch (error) {
+            console.error("Error minting NFT:", error);
+            alert("Error minting NFT. Please try again.");
+        }
     }, [address, writeContract]);
 
-
     useEffect(() => {
-        if (isMintSuccess) {
+        if (isMintSuccess && selectedCollection) {
+            console.log('Mint success, updating image for:', selectedCollection); // Log selectedCollection
+            updateCollectionImage(selectedCollection.collectionAddress, selectedCollection.imageUrl);
             alert("NFT minted successfully!");
             setSelectedCollection(null);
         }
-    }, [isMintSuccess]);
+    }, [isMintSuccess, selectedCollection, updateCollectionImage]);
 
     return (
         <main>

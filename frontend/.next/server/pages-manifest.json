@@ -2,7 +2,5 @@
   "/_app": "pages/_app.js",
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
-  "/marketplace": "pages/marketplace.js",
-  "/marketplace/explore": "pages/marketplace/explore.js",
-  "/marketplace/create": "pages/marketplace/create.js"
+  "/marketplace/explore": "pages/marketplace/explore.js"
 }
